@@ -39,6 +39,11 @@ struct vec3 {
   double length_squared() const {
     return e[0] * e[0] + e[1] * e[1] + e[2] * e[2];
   }
+
+  vec3 normalized() const {
+    const double inv_length = 1 / length();
+    return vec3(e[0] * inv_length, e[1] * inv_length, e[2] * inv_length);
+  }
 };
 
 // Type aliases for vec3
