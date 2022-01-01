@@ -16,7 +16,7 @@ using std::sqrt;
 
 const double infinity = std::numeric_limits<double>::infinity();
 const double pi = 3.1415926535897932385;
-const double eps = 0.001;
+const double eps = 0.0001;
 
 // Utility Functions
 
@@ -24,10 +24,20 @@ inline double degrees_to_radians(double degrees) {
   return degrees * pi / 180.0;
 }
 
+float frand(int *seed) {
+  union {
+    float fres;
+    unsigned int ires;
+  };
+
+  seed[0] *= 16807;
+  ires = (((unsigned int)seed[0]) >> 9) | 0x3f800000;
+  return fres - 1.0f;
+}
+
 inline double random_double() {
-  static std::uniform_real_distribution<double> distribution(0.0, 1.0);
-  static std::mt19937 generator;
-  return distribution(generator);
+  static int seed = 42069;
+  return frand(&seed);
 }
 
 inline double random_double(double min, double max) {
