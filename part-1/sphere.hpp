@@ -7,9 +7,11 @@
 struct sphere : public hittable {
   point3 centre;
   double radius;
+  shared_ptr<material> mat_ptr;
 
   sphere() = default;
-  sphere(const point3 &centre, double r) : centre(centre), radius(r) {}
+  sphere(const point3 &centre, double r, shared_ptr<material> material)
+      : centre(centre), radius(r), mat_ptr(material) {}
 
   virtual bool hit(const ray &r, double t_min, double t_max,
                    hit_record &rec) const override {
@@ -35,6 +37,7 @@ struct sphere : public hittable {
     rec.p = r.at(rec.t);
     const vec3 outward_normal = (rec.p - centre) / radius;
     rec.set_face_normal(r, outward_normal);
+    rec.mat_ptr = mat_ptr;
 
     return true;
   }

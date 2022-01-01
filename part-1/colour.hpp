@@ -7,22 +7,14 @@
 #include <iostream>
 
 inline colour gamma_correct(const colour &c) {
-  return colour(sqrt(c[0]), sqrt(c[1]), sqrt(c[2]));
+  const double gamma = 2.2, gamma_exp = 1.0 / gamma;
+  return colour(pow(c[0], gamma_exp), pow(c[1], gamma_exp),
+                pow(c[2], gamma_exp));
 }
 
-void write_colour(std::ostream &out, colour pixel_colour,
-                  int samples_per_pixel) {
-  double r = pixel_colour.x();
-  double g = pixel_colour.y();
-  double b = pixel_colour.z();
-
-  // Divide the color by the number of samples and gamma-correct for gamma=2.0.
-  const double scale = 1.0 / samples_per_pixel;
-  const double gamma = 2.0, gamma_exp = 1.0 / gamma;
-  r = std::pow(scale * r, gamma_exp);
-  g = std::pow(scale * g, gamma_exp);
-  b = std::pow(scale * b, gamma_exp);
-  out << static_cast<int>(256 * clamp(r, 0.0, 0.999)) << ' '
-      << static_cast<int>(256 * clamp(g, 0.0, 0.999)) << ' '
-      << static_cast<int>(256 * clamp(b, 0.0, 0.999)) << '\n';
+void write_colour(std::ostream &out, colour pixel_colour) {
+  pixel_colour = gamma_correct(pixel_colour).clamp(0, 1);
+  out << static_cast<int>(255.99 * pixel_colour[0]) << ' '
+      << static_cast<int>(255.99 * pixel_colour[1]) << ' '
+      << static_cast<int>(255.99 * pixel_colour[2]) << '\n';
 }

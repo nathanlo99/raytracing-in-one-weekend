@@ -48,6 +48,11 @@ struct vec3 {
     return vec3(e[0] * inv_length, e[1] * inv_length, e[2] * inv_length);
   }
 
+  vec3 clamp(double min, double max) const {
+    return vec3(::clamp(e[0], min, max), ::clamp(e[1], min, max),
+                ::clamp(e[2], min, max));
+  }
+
   inline static vec3 random() {
     return vec3(random_double(), random_double(), random_double());
   }
@@ -55,6 +60,10 @@ struct vec3 {
   inline static vec3 random(double min, double max) {
     return vec3(random_double(min, max), random_double(min, max),
                 random_double(min, max));
+  }
+
+  inline bool near_zero() const {
+    return (fabs(e[0]) < eps) && (fabs(e[1]) < eps) && (fabs(e[2]) < eps);
   }
 };
 
@@ -110,4 +119,8 @@ inline vec3 random_in_unit_sphere() {
 
 inline vec3 random_unit_vector() {
   return random_in_unit_sphere().normalized();
+}
+
+inline vec3 reflect(const vec3 &v, const vec3 &n) {
+  return v - 2 * dot(v, n) * n;
 }
