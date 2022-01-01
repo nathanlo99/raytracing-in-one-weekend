@@ -9,10 +9,14 @@
 #include <fstream>
 #include <iostream>
 
-colour ray_colour(const ray &r, const hittable &world) {
+colour ray_colour(const ray &r, const hittable &world, int depth) {
   hit_record rec;
-  if (world.hit(r, 0, infinity, rec)) {
-    return 0.5 * (rec.normal + colour(1, 1, 1));
+  if (depth <= 0)
+    return colour(0, 0, 0);
+
+  if (world.hit(r, eps, infinity, rec)) {
+    const point3 target = rec.p + rec.normal + random_unit_vector();
+    return 0.5 * ray_colour(ray(rec.p, target - rec.p), world, depth - 1);
   }
   const vec3 unit_direction = r.dir.normalized();
   const double t = (unit_direction.y() + 1.0) / 2.0;
@@ -25,6 +29,7 @@ int main(int argc, char *argv[]) {
   const int image_width = 400;
   const int image_height = static_cast<int>(image_width / aspect_ratio);
   const int samples_per_pixel = 100;
+  const int max_depth = 50;
 
   // World
   hittable_list world;
@@ -46,7 +51,7 @@ int main(int argc, char *argv[]) {
           const double u = (i + random_double()) / (image_width - 1);
           const double v = (j + random_double()) / (image_height - 1);
           const ray r = cam.get_ray(u, v);
-          pixel_colour += ray_colour(r, world);
+          pixel_colour += ray_colour(r, world, max_depth);
         }
         write_colour(out, pixel_colour, samples_per_pixel);
       }

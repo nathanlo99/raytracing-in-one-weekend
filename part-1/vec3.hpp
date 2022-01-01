@@ -1,6 +1,8 @@
 
 #pragma once
 
+#include "util.hpp"
+
 #include <cmath>
 #include <iostream>
 
@@ -8,6 +10,7 @@ struct vec3 {
   double e[3];
 
   vec3() : e{0, 0, 0} {}
+  vec3(double x) : e{x, x, x} {}
   vec3(double e0, double e1, double e2) : e{e0, e1, e2} {}
 
   double x() const { return e[0]; }
@@ -43,6 +46,15 @@ struct vec3 {
   vec3 normalized() const {
     const double inv_length = 1 / length();
     return vec3(e[0] * inv_length, e[1] * inv_length, e[2] * inv_length);
+  }
+
+  inline static vec3 random() {
+    return vec3(random_double(), random_double(), random_double());
+  }
+
+  inline static vec3 random(double min, double max) {
+    return vec3(random_double(min, max), random_double(min, max),
+                random_double(min, max));
   }
 };
 
@@ -86,3 +98,16 @@ inline vec3 cross(const vec3 &u, const vec3 &v) {
 }
 
 inline vec3 unit_vector(const vec3 &v) { return v / v.length(); }
+
+inline vec3 random_in_unit_sphere() {
+  while (true) {
+    const vec3 p = vec3::random(-1, 1);
+    if (p.length_squared() >= 1)
+      continue;
+    return p;
+  }
+}
+
+inline vec3 random_unit_vector() {
+  return random_in_unit_sphere().normalized();
+}
