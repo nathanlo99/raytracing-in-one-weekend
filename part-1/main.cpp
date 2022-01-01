@@ -12,7 +12,7 @@
 #include <iomanip>
 #include <iostream>
 
-colour ray_colour(const ray &r, const hittable &world, int depth) {
+colour ray_colour(const ray &r, const hittable &world, const int depth) {
   if (depth <= 0)
     return colour(0, 0, 0);
 
@@ -29,7 +29,8 @@ colour ray_colour(const ray &r, const hittable &world, int depth) {
   return (1.0 - t) * colour(1.0, 1.0, 1.0) + t * colour(0.5, 0.7, 1.0);
 }
 
-double compute_progress(int image_width, int image_height, int j, int i) {
+constexpr double compute_progress(const int image_width, const int image_height,
+                                  const int j, const int i) {
   return static_cast<double>(j * image_width + i) /
          (image_width * image_height);
 }
@@ -62,7 +63,7 @@ int main(int argc, char *argv[]) {
   image image(image_width, image_height);
   for (int j = 0; j < image_height; ++j) {
     for (int i = 0; i < image_width; ++i) {
-      colour pixel_colour(0, 0, 0);
+      colour pixel_colour;
       for (int s = 0; s < samples_per_pixel; ++s) {
         const double u = (i + random_double()) / (image_width - 1);
         const double v = (j + random_double()) / (image_height - 1);

@@ -11,7 +11,7 @@ private:
   vec3 vertical;
 
 public:
-  camera() {
+  constexpr camera() {
     const double aspect_ratio = 16.0 / 9.0;
     const double viewport_height = 2.0;
     const double viewport_width = aspect_ratio * viewport_height;
@@ -24,7 +24,7 @@ public:
         origin - horizontal / 2.0 + vertical / 2.0 - vec3(0, 0, focal_length);
   }
 
-  ray get_ray(double u, double v) const {
+  constexpr ray get_ray(double u, double v) const {
     return ray(origin,
                upper_left_corner + u * horizontal - v * vertical - origin);
   }

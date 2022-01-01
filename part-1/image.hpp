@@ -19,16 +19,16 @@ struct image {
   int height;
   std::vector<unsigned char> data;
 
-  image(int width, int height)
+  image(const int width, const int height)
       : width(width), height(height), data(3 * width * height) {}
 
-  inline colour get(int row, int col) {
+  constexpr inline colour get(int row, int col) {
     const int idx = row * width + col;
     return colour(from_byte(data[3 * idx + 0]), from_byte(data[3 * idx + 1]),
                   from_byte(data[3 * idx + 2]));
   }
 
-  inline void set(int row, int col, const colour &c) {
+  constexpr inline void set(const int row, const int col, const colour &c) {
     const int idx = row * width + col;
     const colour gamma_corrected = gamma_correct(c);
     data[3 * idx + 0] = to_byte(gamma_corrected[0]);
@@ -40,8 +40,9 @@ struct image {
     std::ofstream out(filename);
     out << "P3\n" << width << ' ' << height << "\n255\n";
     for (int i = 0; i < width * height; ++i) {
-      out << data[3 * i + 0] << ' ' << data[3 * i + 1] << ' ' << data[3 * i + 2]
-          << '\n';
+      out << static_cast<int>(data[3 * i + 0]) << ' '
+          << static_cast<int>(data[3 * i + 1]) << ' '
+          << static_cast<int>(data[3 * i + 2]) << '\n';
     }
   }
 

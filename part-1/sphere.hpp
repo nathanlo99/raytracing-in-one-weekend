@@ -9,8 +9,8 @@ struct sphere : public hittable {
   double radius;
   const material *mat_ptr;
 
-  sphere() = default;
-  sphere(const point3 &centre, double r, const material *mat)
+  constexpr sphere() : centre(0, 0, 0), radius(0), mat_ptr(nullptr) {}
+  constexpr sphere(const point3 &centre, double r, const material *mat)
       : centre(centre), radius(r), mat_ptr(mat) {}
 
   virtual bool hit(const ray &r, double t_min, double t_max,

@@ -12,16 +12,8 @@ inline colour gamma_correct(const colour &c) {
                 pow(c[2], gamma_exp));
 }
 
-inline unsigned char to_byte(const double d) {
-  return static_cast<int>(255.99 * d);
-}
+inline unsigned char to_byte(const double d) { return 255.99 * d; }
 
 inline double from_byte(const unsigned char c) {
   return static_cast<double>(c) / 256;
-}
-
-void write_colour(std::ostream &out, colour pixel_colour) {
-  pixel_colour = gamma_correct(pixel_colour).clamp(0, 1);
-  out << to_byte(pixel_colour[0]) << ' ' << to_byte(pixel_colour[1]) << ' '
-      << to_byte(pixel_colour[2]) << '\n';
 }
