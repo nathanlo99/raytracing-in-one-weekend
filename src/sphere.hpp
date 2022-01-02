@@ -12,6 +12,7 @@ struct sphere : public hittable {
   sphere() : centre(0, 0, 0), radius(0), mat_ptr(nullptr) {}
   sphere(const point3 &centre, double r, std::shared_ptr<material> mat)
       : centre(centre), radius(r), mat_ptr(mat) {}
+  virtual ~sphere() = default;
 
   virtual bool hit(const ray &r, double t_min, double t_max,
                    hit_record &rec) const override {

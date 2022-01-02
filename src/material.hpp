@@ -6,6 +6,7 @@
 struct hit_record;
 
 struct material {
+  virtual ~material() = default;
   virtual bool scatter(const ray &r_in, const hit_record &rec,
                        colour &attenuation, ray &scattered) const = 0;
 };
@@ -14,6 +15,7 @@ struct lambertian : public material {
   colour albedo;
 
   lambertian(const colour &a) : albedo(a) {}
+  virtual ~lambertian() = default;
 
   virtual bool scatter(const ray &r_in, const hit_record &rec,
                        colour &attenuation, ray &scattered) const override {
@@ -32,10 +34,11 @@ struct metal : public material {
   double fuzz;
 
   metal(const colour &a, double f) : albedo(a), fuzz(std::min(1.0, f)) {}
+  virtual ~metal() = default;
 
   virtual bool scatter(const ray &r_in, const hit_record &rec,
                        colour &attenuation, ray &scattered) const override {
-    vec3 reflected = reflect(r_in.dir.normalize(), rec.normal);
+    const vec3 reflected = reflect(r_in.dir.normalize(), rec.normal);
     scattered = ray(rec.p, reflected + fuzz * random_in_unit_sphere());
     attenuation = albedo;
     return dot(scattered.dir, rec.normal) > 0;
@@ -48,6 +51,7 @@ struct dielectric : public material {
 
   explicit dielectric(const colour &a, double index_of_refraction)
       : albedo(a), index_of_refraction(index_of_refraction) {}
+  virtual ~dielectric() = default;
 
   virtual bool scatter(const ray &r_in, const hit_record &rec,
                        colour &attenuation, ray &scattered) const override {
@@ -72,8 +76,9 @@ struct dielectric : public material {
     return true;
   }
 
-  static double reflectance(const double cosine, const double index_ratio) {
-    const double sqrt_r0 = pow((1 - index_ratio) / (1 + index_ratio), 2);
+  static inline double reflectance(const double cosine,
+                                   const double index_ratio) {
+    const double sqrt_r0 = (1 - index_ratio) / (1 + index_ratio);
     const double r0 = sqrt_r0 * sqrt_r0;
     return r0 + (1 - r0) * pow(1 - cosine, 5);
   }

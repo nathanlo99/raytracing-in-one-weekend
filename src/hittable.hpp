@@ -3,7 +3,7 @@
 
 #include "util.hpp"
 
-class material;
+struct material;
 
 struct hit_record {
   point3 p;
