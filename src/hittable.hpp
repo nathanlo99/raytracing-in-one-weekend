@@ -8,7 +8,7 @@ class material;
 struct hit_record {
   point3 p;
   vec3 normal;
-  const material *mat_ptr;
+  shared_ptr<material> mat_ptr;
   double t;
   bool front_face;
 

@@ -43,7 +43,7 @@ struct vec3 {
     return e[0] * e[0] + e[1] * e[1] + e[2] * e[2];
   }
 
-  constexpr vec3 normalized() const {
+  constexpr vec3 normalize() const {
     const double inv_length = 1 / length();
     return vec3(e[0] * inv_length, e[1] * inv_length, e[2] * inv_length);
   }
@@ -63,7 +63,7 @@ struct vec3 {
   }
 
   constexpr inline bool near_zero() const {
-    return (fabs(e[0]) < eps) && (fabs(e[1]) < eps) && (fabs(e[2]) < eps);
+    return std::abs(e[0]) < eps && std::abs(e[1]) < eps && std::abs(e[2]) < eps;
   }
 };
 
@@ -113,16 +113,30 @@ constexpr inline vec3 unit_vector(const vec3 &v) { return v / v.length(); }
 inline vec3 random_in_unit_sphere() {
   while (true) {
     const vec3 p = vec3::random(-1, 1);
-    if (p.length_squared() >= 1)
-      continue;
-    return p;
+    if (p.length_squared() < 1)
+      return p;
   }
 }
 
-inline vec3 random_unit_vector() {
-  return random_in_unit_sphere().normalized();
+inline vec3 random_in_unit_disk() {
+  while (true) {
+    const vec3 p = vec3(random_double(-1, 1), random_double(-1, 1), 0);
+    if (p.length_squared() < 1)
+      return p;
+  }
 }
+
+inline vec3 random_unit_vector() { return random_in_unit_sphere().normalize(); }
 
 constexpr inline vec3 reflect(const vec3 &v, const vec3 &n) {
   return v - 2 * dot(v, n) * n;
+}
+
+constexpr inline vec3 refract(const vec3 &uv, const vec3 &n,
+                              const double index_ratio) {
+  const double cos_theta = std::min(dot(-uv, n), 1.0);
+  const vec3 &r_out_perp = index_ratio * (uv + cos_theta * n);
+  const vec3 &r_out_parallel =
+      -std::sqrt(std::abs(1.0 - r_out_perp.length_squared())) * n;
+  return r_out_perp + r_out_parallel;
 }

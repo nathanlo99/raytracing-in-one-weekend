@@ -24,7 +24,7 @@ inline double degrees_to_radians(double degrees) {
   return degrees * pi / 180.0;
 }
 
-float frand(int *seed) {
+inline float frand(int *seed) {
   union {
     float fres;
     unsigned int ires;
