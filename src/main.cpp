@@ -88,7 +88,7 @@ int main(int argc, char *argv[]) {
   const int image_height = static_cast<int>(image_width / aspect_ratio);
   const int samples_per_pixel = 500;
   const int max_depth = 50;
-  const int tile_size = 16;
+  const int tile_size = 32;
 
   // World
   const auto world = random_scene();
@@ -121,9 +121,6 @@ int main(int argc, char *argv[]) {
 
   struct task {
     int tile_row, tile_col, tile_height, tile_width;
-    task(int tile_row, int tile_col, int tile_height, int tile_width)
-        : tile_row(tile_row), tile_col(tile_col), tile_height(tile_height),
-          tile_width(tile_width) {}
   };
 
   std::mutex task_list_mutex;
@@ -131,13 +128,13 @@ int main(int argc, char *argv[]) {
 
   for (int tile_row = 0; tile_row < image_height; tile_row += tile_size) {
     for (int tile_col = 0; tile_col < image_width; tile_col += tile_size) {
-      task_list.emplace(tile_row, tile_col,
-                        std::min(image_height - tile_row, tile_size),
-                        std::min(image_width - tile_col, tile_size));
+      task_list.push({tile_row, tile_col,
+                      std::min(image_height - tile_row, tile_size),
+                      std::min(image_width - tile_col, tile_size)});
     }
   }
 
-  const int max_threads = std::thread::hardware_concurrency() / 2;
+  const int max_threads = 4;
   std::cerr << "Starting render with " << max_threads << " threads..."
             << std::endl;
   const auto start = std::chrono::system_clock::now();

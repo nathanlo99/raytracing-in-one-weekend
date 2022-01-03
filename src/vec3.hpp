@@ -10,8 +10,9 @@ struct vec3 {
   double e[3];
 
   constexpr vec3() : e{0, 0, 0} {}
-  constexpr vec3(double x) : e{x, x, x} {}
-  constexpr vec3(double e0, double e1, double e2) : e{e0, e1, e2} {}
+  constexpr vec3(const double x) : e{x, x, x} {}
+  constexpr vec3(const double e0, const double e1, const double e2)
+      : e{e0, e1, e2} {}
 
   constexpr double x() const { return e[0]; }
   constexpr double y() const { return e[1]; }
@@ -48,16 +49,16 @@ struct vec3 {
     return vec3(e[0] * inv_length, e[1] * inv_length, e[2] * inv_length);
   }
 
-  constexpr vec3 clamp(double min, double max) const {
-    return vec3(::clamp(e[0], min, max), ::clamp(e[1], min, max),
-                ::clamp(e[2], min, max));
+  constexpr vec3 clamp(const double min, const double max) const {
+    return vec3(std::clamp(e[0], min, max), std::clamp(e[1], min, max),
+                std::clamp(e[2], min, max));
   }
 
   inline static vec3 random() {
     return vec3(random_double(), random_double(), random_double());
   }
 
-  inline static vec3 random(double min, double max) {
+  inline static vec3 random(const double min, const double max) {
     return vec3(random_double(min, max), random_double(min, max),
                 random_double(min, max));
   }

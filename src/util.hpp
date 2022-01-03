@@ -41,17 +41,9 @@ inline double random_double() {
   return frand(&seed);
 }
 
-inline double random_double(double min, double max) {
-  // Returns a random real in [min,max).
+inline double random_double(const double min, const double max) {
+  // Returns a random real in [min, max).
   return min + (max - min) * random_double();
-}
-
-inline double clamp(double x, double min, double max) {
-  if (x < min)
-    return min;
-  if (x > max)
-    return max;
-  return x;
 }
 
 inline long long get_time_ms() {

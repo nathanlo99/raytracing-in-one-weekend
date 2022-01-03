@@ -15,7 +15,7 @@ struct image {
   image(const int width, const int height)
       : width(width), height(height), data(3 * width * height) {}
 
-  constexpr inline colour get(int row, int col) {
+  constexpr inline colour get(const int row, const int col) {
     const int idx = row * width + col;
     return colour(from_byte(data[3 * idx + 0]), from_byte(data[3 * idx + 1]),
                   from_byte(data[3 * idx + 2]));
