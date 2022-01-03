@@ -1,25 +1,35 @@
 
 #pragma once
 
+#include "util.hpp"
+
 #include "hittable.hpp"
-#include "vec3.hpp"
 
-struct sphere : public hittable {
-  point3 centre;
+struct animated_sphere : public hittable {
+  point3 centre0, centre1;
+  double t0, t1;
   double radius;
-  std::shared_ptr<material> mat_ptr;
+  shared_ptr<material> mat_ptr;
 
-  sphere() : centre(0, 0, 0), radius(0), mat_ptr(nullptr) {}
-  sphere(const point3 &centre, const double r, std::shared_ptr<material> mat)
-      : centre(centre), radius(r), mat_ptr(mat) {}
-  virtual ~sphere() = default;
+  animated_sphere(const point3 &c0, const point3 &c1, const double t0,
+                  const double t1, const double radius,
+                  shared_ptr<material> mat_ptr)
+      : centre0(c0), centre1(c1), t0(t0), t1(t1), radius(radius),
+        mat_ptr(mat_ptr) {}
+  virtual ~animated_sphere() = default;
 
   virtual bool hit(const ray &r, const double t_min, const double t_max,
                    hit_record &rec) const override;
+
+  constexpr inline point3 get_centre(const double time) const {
+    const double t = (time - t0) / (t1 - t0);
+    return (1 - t) * centre0 + t * centre1;
+  }
 };
 
-bool sphere::hit(const ray &r, const double t_min, const double t_max,
-                 hit_record &rec) const {
+bool animated_sphere::hit(const ray &r, const double t_min, const double t_max,
+                          hit_record &rec) const {
+  const point3 centre = get_centre(r.time);
   const vec3 oc = r.orig - centre;
   const double a = r.dir.length_squared();
   const double half_b = dot(oc, r.dir);

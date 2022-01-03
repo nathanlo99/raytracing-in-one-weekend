@@ -1,6 +1,7 @@
 
 #include "util.hpp"
 
+#include "animated_sphere.hpp"
 #include "camera.hpp"
 #include "colour.hpp"
 #include "hittable_list.hpp"
@@ -24,7 +25,7 @@ hittable_list random_scene() {
   for (int a = -11; a < 11; a++) {
     for (int b = -11; b < 11; b++) {
       const double choose_mat = random_double();
-      const double ball_height = 0.2 + random_double() * random_double();
+      const double ball_height = 0.2;
       const point3 center(a + 0.9 * random_double(), ball_height,
                           b + 0.9 * random_double());
 
@@ -34,7 +35,9 @@ hittable_list random_scene() {
           const colour albedo = colour::random() * colour::random();
           const shared_ptr<material> sphere_material =
               make_shared<lambertian>(albedo);
-          world.add(make_shared<sphere>(center, 0.2, sphere_material));
+          const point3 center2 = center + vec3(0, random_double(0, .5), 0);
+          world.add(make_shared<animated_sphere>(center, center2, 0.0, 1.0, 0.2,
+                                                 sphere_material));
         } else if (choose_mat < 0.95) {
           // metal
           const colour albedo = colour::random(0.5, 1);
@@ -83,10 +86,10 @@ colour ray_colour(const ray &r, const hittable &world, const int depth) {
 int main(int argc, char *argv[]) {
 
   // Image
-  const double aspect_ratio = 3.0 / 2.0;
-  const int image_width = 800;
+  const double aspect_ratio = 16.0 / 9.0;
+  const int image_width = 400;
   const int image_height = static_cast<int>(image_width / aspect_ratio);
-  const int samples_per_pixel = 500;
+  const int samples_per_pixel = 100;
   const int max_depth = 50;
   const int tile_size = 32;
 
@@ -100,7 +103,8 @@ int main(int argc, char *argv[]) {
   const double dist_to_focus = 10.0;
   const double aperture = 0.1;
 
-  camera cam(lookfrom, lookat, up, 20, aspect_ratio, aperture, dist_to_focus);
+  camera cam(lookfrom, lookat, up, 20, aspect_ratio, aperture, dist_to_focus,
+             0.0, 1.0);
 
   image image(image_width, image_height);
   auto compute_tile = [&](const int tile_row, const int tile_col,
@@ -148,7 +152,6 @@ int main(int argc, char *argv[]) {
         std::unique_lock<std::mutex> lck(task_list_mutex);
         if (task_list.empty())
           break;
-
         const task next_task = task_list.front();
         task_list.pop();
         lck.unlock();
@@ -160,11 +163,8 @@ int main(int argc, char *argv[]) {
         const long long current_time_ms = get_time_ms();
         if (current_time_ms - last_update_ms > 1000) {
           last_update_ms = current_time_ms;
-
-          lck.lock();
           std::cout << "\r" << task_list.size() << "/" << num_tasks
                     << " tasks remaining... " << std::flush;
-          lck.unlock();
           image.write_png("output/progress.png");
         }
       }

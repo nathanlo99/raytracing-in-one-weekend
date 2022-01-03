@@ -23,7 +23,7 @@ struct lambertian : public material {
     if (scatter_direction.near_zero())
       scatter_direction = rec.normal;
 
-    scattered = ray(rec.p, scatter_direction);
+    scattered = ray(rec.p, scatter_direction, r_in.time);
     attenuation = albedo;
     return true;
   }
@@ -39,7 +39,8 @@ struct metal : public material {
   virtual bool scatter(const ray &r_in, const hit_record &rec,
                        colour &attenuation, ray &scattered) const override {
     const vec3 reflected = reflect(r_in.dir.normalize(), rec.normal);
-    scattered = ray(rec.p, reflected + fuzz * random_in_unit_sphere());
+    scattered =
+        ray(rec.p, reflected + fuzz * random_in_unit_sphere(), r_in.time);
     attenuation = albedo;
     return dot(scattered.dir, rec.normal) > 0;
   }
@@ -52,6 +53,13 @@ struct dielectric : public material {
   explicit dielectric(const colour &a, double index_of_refraction)
       : albedo(a), index_of_refraction(index_of_refraction) {}
   virtual ~dielectric() = default;
+
+  static inline double reflectance(const double cosine,
+                                   const double index_ratio) {
+    const double sqrt_r0 = (1 - index_ratio) / (1 + index_ratio);
+    const double r0 = sqrt_r0 * sqrt_r0;
+    return r0 + (1 - r0) * pow(1 - cosine, 5);
+  }
 
   virtual bool scatter(const ray &r_in, const hit_record &rec,
                        colour &attenuation, ray &scattered) const override {
@@ -72,14 +80,7 @@ struct dielectric : public material {
       direction = refract(unit_direction, rec.normal, index_ratio);
     }
 
-    scattered = ray(rec.p, direction);
+    scattered = ray(rec.p, direction, r_in.time);
     return true;
-  }
-
-  static inline double reflectance(const double cosine,
-                                   const double index_ratio) {
-    const double sqrt_r0 = (1 - index_ratio) / (1 + index_ratio);
-    const double r0 = sqrt_r0 * sqrt_r0;
-    return r0 + (1 - r0) * pow(1 - cosine, 5);
   }
 };
