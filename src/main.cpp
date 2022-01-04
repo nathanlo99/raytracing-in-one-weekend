@@ -117,13 +117,16 @@ void render(const hittable_list &world, const camera &cam,
   const int max_depth = 500;
   const int tile_size = 32;
 
+  struct task {
+    int tile_row, tile_col, tile_height, tile_width, tile_weight;
+  };
+
   image image(image_width, image_height);
-  auto compute_tile = [&](const int tile_row, const int tile_col,
-                          const int tile_height, const int tile_width) {
-    for (int j = tile_row; j < tile_row + tile_height; ++j) {
-      for (int i = tile_col; i < tile_col + tile_width; ++i) {
+  auto compute_tile = [&](const task &tsk) {
+    for (int j = tsk.tile_row; j < tsk.tile_row + tsk.tile_height; ++j) {
+      for (int i = tsk.tile_col; i < tsk.tile_col + tsk.tile_width; ++i) {
         colour pixel_colour;
-        for (int s = 1; s <= samples_per_pixel; ++s) {
+        for (int s = 1; s <= tsk.tile_weight; ++s) {
           const double u = (i + random_double()) / (image_width - 1);
           const double v = (j + random_double()) / (image_height - 1);
           const ray r = cam.get_ray(u, v);
@@ -134,18 +137,14 @@ void render(const hittable_list &world, const camera &cam,
     }
   };
 
-  struct task {
-    int tile_row, tile_col, tile_height, tile_width;
-  };
-
   std::mutex task_list_mutex;
   std::queue<task> task_list;
 
   for (int tile_row = 0; tile_row < image_height; tile_row += tile_size) {
     for (int tile_col = 0; tile_col < image_width; tile_col += tile_size) {
-      task_list.push({tile_row, tile_col,
-                      std::min(image_height - tile_row, tile_size),
-                      std::min(image_width - tile_col, tile_size)});
+      task_list.push(
+          {tile_row, tile_col, std::min(image_height - tile_row, tile_size),
+           std::min(image_width - tile_col, tile_size), samples_per_pixel});
     }
   }
 
@@ -166,8 +165,7 @@ void render(const hittable_list &world, const camera &cam,
         task_list.pop();
         lck.unlock();
 
-        compute_tile(next_task.tile_row, next_task.tile_col,
-                     next_task.tile_height, next_task.tile_width);
+        compute_tile(next_task);
 
         static long long last_update_ms = 0;
         const long long current_time_ms = get_time_ms();

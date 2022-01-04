@@ -14,11 +14,11 @@ struct image {
   const static int bytes_per_pixel = 3;
 
   image(const std::string &filename);
-  image(const int width, const int height)
+  image(const int width, const int height, const unsigned char fill_byte = 0)
       : width(width), height(height),
-        data(bytes_per_pixel * width * height, 127) {}
+        data(bytes_per_pixel * width * height, fill_byte) {}
 
-  constexpr inline colour get(const int col, const int row) const {
+  constexpr inline colour get(const int row, const int col) const {
     // Take row mod height and col mod width to wrap the texture on overflow
     const int idx = (row % height) * width + (col % width);
     return colour(from_byte(data[bytes_per_pixel * idx + 0]),
@@ -33,7 +33,7 @@ struct image {
     u = std::clamp(u, 0.0, 1.0) * width;
     v = (1.0 - std::clamp(v, 0.0, 1.0)) * height;
 
-    return get(static_cast<int>(u), static_cast<int>(v));
+    return get(static_cast<int>(v), static_cast<int>(u));
   }
 
   // Bilinear interpolation
@@ -49,10 +49,10 @@ struct image {
     const int floor_u = static_cast<int>(floor_ud);
     const int floor_v = static_cast<int>(floor_vd);
 
-    return frac_u * frac_v * get(floor_u, floor_v) +
-           (1 - frac_u) * frac_v * get(floor_u + 1, floor_v) +
-           frac_u * (1 - frac_v) * get(floor_u, floor_v + 1) +
-           (1 - frac_u) * (1 - frac_v) * get(floor_u + 1, floor_v + 1);
+    return frac_u * frac_v * get(floor_v, floor_u) +
+           (1 - frac_u) * frac_v * get(floor_v, floor_u + 1) +
+           frac_u * (1 - frac_v) * get(floor_v + 1, floor_u) +
+           (1 - frac_u) * (1 - frac_v) * get(floor_v + 1, floor_u + 1);
   }
 
   constexpr inline void set(const int row, const int col, const colour &c) {

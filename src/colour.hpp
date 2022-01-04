@@ -12,8 +12,8 @@ inline colour gamma_correct(const colour &c) {
                 pow(c[2], gamma_exp));
 }
 
-inline unsigned char to_byte(const double d) { return 255.99 * d; }
+inline unsigned char to_byte(const double d) { return 255.0 * d; }
 
 inline double from_byte(const unsigned char c) {
-  return static_cast<double>(c) / 256;
+  return static_cast<double>(c) / 255.0;
 }
