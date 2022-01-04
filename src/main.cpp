@@ -17,7 +17,7 @@
 #include <queue>
 #include <thread>
 
-bvh_node random_scene() {
+auto random_scene() {
   hittable_list world;
 
   const auto ground_material = make_shared<lambertian>(colour(0.5, 0.5, 0.5));
@@ -31,7 +31,13 @@ bvh_node random_scene() {
                           b + 0.9 * random_double());
 
       if ((center - point3(4, 0.2, 0)).length() > 0.9) {
-        if (choose_mat < 0.8) {
+        if (choose_mat < 0.1) {
+          // diffuse
+          const auto earth_texture = make_shared<image_texture>("earthmap.jpg");
+          const shared_ptr<material> sphere_material =
+              make_shared<lambertian>(earth_texture);
+          world.add(make_shared<sphere>(center, 0.2, sphere_material));
+        } else if (choose_mat < 0.8) {
           // diffuse
           const colour albedo = colour::random() * colour::random();
           const shared_ptr<material> sphere_material =
@@ -65,7 +71,15 @@ bvh_node random_scene() {
   const auto material3 = make_shared<metal>(colour(0.7, 0.6, 0.5), 0.0);
   world.add(make_shared<sphere>(point3(4, 1, 0), 1.0, material3));
 
-  return bvh_node::from_list(world, 0.0, 1.0);
+  return hittable_list(bvh_node::from_list(world, 0.0, 1.0));
+}
+
+auto earth() {
+  auto earth_texture = make_shared<image_texture>("earthmap.jpg");
+  auto earth_surface = make_shared<lambertian>(earth_texture);
+  auto globe = make_shared<sphere>(point3(0, 0, 0), 2, earth_surface);
+
+  return hittable_list(globe);
 }
 
 colour ray_colour(const ray &r, const hittable &world, const int depth) {
@@ -84,28 +98,12 @@ colour ray_colour(const ray &r, const hittable &world, const int depth) {
   return (1 - t) * colour(1.0) + t * colour(0.5, 0.7, 1.0);
 }
 
-int main(int argc, char *argv[]) {
-
-  // Image
-  const double aspect_ratio = 16.0 / 9.0;
-  const int image_width = 1000;
-  const int image_height = static_cast<int>(image_width / aspect_ratio);
+void render(const hittable_list &world, const camera &cam,
+            const std::string &output, const int image_width,
+            const int image_height) {
   const int samples_per_pixel = 500;
   const int max_depth = 50;
   const int tile_size = 32;
-
-  // World
-  const auto world = random_scene();
-
-  // Camera
-  const point3 lookfrom(13, 2, 3);
-  const point3 lookat(0, 0, 0);
-  const vec3 up(0, 1, 0);
-  const double dist_to_focus = 10.0;
-  const double aperture = 0.1;
-
-  camera cam(lookfrom, lookat, up, 20, aspect_ratio, aperture, dist_to_focus,
-             0.0, 1.0);
 
   image image(image_width, image_height);
   auto compute_tile = [&](const int tile_row, const int tile_col,
@@ -188,7 +186,48 @@ int main(int argc, char *argv[]) {
   std::cout << std::endl
             << "Done! Took " << elapsed_seconds << " seconds" << std::endl;
 
-  const std::string output_file = (argc > 1) ? argv[1] : "output/output.png";
   image.write_png("output/progress.png");
-  image.write_png(output_file);
+  image.write_png(output);
+}
+
+int main(int argc, char *argv[]) {
+  const std::string output_file = (argc > 1) ? argv[1] : "output/output.png";
+
+  // Image
+  const double aspect_ratio = 16.0 / 9.0;
+  const int image_width = 1000;
+  const int image_height = static_cast<int>(image_width / aspect_ratio);
+
+  {
+    const auto world = earth();
+
+    // Camera
+    const point3 lookfrom(13, 2, 3);
+    const point3 lookat(0, 0, 0);
+    const vec3 up(0, 1, 0);
+    const double dist_to_focus = 10.0;
+    const double aperture = 0.1;
+
+    camera cam(lookfrom, lookat, up, 20, aspect_ratio, aperture, dist_to_focus,
+               0.0, 1.0);
+
+    // render(world, cam, output_file, image_width, image_height);
+  }
+
+  {
+    // World
+    const auto world = random_scene();
+
+    // Camera
+    const point3 lookfrom(13, 2, 3);
+    const point3 lookat(0, 0, 0);
+    const vec3 up(0, 1, 0);
+    const double dist_to_focus = 10.0;
+    const double aperture = 0.1;
+
+    camera cam(lookfrom, lookat, up, 20, aspect_ratio, aperture, dist_to_focus,
+               0.0, 1.0);
+
+    render(world, cam, output_file, image_width, image_height);
+  }
 }

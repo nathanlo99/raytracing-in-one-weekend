@@ -37,7 +37,7 @@ inline float frand(int *seed) {
 }
 
 inline double random_double() {
-  static int seed = 42069;
+  static int seed = 127;
   return frand(&seed);
 }
 

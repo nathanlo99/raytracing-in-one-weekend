@@ -21,8 +21,8 @@ struct bvh_node : public hittable {
            const size_t end, const double time0, const double time1);
   virtual ~bvh_node() = default;
 
-  static bvh_node from_list(const hittable_list &list, const double time0,
-                            const double time1);
+  static shared_ptr<bvh_node> from_list(const hittable_list &list,
+                                        const double time0, const double time1);
 
   virtual bool hit(const ray &r, const double t_min, const double t_max,
                    hit_record &rec) const override;
@@ -44,8 +44,9 @@ bool bvh_node::hit(const ray &r, const double t_min, const double t_max,
   return hit_left || hit_right;
 }
 
-bvh_node bvh_node::from_list(const hittable_list &list, const double time0,
-                             const double time1) {
+shared_ptr<bvh_node> bvh_node::from_list(const hittable_list &list,
+                                         const double time0,
+                                         const double time1) {
   std::vector<hittable_with_box> objects;
   objects.reserve(list.objects.size());
   std::transform(
@@ -57,7 +58,7 @@ bvh_node bvh_node::from_list(const hittable_list &list, const double time0,
         }
         return {obj, box};
       });
-  return bvh_node(objects, 0, objects.size(), time0, time1);
+  return make_shared<bvh_node>(objects, 0, objects.size(), time0, time1);
 }
 
 bvh_node::bvh_node(std::vector<hittable_with_box> &objects, const size_t start,
@@ -81,7 +82,7 @@ bvh_node::bvh_node(std::vector<hittable_with_box> &objects, const size_t start,
 
   // Compute the widest span, and choose the axis appropriately
   aabb total_box;
-  for (int i = start; i < end; ++i)
+  for (size_t i = start; i < end; ++i)
     total_box = surrounding_box(total_box, objects[i].box);
   const vec3 box_span = total_box.max - total_box.min;
   const int axis = box_span.largest_axis();

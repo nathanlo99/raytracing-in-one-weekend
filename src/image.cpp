@@ -14,6 +14,17 @@
 #include <string>
 #include <vector>
 
+image::image(const std::string &filename) {
+  int components_per_pixel = bytes_per_pixel;
+  data = stbi_load(("../res/" + filename).c_str(), &width, &height,
+                   &components_per_pixel, components_per_pixel);
+  if (data == nullptr) {
+    std::cerr << "ERROR: Could not load texture image file '" << filename << "'"
+              << std::endl;
+    width = height = 0;
+  }
+}
+
 void image::write_ppm(const std::string &filename) {
   std::ofstream out(filename);
   out << "P3\n" << width << ' ' << height << "\n255\n";
@@ -25,7 +36,8 @@ void image::write_ppm(const std::string &filename) {
 }
 
 void image::write_png(const std::string &filename) {
-  const int result = stbi_write_png(filename.c_str(), width, height, 3,
-                                    data.data(), 3 * width);
+  const int result =
+      stbi_write_png(filename.c_str(), width, height, bytes_per_pixel, data,
+                     bytes_per_pixel * width);
   assert(result != 0);
 }

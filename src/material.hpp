@@ -3,6 +3,8 @@
 
 #include "util.hpp"
 
+#include "texture.hpp"
+
 struct hit_record;
 
 struct material {
@@ -12,9 +14,11 @@ struct material {
 };
 
 struct lambertian : public material {
-  colour albedo;
+  shared_ptr<texture> albedo;
 
-  lambertian(const colour &a) : albedo(a) {}
+  lambertian(const colour &a) : albedo(make_shared<solid_colour>(a)) {}
+  lambertian(shared_ptr<texture> a) : albedo(a) {}
+
   virtual ~lambertian() = default;
 
   virtual bool scatter(const ray &r_in, const hit_record &rec,
@@ -24,7 +28,7 @@ struct lambertian : public material {
       scatter_direction = rec.normal;
 
     scattered = ray(rec.p, scatter_direction, r_in.time);
-    attenuation = albedo;
+    attenuation = albedo->value(rec.u, rec.v, rec.p);
     return true;
   }
 };
