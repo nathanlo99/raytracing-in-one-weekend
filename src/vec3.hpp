@@ -54,6 +54,14 @@ struct vec3 {
                 std::clamp(e[2], min, max));
   }
 
+  constexpr int largest_axis() const {
+    if (e[2] > e[1] && e[2] > e[0])
+      return 2;
+    if (e[1] > e[0])
+      return 1;
+    return 0;
+  }
+
   inline static vec3 random() {
     return vec3(random_double(), random_double(), random_double());
   }

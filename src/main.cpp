@@ -2,6 +2,7 @@
 #include "util.hpp"
 
 #include "animated_sphere.hpp"
+#include "bvh_node.hpp"
 #include "camera.hpp"
 #include "colour.hpp"
 #include "hittable_list.hpp"
@@ -16,7 +17,7 @@
 #include <queue>
 #include <thread>
 
-hittable_list random_scene() {
+bvh_node random_scene() {
   hittable_list world;
 
   const auto ground_material = make_shared<lambertian>(colour(0.5, 0.5, 0.5));
@@ -64,7 +65,7 @@ hittable_list random_scene() {
   const auto material3 = make_shared<metal>(colour(0.7, 0.6, 0.5), 0.0);
   world.add(make_shared<sphere>(point3(4, 1, 0), 1.0, material3));
 
-  return world;
+  return bvh_node::from_list(world, 0.0, 1.0);
 }
 
 colour ray_colour(const ray &r, const hittable &world, const int depth) {
@@ -87,10 +88,10 @@ int main(int argc, char *argv[]) {
 
   // Image
   const double aspect_ratio = 16.0 / 9.0;
-  const int image_width = 400;
+  const int image_width = 2400;
   const int image_height = static_cast<int>(image_width / aspect_ratio);
-  const int samples_per_pixel = 100;
-  const int max_depth = 50;
+  const int samples_per_pixel = 1000;
+  const int max_depth = 500;
   const int tile_size = 32;
 
   // World
@@ -182,5 +183,6 @@ int main(int argc, char *argv[]) {
             << std::endl;
 
   const std::string output_file = (argc > 1) ? argv[1] : "output/output.png";
+  image.write_png("output/progress.png");
   image.write_png(output_file);
 }

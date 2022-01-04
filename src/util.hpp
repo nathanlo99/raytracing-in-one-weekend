@@ -46,6 +46,11 @@ inline double random_double(const double min, const double max) {
   return min + (max - min) * random_double();
 }
 
+inline int random_int(const int min, const int max) {
+  // Returns a random integer in [min, max].
+  return static_cast<int>(random_double(min, max + 1));
+}
+
 inline long long get_time_ms() {
   return std::chrono::duration_cast<std::chrono::milliseconds>(
              std::chrono::system_clock::now().time_since_epoch())

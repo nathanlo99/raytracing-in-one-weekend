@@ -61,8 +61,7 @@ bool animated_sphere::hit(const ray &r, const double t_min, const double t_max,
 
 bool animated_sphere::bounding_box(const double time0, const double time1,
                                    aabb &output_box) const {
-  const aabb box0(centre0 - vec3(radius), centre0 + vec3(radius));
-  const aabb box1(centre1 - vec3(radius), centre1 + vec3(radius));
-  output_box = surrounding_box(box0, box1);
+  output_box = aabb(min(centre0, centre1) - vec3(radius),
+                    max(centre0, centre1) + vec3(radius));
   return true;
 }
