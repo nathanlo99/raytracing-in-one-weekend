@@ -1,6 +1,7 @@
 
 #pragma once
 
+#include "aabb.hpp"
 #include "hittable.hpp"
 #include "vec3.hpp"
 
@@ -16,6 +17,8 @@ struct sphere : public hittable {
 
   virtual bool hit(const ray &r, const double t_min, const double t_max,
                    hit_record &rec) const override;
+  virtual bool bounding_box(const double time0, const double time1,
+                            aabb &output_box) const override;
 };
 
 bool sphere::hit(const ray &r, const double t_min, const double t_max,
@@ -44,5 +47,11 @@ bool sphere::hit(const ray &r, const double t_min, const double t_max,
   rec.set_face_normal(r, outward_normal);
   rec.mat_ptr = mat_ptr;
 
+  return true;
+}
+
+bool sphere::bounding_box(const double time0, const double time1,
+                          aabb &output_box) const {
+  output_box = aabb(centre - vec3(radius), centre + vec3(radius));
   return true;
 }

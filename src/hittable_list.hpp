@@ -20,6 +20,8 @@ struct hittable_list : public hittable {
 
   virtual bool hit(const ray &r, const double t_min, const double t_max,
                    hit_record &rec) const override;
+  virtual bool bounding_box(const double time0, const double time1,
+                            aabb &output_box) const override;
 };
 
 bool hittable_list::hit(const ray &r, const double t_min, const double t_max,
@@ -37,4 +39,19 @@ bool hittable_list::hit(const ray &r, const double t_min, const double t_max,
   }
 
   return hit_anything;
+}
+
+bool hittable_list::bounding_box(const double time0, const double time1,
+                                 aabb &output_box) const {
+  if (objects.empty())
+    return false;
+
+  aabb temp_box;
+  for (const auto &object : objects) {
+    if (!object->bounding_box(time0, time1, temp_box))
+      return false;
+    output_box = surrounding_box(output_box, temp_box);
+  }
+
+  return true;
 }
