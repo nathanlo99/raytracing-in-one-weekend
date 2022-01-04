@@ -10,15 +10,13 @@
 struct image {
   int width;
   int height;
-  unsigned char *data;
+  std::vector<unsigned char> data;
   const static int bytes_per_pixel = 3;
 
   image(const std::string &filename);
-  image(const int width, const int height) : width(width), height(height) {
-    data = new unsigned char[bytes_per_pixel * width * height];
-    memset(data, 0, bytes_per_pixel * width * height);
-  }
-  ~image() { delete data; }
+  image(const int width, const int height)
+      : width(width), height(height),
+        data(bytes_per_pixel * width * height, 127) {}
 
   constexpr inline colour get(const int col, const int row) const {
     // Take row mod height and col mod width to wrap the texture on overflow
@@ -29,7 +27,7 @@ struct image {
   }
 
   constexpr inline colour get_floored(double u, double v) const {
-    if (data == nullptr)
+    if (data.empty())
       return colour(0, 1, 1);
 
     u = std::clamp(u, 0.0, 1.0) * width;
@@ -40,7 +38,7 @@ struct image {
 
   // Bilinear interpolation
   constexpr inline colour get_interpolated(double u, double v) const {
-    if (data == nullptr)
+    if (data.empty())
       return colour(0, 1, 1);
 
     u = std::clamp(u, 0.0, 1.0) * width;

@@ -35,8 +35,16 @@ auto random_scene() {
           // diffuse
           const auto earth_texture = make_shared<image_texture>("earthmap.jpg");
           const shared_ptr<material> sphere_material =
-              make_shared<lambertian>(earth_texture);
+              make_shared<diffuse_light>(earth_texture);
           world.add(make_shared<sphere>(center, 0.2, sphere_material));
+        } else if (choose_mat < 0.4) {
+          // diffuse
+          const colour albedo = colour::random() * colour::random();
+          const shared_ptr<material> sphere_material =
+              make_shared<diffuse_light>(albedo);
+          const point3 center2 = center + vec3(0, random_double(0, .5), 0);
+          world.add(make_shared<animated_sphere>(center, center2, 0.0, 1.0, 0.2,
+                                                 sphere_material));
         } else if (choose_mat < 0.8) {
           // diffuse
           const colour albedo = colour::random() * colour::random();
@@ -65,7 +73,7 @@ auto random_scene() {
   const auto material1 = make_shared<dielectric>(colour(1.0), 1.5);
   world.add(make_shared<sphere>(point3(0, 1, 0), 1.0, material1));
 
-  const auto material2 = make_shared<lambertian>(colour(0.4, 0.2, 0.1));
+  const auto material2 = make_shared<diffuse_light>(colour(0.4, 0.2, 0.1));
   world.add(make_shared<sphere>(point3(-4, 1, 0), 1.0, material2));
 
   const auto material3 = make_shared<metal>(colour(0.7, 0.6, 0.5), 0.0);
@@ -82,27 +90,31 @@ auto earth() {
   return hittable_list(globe);
 }
 
-colour ray_colour(const ray &r, const hittable &world, const int depth) {
+colour ray_colour(const ray &r, const colour &background, const hittable &world,
+                  const int depth) {
   if (depth <= 0)
     return colour(0.0);
 
-  if (hit_record rec; world.hit(r, eps, infinity, rec)) {
-    ray scattered;
-    colour attenuation;
-    if (rec.mat_ptr->scatter(r, rec, attenuation, scattered))
-      return attenuation * ray_colour(scattered, world, depth - 1);
-    return colour(0.0);
-  }
-  const vec3 unit_direction = r.dir.normalize();
-  const double t = (unit_direction.y() + 1.0) / 2.0;
-  return (1 - t) * colour(1.0) + t * colour(0.5, 0.7, 1.0);
+  hit_record rec;
+  if (!world.hit(r, eps, infinity, rec))
+    return background;
+
+  ray scattered;
+  colour attenuation;
+  colour emitted = rec.mat_ptr->emitted(rec.u, rec.v, rec.p);
+
+  if (!rec.mat_ptr->scatter(r, rec, attenuation, scattered))
+    return emitted;
+
+  return emitted +
+         attenuation * ray_colour(scattered, background, world, depth - 1);
 }
 
 void render(const hittable_list &world, const camera &cam,
-            const std::string &output, const int image_width,
-            const int image_height) {
-  const int samples_per_pixel = 500;
-  const int max_depth = 50;
+            const colour &background, const std::string &output,
+            const int image_width, const int image_height) {
+  const int samples_per_pixel = 100;
+  const int max_depth = 500;
   const int tile_size = 32;
 
   image image(image_width, image_height);
@@ -115,7 +127,7 @@ void render(const hittable_list &world, const camera &cam,
           const double u = (i + random_double()) / (image_width - 1);
           const double v = (j + random_double()) / (image_height - 1);
           const ray r = cam.get_ray(u, v);
-          pixel_colour += ray_colour(r, world, max_depth);
+          pixel_colour += ray_colour(r, background, world, max_depth);
         }
         image.set(j, i, pixel_colour / samples_per_pixel);
       }
@@ -199,22 +211,6 @@ int main(int argc, char *argv[]) {
   const int image_height = static_cast<int>(image_width / aspect_ratio);
 
   {
-    const auto world = earth();
-
-    // Camera
-    const point3 lookfrom(13, 2, 3);
-    const point3 lookat(0, 0, 0);
-    const vec3 up(0, 1, 0);
-    const double dist_to_focus = 10.0;
-    const double aperture = 0.1;
-
-    camera cam(lookfrom, lookat, up, 20, aspect_ratio, aperture, dist_to_focus,
-               0.0, 1.0);
-
-    // render(world, cam, output_file, image_width, image_height);
-  }
-
-  {
     // World
     const auto world = random_scene();
 
@@ -228,6 +224,8 @@ int main(int argc, char *argv[]) {
     camera cam(lookfrom, lookat, up, 20, aspect_ratio, aperture, dist_to_focus,
                0.0, 1.0);
 
-    render(world, cam, output_file, image_width, image_height);
+    const colour background(0, 0, 0.05); // (0.70, 0.80, 1.00);
+
+    render(world, cam, background, output_file, image_width, image_height);
   }
 }

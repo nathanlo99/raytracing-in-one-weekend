@@ -11,6 +11,10 @@ struct material {
   virtual ~material() = default;
   virtual bool scatter(const ray &r_in, const hit_record &rec,
                        colour &attenuation, ray &scattered) const = 0;
+  virtual colour emitted(const double u, const double v,
+                         const point3 &p) const {
+    return colour(0, 0, 0);
+  }
 };
 
 struct lambertian : public material {
@@ -86,5 +90,22 @@ struct dielectric : public material {
 
     scattered = ray(rec.p, direction, r_in.time);
     return true;
+  }
+};
+
+struct diffuse_light : public material {
+  shared_ptr<texture> emit;
+
+  diffuse_light(shared_ptr<texture> a) : emit(a) {}
+  diffuse_light(const colour &a) : emit(make_shared<solid_colour>(a)) {}
+
+  virtual bool scatter(const ray &r_in, const hit_record &rec,
+                       colour &attenuation, ray &scattered) const override {
+    return false;
+  }
+
+  virtual colour emitted(const double u, const double v,
+                         const point3 &p) const override {
+    return emit->value(u, v, p);
   }
 };

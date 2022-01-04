@@ -16,13 +16,17 @@
 
 image::image(const std::string &filename) {
   int components_per_pixel = bytes_per_pixel;
-  data = stbi_load(("../res/" + filename).c_str(), &width, &height,
-                   &components_per_pixel, components_per_pixel);
-  if (data == nullptr) {
+  unsigned char *loaded_data =
+      stbi_load(("../res/" + filename).c_str(), &width, &height,
+                &components_per_pixel, components_per_pixel);
+  if (loaded_data == nullptr) {
     std::cerr << "ERROR: Could not load texture image file '" << filename << "'"
               << std::endl;
-    width = height = 0;
+  } else {
+    data = std::vector<unsigned char>(
+        loaded_data, loaded_data + bytes_per_pixel * width * height);
   }
+  delete loaded_data;
 }
 
 void image::write_ppm(const std::string &filename) {
@@ -37,7 +41,7 @@ void image::write_ppm(const std::string &filename) {
 
 void image::write_png(const std::string &filename) {
   const int result =
-      stbi_write_png(filename.c_str(), width, height, bytes_per_pixel, data,
-                     bytes_per_pixel * width);
+      stbi_write_png(filename.c_str(), width, height, bytes_per_pixel,
+                     data.data(), bytes_per_pixel * width);
   assert(result != 0);
 }
