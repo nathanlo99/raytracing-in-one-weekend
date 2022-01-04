@@ -88,10 +88,10 @@ int main(int argc, char *argv[]) {
 
   // Image
   const double aspect_ratio = 16.0 / 9.0;
-  const int image_width = 2400;
+  const int image_width = 1000;
   const int image_height = static_cast<int>(image_width / aspect_ratio);
-  const int samples_per_pixel = 1000;
-  const int max_depth = 500;
+  const int samples_per_pixel = 500;
+  const int max_depth = 50;
   const int tile_size = 32;
 
   // World
@@ -142,8 +142,7 @@ int main(int argc, char *argv[]) {
   const int max_threads = 4;
   std::cerr << "Starting render with " << max_threads << " threads..."
             << std::endl;
-  const auto start = std::chrono::system_clock::now();
-
+  const auto start_ms = get_time_ms();
   const int num_tasks = task_list.size();
 
   std::vector<std::thread> threads;
@@ -163,9 +162,16 @@ int main(int argc, char *argv[]) {
         static long long last_update_ms = 0;
         const long long current_time_ms = get_time_ms();
         if (current_time_ms - last_update_ms > 1000) {
+          const double elapsed_ms = current_time_ms - start_ms;
+          const double remaining_tasks = task_list.size();
+          const double done_tasks = num_tasks - remaining_tasks;
+          const double estimated_remaining_ms =
+              elapsed_ms / done_tasks * remaining_tasks;
           last_update_ms = current_time_ms;
-          std::cout << "\r" << task_list.size() << "/" << num_tasks
-                    << " tasks remaining... " << std::flush;
+          std::cout << "\r" << elapsed_ms / 1000 << "s elapsed, "
+                    << estimated_remaining_ms / 1000 << "s remaining, "
+                    << task_list.size() << "/" << num_tasks
+                    << " tiles remaining... " << std::flush;
           image.write_png("output/progress.png");
         }
       }
@@ -176,11 +182,11 @@ int main(int argc, char *argv[]) {
     thread.join();
   }
 
-  const auto end = std::chrono::system_clock::now();
-  std::chrono::duration<double> elapsed_seconds = end - start;
+  const auto end_ms = get_time_ms();
+  const double elapsed_seconds =
+      static_cast<double>(end_ms - start_ms) / 1000.0;
   std::cout << std::endl
-            << "Done! Took " << elapsed_seconds.count() << " seconds"
-            << std::endl;
+            << "Done! Took " << elapsed_seconds << " seconds" << std::endl;
 
   const std::string output_file = (argc > 1) ? argv[1] : "output/output.png";
   image.write_png("output/progress.png");

@@ -64,25 +64,29 @@ bvh_node::bvh_node(std::vector<hittable_with_box> &objects, const size_t start,
                    const size_t end, const double time0, const double time1) {
 
   const size_t span = end - start;
-  if (span == 1) {
-    left = right = objects[start].object;
-    box = objects[start].box;
-    return;
-  } else if (span == 2) {
+  assert(span >= 2);
+  if (span == 2) {
     left = objects[start].object;
     right = objects[start + 1].object;
     box = surrounding_box(objects[start].box, objects[start + 1].box);
+    return;
+  } else if (span == 3) {
+    left = make_shared<bvh_node>(objects, start, end - 1, time0, time1);
+    right = objects[end - 1].object;
+    box = surrounding_box(
+        objects[start].box,
+        surrounding_box(objects[start + 1].box, objects[start + 2].box));
     return;
   }
 
   // Compute the widest span, and choose the axis appropriately
   aabb total_box;
-  for (const auto &obj : objects)
-    total_box = surrounding_box(total_box, obj.box);
+  for (int i = start; i < end; ++i)
+    total_box = surrounding_box(total_box, objects[i].box);
   const vec3 box_span = total_box.max - total_box.min;
   const int axis = box_span.largest_axis();
 
-  std::sort(objects.begin(), objects.end(),
+  std::sort(objects.begin() + start, objects.begin() + end,
             [axis](const hittable_with_box &a, const hittable_with_box &b) {
               return a.box.min[axis] < b.box.min[axis];
             });
