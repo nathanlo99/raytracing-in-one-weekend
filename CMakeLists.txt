@@ -10,7 +10,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_CXX_FLAGS "-Ofast -ffast-math -Wall -Wextra -Wno-unused-parameter -pedantic")
 
 # add the executable
-add_executable(raytracer src/image.cpp src/main.cpp)
+add_executable(raytracer src/stb.cpp src/image.cpp src/main.cpp)
 
 
 cmake_minimum_required(VERSION 3.16.3)
@@ -35,6 +35,5 @@ endif()
 
 #Use the brcmGLESv2 driver instead of GLESv2. May be required on versions older than pi4
 #set(USE_BROADCOM_DRIVER ON)
-
 
 add_subdirectory("thirdparty")
