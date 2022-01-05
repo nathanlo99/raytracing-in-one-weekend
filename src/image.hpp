@@ -14,9 +14,8 @@ struct image {
   const static int bytes_per_pixel = 3;
 
   image(const std::string &filename);
-  image(const int width, const int height, const unsigned char fill_byte = 0)
-      : width(width), height(height),
-        data(bytes_per_pixel * width * height, fill_byte) {}
+  image(const int width, const int height)
+      : width(width), height(height), data(bytes_per_pixel * width * height) {}
 
   constexpr inline colour get(const int row, const int col) const {
     // Take row mod height and col mod width to wrap the texture on overflow
@@ -57,12 +56,10 @@ struct image {
 
   constexpr inline void set(const int row, const int col, const colour &c) {
     const int idx = row * width + col;
-    const colour gamma_corrected = gamma_correct(c);
-    data[bytes_per_pixel * idx + 0] = to_byte(gamma_corrected[0]);
-    data[bytes_per_pixel * idx + 1] = to_byte(gamma_corrected[1]);
-    data[bytes_per_pixel * idx + 2] = to_byte(gamma_corrected[2]);
+    data[bytes_per_pixel * idx + 0] = to_byte(c[0]);
+    data[bytes_per_pixel * idx + 1] = to_byte(c[1]);
+    data[bytes_per_pixel * idx + 2] = to_byte(c[2]);
   }
 
-  void write_ppm(const std::string &filename);
   void write_png(const std::string &filename);
 };
