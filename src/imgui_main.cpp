@@ -15,6 +15,12 @@
 #include <SDL_opengl.h>
 #endif
 
+#include "image.hpp"
+
+void drawImage(const image &img) {
+  //
+}
+
 // Main code
 int main(int, char **) {
   // Setup SDL
@@ -114,6 +120,8 @@ int main(int, char **) {
   bool show_another_window = false;
   ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
+  image earth("../res/earthmap.jpg");
+
   // Main loop
   bool done = false;
   while (!done) {
@@ -195,11 +203,14 @@ int main(int, char **) {
     }
 
     // Rendering
+    drawImage(earth);
+
     ImGui::Render();
     glViewport(0, 0, (int)io.DisplaySize.x, (int)io.DisplaySize.y);
     glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w,
                  clear_color.z * clear_color.w, clear_color.w);
     glClear(GL_COLOR_BUFFER_BIT);
+
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     SDL_GL_SwapWindow(window);
   }

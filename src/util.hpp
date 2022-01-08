@@ -25,20 +25,26 @@ constexpr inline double degrees_to_radians(double degrees) {
   return degrees * pi / 180.0;
 }
 
-inline float frand(int *seed) {
-  union {
-    float fres;
-    unsigned int ires;
-  };
-
-  seed[0] *= 16807;
-  ires = (((unsigned int)seed[0]) >> 9) | 0x3f800000;
-  return fres - 1.0f;
-}
+// inline float frand(int *seed) {
+//   union {
+//     float fres;
+//     unsigned int ires;
+//   };
+//
+//   seed[0] *= 16807;
+//   ires = (((unsigned int)seed[0]) >> 9) | 0x3f800000;
+//   return fres - 1.0f;
+// }
+//
+// inline double random_double() {
+//   static int seed = 127;
+//   return frand(&seed);
+// }
 
 inline double random_double() {
-  static int seed = 127;
-  return frand(&seed);
+  static std::uniform_real_distribution<double> distribution(0.0, 1.0);
+  static std::mt19937 generator(127);
+  return distribution(generator);
 }
 
 inline double random_double(const double min, const double max) {

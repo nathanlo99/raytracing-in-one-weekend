@@ -56,9 +56,9 @@ struct image {
 
   constexpr inline void set(const int row, const int col, const colour &c) {
     const int idx = row * width + col;
-    data[bytes_per_pixel * idx + 0] = to_byte(c[0]);
-    data[bytes_per_pixel * idx + 1] = to_byte(c[1]);
-    data[bytes_per_pixel * idx + 2] = to_byte(c[2]);
+    data[bytes_per_pixel * idx + 0] = to_byte(std::clamp(c[0], 0.0, 1.0));
+    data[bytes_per_pixel * idx + 1] = to_byte(std::clamp(c[1], 0.0, 1.0));
+    data[bytes_per_pixel * idx + 2] = to_byte(std::clamp(c[2], 0.0, 1.0));
   }
 
   void write_png(const std::string &filename);

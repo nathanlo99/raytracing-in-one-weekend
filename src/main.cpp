@@ -284,7 +284,7 @@ void render(const hittable_list &world, const camera &cam,
 }
 
 int main(int argc, char *argv[]) {
-  {
+  if (false) {
     // Image
     const double aspect_ratio = 16.0 / 9.0;
     const int image_width = 1200;
@@ -300,8 +300,8 @@ int main(int argc, char *argv[]) {
     const double dist_to_focus = 10.0;
     const double aperture = 0.1;
 
-    camera cam(lookfrom, lookat, up, 20, aspect_ratio, aperture, dist_to_focus,
-               0.0, 1.0);
+    const camera cam(lookfrom, lookat, up, 20, aspect_ratio, aperture,
+                     dist_to_focus, 0.0, 1.0);
 
     const colour background(0.0, 0.0, 0.03);
 
@@ -315,7 +315,10 @@ int main(int argc, char *argv[]) {
     const int image_height = static_cast<int>(image_width / aspect_ratio);
 
     // World
-    const auto world = bright_scene();
+    auto world = bright_scene();
+    const auto skybox_texture = make_shared<diffuse_light>(
+        make_shared<image_texture>("hdr_pack/3.hdr", 2.0));
+    world.add(make_shared<sphere>(point3(0, 0, 0), 9000, skybox_texture));
 
     // Camera
     const point3 lookfrom(13, 2, 3);
@@ -324,8 +327,8 @@ int main(int argc, char *argv[]) {
     const double dist_to_focus = 10.0;
     const double aperture = 0.1;
 
-    camera cam(lookfrom, lookat, up, 20, aspect_ratio, aperture, dist_to_focus,
-               0.0, 1.0);
+    const camera cam(lookfrom, lookat, up, 40, aspect_ratio, aperture,
+                     dist_to_focus, 0.0, 1.0);
 
     const colour background(0.70, 0.80, 1.00);
 
