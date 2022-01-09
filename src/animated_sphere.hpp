@@ -52,8 +52,7 @@ bool animated_sphere::hit(const ray &r, const double t_min, const double t_max,
 
   rec.t = root;
   rec.p = r.at(rec.t);
-  const vec3 outward_normal = (rec.p - centre) / radius;
-  rec.set_face_normal(r, outward_normal);
+  rec.set_face_normal(r, (rec.p - centre) / radius);
   rec.mat_ptr = mat_ptr;
 
   return true;

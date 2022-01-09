@@ -8,6 +8,7 @@
 #include "hittable_list.hpp"
 #include "image.hpp"
 #include "material.hpp"
+#include "scenes/scenes.hpp"
 #include "sphere.hpp"
 
 #include <atomic>
@@ -16,146 +17,6 @@
 #include <iostream>
 #include <queue>
 #include <thread>
-
-auto bright_scene() {
-  hittable_list world;
-
-  const auto ground_material = make_shared<lambertian>(colour(0.5, 0.5, 0.5));
-  world.add(make_shared<sphere>(point3(0, -1000, 0), 1000, ground_material));
-
-  const auto earth_texture = make_shared<image_texture>("../res/earthmap.jpg");
-
-  for (int a = -11; a < 11; a++) {
-    for (int b = -11; b < 11; b++) {
-      const double choose_mat = random_double();
-      const double ball_height = 0.2;
-      const point3 center(a + 0.9 * random_double(), ball_height,
-                          b + 0.9 * random_double());
-
-      if ((center - point3(4, 0.2, 0)).length() > 0.9) {
-        if (choose_mat < 0.1) {
-          // diffuse earth
-          const shared_ptr<material> sphere_material =
-              make_shared<lambertian>(earth_texture);
-          world.add(make_shared<sphere>(center, 0.2, sphere_material));
-        } else if (choose_mat < 0.4) {
-          // diffuse
-          const colour albedo = colour::random() * colour::random();
-          const shared_ptr<material> sphere_material =
-              make_shared<lambertian>(albedo);
-          const point3 center2 = center + vec3(0, random_double(0, .5), 0);
-          world.add(make_shared<animated_sphere>(center, center2, 0.0, 1.0, 0.2,
-                                                 sphere_material));
-        } else if (choose_mat < 0.8) {
-          // diffuse
-          const colour albedo = colour::random() * colour::random();
-          const shared_ptr<material> sphere_material =
-              make_shared<lambertian>(albedo);
-          const point3 center2 = center + vec3(0, random_double(0, .5), 0);
-          world.add(make_shared<animated_sphere>(center, center2, 0.0, 1.0, 0.2,
-                                                 sphere_material));
-        } else if (choose_mat < 0.95) {
-          // metal
-          const colour albedo = colour::random(0.5, 1);
-          const double fuzz = random_double(0, 0.5);
-          const shared_ptr<material> sphere_material =
-              make_shared<metal>(albedo, fuzz);
-          world.add(make_shared<sphere>(center, 0.2, sphere_material));
-        } else {
-          // glass
-          const shared_ptr<material> sphere_material =
-              make_shared<dielectric>(colour(1.0), 1.5);
-          world.add(make_shared<sphere>(center, 0.2, sphere_material));
-        }
-      }
-    }
-  }
-
-  const auto material1 = make_shared<dielectric>(colour(1.0), 1.5);
-  world.add(make_shared<sphere>(point3(0, 1, 0), 1.0, material1));
-
-  const auto material2 = make_shared<lambertian>(colour(0.4, 0.2, 0.1));
-  world.add(make_shared<sphere>(point3(-4, 1, 0), 1.0, material2));
-
-  const auto material3 = make_shared<metal>(colour(0.7, 0.6, 0.5), 0.0);
-  world.add(make_shared<sphere>(point3(4, 1, 0), 1.0, material3));
-
-  return hittable_list(bvh_node::from_list(world, 0.0, 1.0));
-}
-
-auto dark_scene() {
-  hittable_list world;
-
-  const auto ground_material = make_shared<lambertian>(colour(0.5, 0.5, 0.5));
-  world.add(make_shared<sphere>(point3(0, -1000, 0), 1000, ground_material));
-
-  const auto earth_texture = make_shared<image_texture>("../res/earthmap.jpg");
-
-  for (int a = -11; a < 11; a++) {
-    for (int b = -11; b < 11; b++) {
-      const double choose_mat = random_double();
-      const double ball_height = 0.2;
-      const point3 center(a + 0.9 * random_double(), ball_height,
-                          b + 0.9 * random_double());
-
-      if ((center - point3(4, 0.2, 0)).length() > 0.9) {
-        if (choose_mat < 0.1) {
-          // diffuse
-          const shared_ptr<material> sphere_material =
-              make_shared<diffuse_light>(earth_texture);
-          world.add(make_shared<sphere>(center, 0.2, sphere_material));
-        } else if (choose_mat < 0.4) {
-          // diffuse
-          const colour albedo = colour::random() * colour::random();
-          const shared_ptr<material> sphere_material =
-              make_shared<diffuse_light>(albedo);
-          const point3 center2 = center + vec3(0, random_double(0, .5), 0);
-          world.add(make_shared<animated_sphere>(center, center2, 0.0, 1.0, 0.2,
-                                                 sphere_material));
-        } else if (choose_mat < 0.8) {
-          // diffuse
-          const colour albedo = colour::random() * colour::random();
-          const shared_ptr<material> sphere_material =
-              make_shared<lambertian>(albedo);
-          const point3 center2 = center + vec3(0, random_double(0, .5), 0);
-          world.add(make_shared<animated_sphere>(center, center2, 0.0, 1.0, 0.2,
-                                                 sphere_material));
-        } else if (choose_mat < 0.95) {
-          // metal
-          const colour albedo = colour::random(0.5, 1);
-          const double fuzz = random_double(0, 0.5);
-          const shared_ptr<material> sphere_material =
-              make_shared<metal>(albedo, fuzz);
-          world.add(make_shared<sphere>(center, 0.2, sphere_material));
-        } else {
-          // glass
-          const shared_ptr<material> sphere_material =
-              make_shared<dielectric>(colour(1.0), 1.5);
-          world.add(make_shared<sphere>(center, 0.2, sphere_material));
-        }
-      }
-    }
-  }
-
-  const auto material1 = make_shared<dielectric>(colour(1.0), 1.5);
-  world.add(make_shared<sphere>(point3(0, 1, 0), 1.0, material1));
-
-  const auto material2 = make_shared<diffuse_light>(colour(0.4, 0.2, 0.1));
-  world.add(make_shared<sphere>(point3(-4, 1, 0), 1.0, material2));
-
-  const auto material3 = make_shared<metal>(colour(0.7, 0.6, 0.5), 0.0);
-  world.add(make_shared<sphere>(point3(4, 1, 0), 1.0, material3));
-
-  return hittable_list(bvh_node::from_list(world, 0.0, 1.0));
-}
-
-auto earth() {
-  auto earth_texture = make_shared<image_texture>("../res/earthmap.jpg");
-  auto earth_surface = make_shared<lambertian>(earth_texture);
-  auto globe = make_shared<sphere>(point3(0, 0, 0), 2, earth_surface);
-
-  return hittable_list(globe);
-}
 
 colour ray_colour(const ray &r, const colour &background, const hittable &world,
                   const int depth) {
@@ -180,7 +41,7 @@ colour ray_colour(const ray &r, const colour &background, const hittable &world,
 void render(const hittable_list &world, const camera &cam,
             const colour &background, const std::string &output,
             const int image_width, const int image_height) {
-  const int samples_per_pixel = 5000;
+  const int samples_per_pixel = 5;
   const int max_depth = 50;
   const int tile_size = std::max(image_width, image_height);
   const int tile_weight = 1;
@@ -219,16 +80,16 @@ void render(const hittable_list &world, const camera &cam,
     }
   };
 
-  std::mutex task_list_mutex;
-  std::queue<task> task_list;
+  std::vector<task> task_list;
+  std::atomic<size_t> next_task_idx = 0;
 
   for (int samples = 0; samples < samples_per_pixel; samples += tile_weight) {
     for (int tile_row = 0; tile_row < image_height; tile_row += tile_size) {
       for (int tile_col = 0; tile_col < image_width; tile_col += tile_size) {
-        task_list.push({tile_row, tile_col,
-                        std::min(image_height - tile_row, tile_size),
-                        std::min(image_width - tile_col, tile_size),
-                        std::min(samples_per_pixel - samples, tile_weight)});
+        task_list.push_back(
+            {tile_row, tile_col, std::min(image_height - tile_row, tile_size),
+             std::min(image_width - tile_col, tile_size),
+             std::min(samples_per_pixel - samples, tile_weight)});
       }
     }
   }
@@ -237,35 +98,31 @@ void render(const hittable_list &world, const camera &cam,
   std::cerr << "Starting render with " << task_list.size() << " tasks and "
             << max_threads << " threads..." << std::endl;
   const auto start_ms = get_time_ms();
-  const int num_tasks = task_list.size();
+  const size_t num_tasks = task_list.size();
 
   std::vector<std::thread> threads;
   for (int i = 0; i < max_threads; ++i) {
     threads.emplace_back([&]() {
       while (true) {
-        std::unique_lock<std::mutex> lck(task_list_mutex);
-        if (task_list.empty())
+        const size_t task_idx = next_task_idx++;
+        if (task_idx >= num_tasks)
           break;
-        const task next_task = task_list.front();
-        task_list.pop();
-        lck.unlock();
-
-        compute_tile(next_task);
+        compute_tile(task_list[task_idx]);
 
         static long long last_update_ms = 0;
         const long long current_time_ms = get_time_ms();
         if (current_time_ms - last_update_ms > 1000) {
+          last_update_ms = current_time_ms;
           const double elapsed_ms = current_time_ms - start_ms;
-          const double remaining_tasks = task_list.size();
-          const double done_tasks = num_tasks - remaining_tasks;
+          const double done_tasks = std::min<size_t>(num_tasks, next_task_idx);
+          const double remaining_tasks = num_tasks - done_tasks;
           const double tasks_per_ms = done_tasks / elapsed_ms;
           const double estimated_remaining_ms =
               elapsed_ms / done_tasks * remaining_tasks;
-          last_update_ms = current_time_ms;
           std::cout << "\r" << elapsed_ms / 1000 << "s elapsed, "
                     << tasks_per_ms * 1000 << " tasks per sec, "
                     << estimated_remaining_ms / 1000 << "s remaining, "
-                    << task_list.size() << "/" << num_tasks
+                    << remaining_tasks << "/" << num_tasks
                     << " tasks remaining... " << std::flush;
           result_image.write_png("output/progress.png");
         }
@@ -278,8 +135,7 @@ void render(const hittable_list &world, const camera &cam,
   }
 
   const auto end_ms = get_time_ms();
-  const double elapsed_seconds =
-      static_cast<double>(end_ms - start_ms) / 1000.0;
+  const double elapsed_seconds = (end_ms - start_ms) / 1000.0;
   std::cout << std::endl
             << "Done! Took " << elapsed_seconds << " seconds" << std::endl;
 

@@ -2,12 +2,10 @@
 #pragma once
 
 #include "hittable.hpp"
+#include "util.hpp"
 
 #include <memory>
 #include <vector>
-
-using std::make_shared;
-using std::shared_ptr;
 
 struct hittable_list : public hittable {
   std::vector<shared_ptr<hittable>> objects;

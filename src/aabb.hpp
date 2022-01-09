@@ -25,7 +25,7 @@ struct aabb {
   }
 };
 
-inline aabb surrounding_box(const aabb &box0, const aabb &box1) {
+constexpr inline aabb surrounding_box(const aabb &box0, const aabb &box1) {
   const point3 small = min(box0.min, box1.min);
   const point3 big = max(box0.max, box1.max);
   return aabb(small, big);

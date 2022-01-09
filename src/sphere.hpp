@@ -10,7 +10,7 @@ struct sphere : public hittable {
   double radius;
   std::shared_ptr<material> mat_ptr;
 
-  sphere() : centre(0, 0, 0), radius(0), mat_ptr(nullptr) {}
+  sphere() : centre(), radius(0), mat_ptr(nullptr) {}
   sphere(const point3 &centre, const double r, std::shared_ptr<material> mat)
       : centre(centre), radius(r), mat_ptr(mat) {}
   virtual ~sphere() = default;
@@ -21,7 +21,7 @@ struct sphere : public hittable {
                             aabb &output_box) const override;
 
 private:
-  static void get_sphere_uv(const point3 &p, double &u, double &v) {
+  static constexpr void get_sphere_uv(const point3 &p, double &u, double &v) {
     const double theta = acos(-p.y());
     const double phi = atan2(-p.z(), p.x()) + pi;
     u = phi / (2 * pi);
