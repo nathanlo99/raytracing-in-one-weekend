@@ -18,13 +18,13 @@ struct image {
   image(const int width, const int height)
       : width(width), height(height), pixels(width * height) {}
 
-  constexpr inline colour get(const int row, const int col) const {
+  inline colour get(const int row, const int col) const {
     // Take row mod height and col mod width to wrap the texture on overflow
     const int idx = (row % height) * width + (col % width);
     return pixels[idx];
   }
 
-  constexpr inline colour get_floored(double u, double v) const {
+  inline colour get_floored(double u, double v) const {
     if (pixels.empty())
       return colour(0, 1, 1);
 
@@ -35,7 +35,7 @@ struct image {
   }
 
   // Bilinear interpolation
-  constexpr inline colour get_interpolated(double u, double v) const {
+  inline colour get_interpolated(double u, double v) const {
     if (pixels.empty())
       return colour(0, 1, 1);
 
@@ -53,7 +53,7 @@ struct image {
            (1 - frac_u) * (1 - frac_v) * get(floor_v + 1, floor_u + 1);
   }
 
-  constexpr inline void set(const int row, const int col, const colour &c) {
+  inline void set(const int row, const int col, const colour &c) {
     const int idx = row * width + col;
     pixels[idx] = c;
   }

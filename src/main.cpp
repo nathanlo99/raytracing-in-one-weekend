@@ -15,6 +15,7 @@
 #include <fstream>
 #include <iomanip>
 #include <iostream>
+#include <mutex>
 #include <queue>
 #include <thread>
 
@@ -38,10 +39,62 @@ colour ray_colour(const ray &r, const colour &background, const hittable &world,
          attenuation * ray_colour(scattered, background, world, depth - 1);
 }
 
+void render_singlethreaded(const hittable_list &world, const camera &cam,
+                           const colour &background, const std::string &output,
+                           const int image_width, const int image_height) {
+  const int samples_per_pixel = 10000;
+  const int max_depth = 50;
+
+  image result_image(image_width, image_height);
+
+  const auto start_ms = get_time_ms();
+  size_t pixels = 0;
+  std::cout << "Starting render with 1 thread..." << std::endl;
+  for (int j = 0; j < image_height; ++j) {
+    for (int i = 0; i < image_width; ++i) {
+      colour pixel_colour;
+      for (int s = 1; s <= samples_per_pixel; ++s) {
+        const double u = (i + random_double()) / (image_width - 1);
+        const double v = (j + random_double()) / (image_height - 1);
+        const ray r = cam.get_ray(u, v);
+        pixel_colour += ray_colour(r, background, world, max_depth);
+      }
+      pixels++;
+      result_image.set(j, i, pixel_colour / samples_per_pixel);
+
+      static long long last_update_ms = 0;
+      const long long current_time_ms = get_time_ms();
+      if (current_time_ms - last_update_ms > 1000) {
+        last_update_ms = current_time_ms;
+        const double elapsed_ms = current_time_ms - start_ms;
+        const double done_tasks = pixels;
+        const double num_tasks = image_width * image_height;
+        const double remaining_tasks = num_tasks - done_tasks;
+        const double tasks_per_ms = done_tasks / elapsed_ms;
+        const double estimated_remaining_ms = num_tasks / tasks_per_ms;
+        std::cout << "\r" << elapsed_ms / 1000 << "s elapsed, "
+                  << tasks_per_ms * 1000 << " pixels per sec, "
+                  << estimated_remaining_ms / 1000 << "s remaining, "
+                  << remaining_tasks << "/" << num_tasks
+                  << " pixels remaining... " << std::flush;
+        result_image.write_png("output/progress.png");
+      }
+    }
+  }
+
+  const auto end_ms = get_time_ms();
+  const double elapsed_seconds = (end_ms - start_ms) / 1000.0;
+  std::cout << std::endl
+            << "Done! Took " << elapsed_seconds << " seconds" << std::endl;
+
+  result_image.write_png("output/progress.png");
+  result_image.write_png(output);
+}
+
 void render(const hittable_list &world, const camera &cam,
             const colour &background, const std::string &output,
             const int image_width, const int image_height) {
-  const int samples_per_pixel = 5;
+  const int samples_per_pixel = 10000;
   const int max_depth = 50;
   const int tile_size = std::max(image_width, image_height);
   const int tile_weight = 1;
@@ -144,14 +197,18 @@ void render(const hittable_list &world, const camera &cam,
 }
 
 int main(int argc, char *argv[]) {
-  if (false) {
+  if (true) {
     // Image
     const double aspect_ratio = 16.0 / 9.0;
     const int image_width = 1200;
     const int image_height = static_cast<int>(image_width / aspect_ratio);
 
     // World
-    const auto world = dark_scene();
+    auto world = bright_scene();
+    const auto skybox_image =
+        make_shared<image_texture>("../res/hdr_pack/5.hdr");
+    const auto skybox_texture = make_shared<diffuse_light>(skybox_image);
+    world.add(make_shared<sphere>(point3(0, 0, 0), 9000, skybox_texture));
 
     // Camera
     const point3 lookfrom(13, 2, 3);
@@ -165,35 +222,36 @@ int main(int argc, char *argv[]) {
 
     const colour background(0.0, 0.0, 0.03);
 
-    render(world, cam, background, "dark_scene.png", image_width, image_height);
+    render_singlethreaded(world, cam, background, "bright_scene.png",
+                          image_width, image_height);
   }
 
   {
     // Image
-    const double aspect_ratio = 16.0 / 9.0;
+    const double aspect_ratio = 2.0;
     const int image_width = 1200;
     const int image_height = static_cast<int>(image_width / aspect_ratio);
 
     // World
-    auto world = bright_scene();
+    auto world = simple_scene();
     const auto skybox_image =
-        make_shared<image_texture>("../res/hdr_pack/3.hdr");
+        make_shared<image_texture>("../res/hdr_pack/5.hdr");
     const auto skybox_texture = make_shared<diffuse_light>(skybox_image);
     world.add(make_shared<sphere>(point3(0, 0, 0), 9000, skybox_texture));
 
     // Camera
-    const point3 lookfrom(13, 2, 3);
-    const point3 lookat(0, 0, 0);
+    const point3 lookfrom(0, 3, 6);
+    const point3 lookat(0, 1, 0);
     const vec3 up(0, 1, 0);
     const double dist_to_focus = 10.0;
     const double aperture = 0.1;
 
-    const camera cam(lookfrom, lookat, up, 40, aspect_ratio, aperture,
+    const camera cam(lookfrom, lookat, up, 50, aspect_ratio, aperture,
                      dist_to_focus, 0.0, 1.0);
 
     const colour background(0.70, 0.80, 1.00);
 
-    render(world, cam, background, "bright_scene.png", image_width,
+    render(world, cam, background, "simple_scene.png", image_width,
            image_height);
   }
 }
