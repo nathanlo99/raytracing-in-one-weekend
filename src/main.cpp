@@ -23,6 +23,8 @@ auto bright_scene() {
   const auto ground_material = make_shared<lambertian>(colour(0.5, 0.5, 0.5));
   world.add(make_shared<sphere>(point3(0, -1000, 0), 1000, ground_material));
 
+  const auto earth_texture = make_shared<image_texture>("../res/earthmap.jpg");
+
   for (int a = -11; a < 11; a++) {
     for (int b = -11; b < 11; b++) {
       const double choose_mat = random_double();
@@ -32,8 +34,7 @@ auto bright_scene() {
 
       if ((center - point3(4, 0.2, 0)).length() > 0.9) {
         if (choose_mat < 0.1) {
-          // diffuse
-          const auto earth_texture = make_shared<image_texture>("earthmap.jpg");
+          // diffuse earth
           const shared_ptr<material> sphere_material =
               make_shared<lambertian>(earth_texture);
           world.add(make_shared<sphere>(center, 0.2, sphere_material));
@@ -88,6 +89,8 @@ auto dark_scene() {
   const auto ground_material = make_shared<lambertian>(colour(0.5, 0.5, 0.5));
   world.add(make_shared<sphere>(point3(0, -1000, 0), 1000, ground_material));
 
+  const auto earth_texture = make_shared<image_texture>("../res/earthmap.jpg");
+
   for (int a = -11; a < 11; a++) {
     for (int b = -11; b < 11; b++) {
       const double choose_mat = random_double();
@@ -98,7 +101,7 @@ auto dark_scene() {
       if ((center - point3(4, 0.2, 0)).length() > 0.9) {
         if (choose_mat < 0.1) {
           // diffuse
-          const auto earth_texture = make_shared<image_texture>("earthmap.jpg");
+
           const shared_ptr<material> sphere_material =
               make_shared<diffuse_light>(earth_texture);
           world.add(make_shared<sphere>(center, 0.2, sphere_material));
@@ -148,7 +151,7 @@ auto dark_scene() {
 }
 
 auto earth() {
-  auto earth_texture = make_shared<image_texture>("earthmap.jpg");
+  auto earth_texture = make_shared<image_texture>("../res/earthmap.jpg");
   auto earth_surface = make_shared<lambertian>(earth_texture);
   auto globe = make_shared<sphere>(point3(0, 0, 0), 2, earth_surface);
 
@@ -158,16 +161,16 @@ auto earth() {
 colour ray_colour(const ray &r, const colour &background, const hittable &world,
                   const int depth) {
   if (depth <= 0)
-    return colour(0.0);
+    return colour::random();
 
   hit_record rec;
   if (!world.hit(r, eps, infinity, rec))
     return background;
 
+  const colour emitted = rec.mat_ptr->emitted(rec.u, rec.v, rec.p);
+
   ray scattered;
   colour attenuation;
-  colour emitted = rec.mat_ptr->emitted(rec.u, rec.v, rec.p);
-
   if (!rec.mat_ptr->scatter(r, rec, attenuation, scattered))
     return emitted;
 
@@ -178,7 +181,7 @@ colour ray_colour(const ray &r, const colour &background, const hittable &world,
 void render(const hittable_list &world, const camera &cam,
             const colour &background, const std::string &output,
             const int image_width, const int image_height) {
-  const int samples_per_pixel = 1000;
+  const int samples_per_pixel = 5000;
   const int max_depth = 50;
   const int tile_size = std::max(image_width, image_height);
   const int tile_weight = 1;
@@ -256,10 +259,12 @@ void render(const hittable_list &world, const camera &cam,
           const double elapsed_ms = current_time_ms - start_ms;
           const double remaining_tasks = task_list.size();
           const double done_tasks = num_tasks - remaining_tasks;
+          const double tasks_per_ms = done_tasks / elapsed_ms;
           const double estimated_remaining_ms =
               elapsed_ms / done_tasks * remaining_tasks;
           last_update_ms = current_time_ms;
           std::cout << "\r" << elapsed_ms / 1000 << "s elapsed, "
+                    << tasks_per_ms * 1000 << " tasks per sec, "
                     << estimated_remaining_ms / 1000 << "s remaining, "
                     << task_list.size() << "/" << num_tasks
                     << " tasks remaining... " << std::flush;
@@ -316,8 +321,9 @@ int main(int argc, char *argv[]) {
 
     // World
     auto world = bright_scene();
-    const auto skybox_texture = make_shared<diffuse_light>(
-        make_shared<image_texture>("hdr_pack/3.hdr", 2.0));
+    const auto skybox_image =
+        make_shared<image_texture>("../res/hdr_pack/3.hdr", 1.0);
+    const auto skybox_texture = make_shared<diffuse_light>(skybox_image);
     world.add(make_shared<sphere>(point3(0, 0, 0), 9000, skybox_texture));
 
     // Camera

@@ -10,23 +10,22 @@
 struct image {
   int width;
   int height;
-  std::vector<unsigned char> data;
+  std::vector<colour> pixels;
+
   const static int bytes_per_pixel = 3;
 
   image(const std::string &filename);
   image(const int width, const int height)
-      : width(width), height(height), data(bytes_per_pixel * width * height) {}
+      : width(width), height(height), pixels(width * height) {}
 
   constexpr inline colour get(const int row, const int col) const {
     // Take row mod height and col mod width to wrap the texture on overflow
     const int idx = (row % height) * width + (col % width);
-    return colour(from_byte(data[bytes_per_pixel * idx + 0]),
-                  from_byte(data[bytes_per_pixel * idx + 1]),
-                  from_byte(data[bytes_per_pixel * idx + 2]));
+    return pixels[idx];
   }
 
   constexpr inline colour get_floored(double u, double v) const {
-    if (data.empty())
+    if (pixels.empty())
       return colour(0, 1, 1);
 
     u = std::clamp(u, 0.0, 1.0) * width;
@@ -37,7 +36,7 @@ struct image {
 
   // Bilinear interpolation
   constexpr inline colour get_interpolated(double u, double v) const {
-    if (data.empty())
+    if (pixels.empty())
       return colour(0, 1, 1);
 
     u = std::clamp(u, 0.0, 1.0) * width;
@@ -56,9 +55,7 @@ struct image {
 
   constexpr inline void set(const int row, const int col, const colour &c) {
     const int idx = row * width + col;
-    data[bytes_per_pixel * idx + 0] = to_byte(std::clamp(c[0], 0.0, 1.0));
-    data[bytes_per_pixel * idx + 1] = to_byte(std::clamp(c[1], 0.0, 1.0));
-    data[bytes_per_pixel * idx + 2] = to_byte(std::clamp(c[2], 0.0, 1.0));
+    pixels[idx] = c;
   }
 
   void write_png(const std::string &filename);
