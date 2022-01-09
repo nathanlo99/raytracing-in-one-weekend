@@ -101,7 +101,6 @@ auto dark_scene() {
       if ((center - point3(4, 0.2, 0)).length() > 0.9) {
         if (choose_mat < 0.1) {
           // diffuse
-
           const shared_ptr<material> sphere_material =
               make_shared<diffuse_light>(earth_texture);
           world.add(make_shared<sphere>(center, 0.2, sphere_material));
@@ -322,7 +321,7 @@ int main(int argc, char *argv[]) {
     // World
     auto world = bright_scene();
     const auto skybox_image =
-        make_shared<image_texture>("../res/hdr_pack/3.hdr", 1.0);
+        make_shared<image_texture>("../res/hdr_pack/3.hdr");
     const auto skybox_texture = make_shared<diffuse_light>(skybox_image);
     world.add(make_shared<sphere>(point3(0, 0, 0), 9000, skybox_texture));
 

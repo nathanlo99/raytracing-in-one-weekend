@@ -24,14 +24,12 @@ struct solid_colour : public texture {
 
 struct image_texture : public texture {
   image img;
-  const double mult;
 
-  image_texture(const std::string &filename, const double mult = 1.0)
-      : img(filename), mult(mult) {}
+  image_texture(const std::string &filename) : img(filename) {}
   virtual ~image_texture() = default;
 
-  virtual colour value(const double u, const double v,
-                       const vec3 &p) const override {
-    return mult * img.get_interpolated(u, v);
+  virtual inline colour value(const double u, const double v,
+                              const vec3 &p) const override {
+    return img.get_interpolated(u, v);
   }
 };
