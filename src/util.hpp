@@ -11,6 +11,10 @@
 #include <utility>
 #include <vector>
 
+#include <boost/random/sobol.hpp>
+#include <boost/random/uniform_real.hpp>
+#include <boost/random/variate_generator.hpp>
+
 // Usings
 
 using std::make_shared;
@@ -65,6 +69,21 @@ inline long long get_time_ms() {
   return std::chrono::duration_cast<std::chrono::milliseconds>(
              std::chrono::system_clock::now().time_since_epoch())
       .count();
+}
+
+inline auto get_sobol_sequence(const size_t dimensions,
+                               const size_t num_samples) {
+  boost::random::sobol generator(dimensions);
+  boost::uniform_real<> uni_dist(0.0, 1.0);
+  boost::variate_generator<boost::random::sobol &, boost::uniform_real<>> uni(
+      generator, uni_dist);
+
+  std::vector<std::pair<double, double>> result(num_samples);
+  for (size_t i = 0; i < num_samples; ++i) {
+    const double x = uni(), y = uni();
+    result[i] = std::make_pair(x, y);
+  }
+  return result;
 }
 
 // Common Headers

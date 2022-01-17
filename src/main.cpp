@@ -11,6 +11,8 @@
 #include "scenes/scenes.hpp"
 #include "sphere.hpp"
 
+#include <boost/random/sobol.hpp>
+
 #include <atomic>
 #include <fstream>
 #include <iomanip>
@@ -100,7 +102,7 @@ void render(const hittable_list &world, const camera &cam,
             const std::string &output, const int image_width,
             const int image_height, const TileProtocol protocol = PER_PIXEL) {
   const int max_threads = 4;
-  const int samples_per_pixel = 10000;
+  const int samples_per_pixel = 1000;
   const int max_depth = 500;
 
   const auto [tile_width, tile_height, tile_weight] = std::invoke(
@@ -117,7 +119,7 @@ void render(const hittable_list &world, const camera &cam,
       protocol);
 
   struct task {
-    int tile_row, tile_col, tile_height, tile_width, tile_weight;
+    int tile_row, tile_col, tile_height, tile_width, sample_idx, tile_weight;
   };
 
   image result_image(image_width, image_height);
@@ -125,15 +127,19 @@ void render(const hittable_list &world, const camera &cam,
   std::vector<int> weights(image_width * image_height);
   std::mutex image_mutex;
   std::atomic<long long> num_samples = 0;
+  const auto pixel_jitters = get_sobol_sequence(2, samples_per_pixel);
 
   auto compute_tile = [&](const task &tsk) {
     std::vector<colour> tmp_image(image_width * image_height);
     for (int j = tsk.tile_row; j < tsk.tile_row + tsk.tile_height; ++j) {
       for (int i = tsk.tile_col; i < tsk.tile_col + tsk.tile_width; ++i) {
         colour &pixel_colour = tmp_image[j * image_width + i];
-        for (int s = 1; s <= tsk.tile_weight; ++s) {
-          const double u = (i + random_double()) / (image_width - 1);
-          const double v = (j + random_double()) / (image_height - 1);
+        for (int s = 0; s < tsk.tile_weight; ++s) {
+          // const auto &[dx, dy] = pixel_jitters[tsk.sample_idx + s];
+          const double dx = random_double();
+          const double dy = random_double();
+          const double u = (i + dx) / (image_width - 1);
+          const double v = (j + dy) / (image_height - 1);
           const ray r = cam.get_ray(u, v);
           pixel_colour += ray_colour(r, world, max_depth);
         }
@@ -160,7 +166,7 @@ void render(const hittable_list &world, const camera &cam,
       for (int tile_col = 0; tile_col < image_width; tile_col += tile_width) {
         task_list.push_back(
             {tile_row, tile_col, std::min(image_height - tile_row, tile_height),
-             std::min(image_width - tile_col, tile_width),
+             std::min(image_width - tile_col, tile_width), samples,
              std::min(samples_per_pixel - samples, tile_weight)});
       }
     }
@@ -217,6 +223,7 @@ void render(const hittable_list &world, const camera &cam,
 }
 
 int main(int argc, char *argv[]) {
+
   {
     const auto [world, cam, image_width, image_height] = bright_scene();
     render(world, cam, "bright_scene.png", image_width, image_height,
