@@ -8,10 +8,10 @@
 struct sphere : public hittable {
   point3 centre;
   double radius;
-  std::shared_ptr<material> mat_ptr;
+  material *mat_ptr;
 
   sphere() : centre(), radius(0), mat_ptr(nullptr) {}
-  sphere(const point3 &centre, const double r, std::shared_ptr<material> mat)
+  sphere(const point3 &centre, const double r, material *mat)
       : centre(centre), radius(r), mat_ptr(mat) {}
   virtual ~sphere() = default;
 

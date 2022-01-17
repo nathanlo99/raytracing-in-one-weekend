@@ -219,11 +219,13 @@ void render(const hittable_list &world, const camera &cam,
 int main(int argc, char *argv[]) {
   {
     const auto [world, cam, image_width, image_height] = bright_scene();
-    render(world, cam, "bright_scene.png", image_width, image_height, PER_LINE);
+    render(world, cam, "bright_scene.png", image_width, image_height,
+           PER_FRAME);
   }
 
   {
     const auto [world, cam, image_width, image_height] = simple_scene();
-    render(world, cam, "simple_scene.png", image_width, image_height, PER_LINE);
+    render(world, cam, "simple_scene.png", image_width, image_height,
+           PER_FRAME);
   }
 }

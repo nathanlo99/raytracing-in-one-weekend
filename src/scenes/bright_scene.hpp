@@ -12,6 +12,8 @@
 #include "material.hpp"
 #include "sphere.hpp"
 
+#include "material_manager.hpp"
+
 auto bright_scene() {
   // Image
   const double aspect_ratio = 16.0 / 9.0;
@@ -20,7 +22,8 @@ auto bright_scene() {
 
   hittable_list world;
 
-  const auto ground_material = make_shared<lambertian>(colour(0.5, 0.5, 0.5));
+  const auto ground_material =
+      material_manager::instance().create<lambertian>(colour(0.5, 0.5, 0.5));
   world.add(make_shared<sphere>(point3(0, -1000, 0), 1000, ground_material));
 
   const auto earth_texture = make_shared<image_texture>("../res/earthmap.jpg");
@@ -35,22 +38,22 @@ auto bright_scene() {
       if ((center - point3(4, 0.2, 0)).length() > 0.9) {
         if (choose_mat < 0.1) {
           // diffuse earth
-          const shared_ptr<material> sphere_material =
-              make_shared<lambertian>(earth_texture);
+          const auto sphere_material =
+              material_manager::instance().create<lambertian>(earth_texture);
           world.add(make_shared<sphere>(center, 0.2, sphere_material));
         } else if (choose_mat < 0.4) {
           // diffuse
           const colour albedo = colour::random() * colour::random();
-          const shared_ptr<material> sphere_material =
-              make_shared<lambertian>(albedo);
+          const auto sphere_material =
+              material_manager::instance().create<lambertian>(albedo);
           const point3 center2 = center + vec3(0, random_double(0, .5), 0);
           world.add(make_shared<animated_sphere>(center, center2, 0.0, 1.0, 0.2,
                                                  sphere_material));
         } else if (choose_mat < 0.8) {
           // diffuse
           const colour albedo = colour::random() * colour::random();
-          const shared_ptr<material> sphere_material =
-              make_shared<lambertian>(albedo);
+          const auto sphere_material =
+              material_manager::instance().create<lambertian>(albedo);
           const point3 center2 = center + vec3(0, random_double(0, .5), 0);
           world.add(make_shared<animated_sphere>(center, center2, 0.0, 1.0, 0.2,
                                                  sphere_material));
@@ -58,32 +61,36 @@ auto bright_scene() {
           // metal
           const colour albedo = colour::random(0.5, 1);
           const double fuzz = random_double(0, 0.5);
-          const shared_ptr<material> sphere_material =
-              make_shared<metal>(albedo, fuzz);
+          const auto sphere_material =
+              material_manager::instance().create<metal>(albedo, fuzz);
           world.add(make_shared<sphere>(center, 0.2, sphere_material));
         } else {
           // glass
-          const shared_ptr<material> sphere_material =
-              make_shared<dielectric>(colour(1.0), 1.5);
+          const auto sphere_material =
+              material_manager::instance().create<dielectric>(colour(1.0), 1.5);
           world.add(make_shared<sphere>(center, 0.2, sphere_material));
         }
       }
     }
   }
 
-  const auto material1 = make_shared<dielectric>(colour(1.0), 1.5);
+  const auto material1 =
+      material_manager::instance().create<dielectric>(colour(1.0), 1.5);
   world.add(make_shared<sphere>(point3(0, 1, 0), 1.0, material1));
 
-  const auto material2 = make_shared<lambertian>(colour(0.4, 0.2, 0.1));
+  const auto material2 =
+      material_manager::instance().create<lambertian>(colour(0.4, 0.2, 0.1));
   world.add(make_shared<sphere>(point3(-4, 1, 0), 1.0, material2));
 
-  const auto material3 = make_shared<metal>(colour(0.7, 0.6, 0.5), 0.0);
+  const auto material3 =
+      material_manager::instance().create<metal>(colour(0.7, 0.6, 0.5), 0.0);
   world.add(make_shared<sphere>(point3(4, 1, 0), 1.0, material3));
 
   auto list = hittable_list(bvh_node::from_list(world, 0.0, 1.0));
 
   const auto skybox_image = make_shared<image_texture>("../res/hdr_pack/5.hdr");
-  const auto skybox_texture = make_shared<diffuse_light>(skybox_image);
+  const auto skybox_texture =
+      material_manager::instance().create<diffuse_light>(skybox_image);
   list.add(make_shared<sphere>(point3(0, 0, 0), 9000, skybox_texture));
 
   // Camera

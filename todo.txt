@@ -1,4 +1,5 @@
 
+- refactor material shared_ptr to raw material pointer and add material_manager
 - triangle mesh import
 - add a GUI (maybe imgui)
 - add scene lua support (can get inspiration from lux)

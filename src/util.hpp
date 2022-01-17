@@ -68,6 +68,5 @@ inline long long get_time_ms() {
 }
 
 // Common Headers
-
 #include "ray.hpp"
 #include "vec3.hpp"
