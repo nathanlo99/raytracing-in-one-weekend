@@ -135,9 +135,7 @@ void render(const hittable_list &world, const camera &cam,
       for (int i = tsk.tile_col; i < tsk.tile_col + tsk.tile_width; ++i) {
         colour &pixel_colour = tmp_image[j * image_width + i];
         for (int s = 0; s < tsk.tile_weight; ++s) {
-          // const auto &[dx, dy] = pixel_jitters[tsk.sample_idx + s];
-          const double dx = random_double();
-          const double dy = random_double();
+          const auto &[dx, dy] = pixel_jitters[tsk.sample_idx + s];
           const double u = (i + dx) / (image_width - 1);
           const double v = (j + dy) / (image_height - 1);
           const ray r = cam.get_ray(u, v);
@@ -223,14 +221,13 @@ void render(const hittable_list &world, const camera &cam,
 }
 
 int main(int argc, char *argv[]) {
-
-  {
+  if (false) {
     const auto [world, cam, image_width, image_height] = bright_scene();
     render(world, cam, "bright_scene.png", image_width, image_height,
            PER_FRAME);
   }
 
-  {
+  if (true) {
     const auto [world, cam, image_width, image_height] = simple_scene();
     render(world, cam, "simple_scene.png", image_width, image_height,
            PER_FRAME);

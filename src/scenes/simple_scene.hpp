@@ -26,24 +26,20 @@ auto simple_scene() {
       material_manager::instance().create<lambertian>(colour(0.5, 0.5, 0.5));
   world.add(make_shared<sphere>(point3(0, -1000, 0), 1000, ground_material));
 
-  const auto material1 =
+  const auto glass_material =
       material_manager::instance().create<dielectric>(colour(1.0), 1.5);
-  world.add(make_shared<sphere>(point3(0, 1, 0), 1.0, material1));
+  world.add(make_shared<sphere>(point3(0, 1, 0), 1.0, glass_material));
 
-  const auto material2 =
+  const auto egg_material =
       material_manager::instance().create<lambertian>(colour(0.4, 0.2, 0.1));
-  world.add(make_shared<sphere>(point3(-2.5, 1, 0), 1.0, material2));
+  world.add(make_shared<sphere>(point3(-2.5, 1, 0), 1.0, egg_material));
 
-  const auto material3 =
+  const auto mirror_material =
       material_manager::instance().create<metal>(colour(0.7, 0.6, 0.5), 0.0);
-  world.add(make_shared<sphere>(point3(2.5, 1, 0), 1.0, material3));
+  world.add(make_shared<sphere>(point3(2.5, 1, 0), 1.0, mirror_material));
 
   auto list = hittable_list(bvh_node::from_list(world, 0.0, 1.0));
-
-  const auto skybox_image = make_shared<image_texture>("../res/hdr_pack/5.hdr");
-  const auto skybox_texture =
-      material_manager::instance().create<diffuse_light>(skybox_image);
-  list.add(make_shared<sphere>(point3(0, 0, 0), 9000, skybox_texture));
+  list.add_background_map("../res/hdr_pack/5.hdr");
 
   // Camera
   const point3 lookfrom(0, 3, 6);

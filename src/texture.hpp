@@ -1,6 +1,7 @@
 
 #pragma once
 
+#include "image.hpp"
 #include "util.hpp"
 
 struct texture {
