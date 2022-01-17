@@ -20,7 +20,6 @@ struct sphere : public hittable {
   virtual bool bounding_box(const double time0, const double time1,
                             aabb &output_box) const override;
 
-private:
   static constexpr void get_sphere_uv(const point3 &p, double &u, double &v) {
     const double theta = acos(-p.y());
     const double phi = atan2(-p.z(), p.x()) + pi;
@@ -29,8 +28,9 @@ private:
   }
 };
 
-bool sphere::hit(const ray &r, const double t_min, const double t_max,
-                 hit_record &rec) const {
+__attribute__((hot)) bool sphere::hit(const ray &r, const double t_min,
+                                      const double t_max,
+                                      hit_record &rec) const {
   const vec3 oc = r.orig - centre;
   const double a = r.dir.length_squared();
   const double half_b = dot(oc, r.dir);

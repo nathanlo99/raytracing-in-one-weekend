@@ -16,8 +16,8 @@ struct aabb {
       double t1 = (max[a] - r.orig[a]) * invD;
       if (invD < 0.0f)
         std::swap(t0, t1);
-      t_min = t0 > t_min ? t0 : t_min;
-      t_max = t1 < t_max ? t1 : t_max;
+      t_min = std::max(t0, t_min);
+      t_max = std::min(t1, t_max);
       if (t_max <= t_min)
         return false;
     }

@@ -4,6 +4,7 @@
 #include "util.hpp"
 
 #include "hittable.hpp"
+#include "sphere.hpp"
 
 struct animated_sphere : public hittable {
   point3 centre0, centre1;
@@ -29,8 +30,9 @@ struct animated_sphere : public hittable {
   }
 };
 
-bool animated_sphere::hit(const ray &r, const double t_min, const double t_max,
-                          hit_record &rec) const {
+__attribute__((hot)) bool animated_sphere::hit(const ray &r, const double t_min,
+                                               const double t_max,
+                                               hit_record &rec) const {
   const point3 centre = get_centre(r.time);
   const vec3 oc = r.orig - centre;
   const double a = r.dir.length_squared();
@@ -52,7 +54,9 @@ bool animated_sphere::hit(const ray &r, const double t_min, const double t_max,
 
   rec.t = root;
   rec.p = r.at(rec.t);
-  rec.set_face_normal(r, (rec.p - centre) / radius);
+  const auto outward_normal = (rec.p - centre) / radius;
+  rec.set_face_normal(r, outward_normal);
+  sphere::get_sphere_uv(outward_normal, rec.u, rec.v);
   rec.mat_ptr = mat_ptr;
 
   return true;

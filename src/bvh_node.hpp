@@ -72,7 +72,7 @@ bvh_node::bvh_node(std::vector<hittable_with_box> &objects, const size_t start,
     box = surrounding_box(objects[start].box, objects[start + 1].box);
     return;
   } else if (span == 3) {
-    left = make_shared<bvh_node>(objects, start, end - 1, time0, time1);
+    left = make_shared<bvh_node>(objects, start, start + 2, time0, time1);
     right = objects[end - 1].object;
     box = surrounding_box(
         objects[start].box,
