@@ -65,6 +65,12 @@ inline int random_int(const int min, const int max) {
   return static_cast<int>(random_double(min, max + 1));
 }
 
+inline long long get_time_ns() {
+  return std::chrono::duration_cast<std::chrono::nanoseconds>(
+             std::chrono::system_clock::now().time_since_epoch())
+      .count();
+}
+
 inline long long get_time_ms() {
   return std::chrono::duration_cast<std::chrono::milliseconds>(
              std::chrono::system_clock::now().time_since_epoch())
@@ -79,10 +85,8 @@ inline auto get_sobol_sequence(const size_t dimensions,
       generator, uni_dist);
 
   std::vector<std::pair<double, double>> result(num_samples);
-  for (size_t i = 0; i < num_samples; ++i) {
-    const double x = uni(), y = uni();
-    result[i] = std::make_pair(x, y);
-  }
+  for (size_t i = 0; i < num_samples; ++i)
+    result[i] = std::make_pair(uni(), uni());
   return result;
 }
 

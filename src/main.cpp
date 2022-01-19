@@ -21,10 +21,13 @@
 #include <queue>
 #include <thread>
 
-__attribute__((hot)) colour ray_colour(const ray &r, const hittable &world,
-                                       const int depth) {
+__attribute__((hot)) colour
+ray_colour(const ray &r, const hittable &world, const int depth,
+           const colour &contribution = colour(1.0)) {
   if (depth <= 0)
     return colour();
+  if (contribution.length_squared() < 1e-12)
+    return colour::random();
 
   hit_record rec;
   if (!world.hit(r, eps, infinity, rec))
@@ -37,26 +40,39 @@ __attribute__((hot)) colour ray_colour(const ray &r, const hittable &world,
   if (!rec.mat_ptr->scatter(r, rec, attenuation, scattered))
     return emitted;
 
-  return emitted + attenuation * ray_colour(scattered, world, depth - 1);
+  return emitted + attenuation * ray_colour(scattered, world, depth - 1,
+                                            contribution * attenuation);
 }
+
+enum TileProtocol {
+  PER_FRAME,
+  PER_PIXEL,
+  PER_LINE,
+  PER_TILE,
+};
 
 void render_singlethreaded(const hittable_list &world, const camera &cam,
                            const std::string &output, const int image_width,
-                           const int image_height) {
+                           const int image_height, const TileProtocol) {
   const int samples_per_pixel = 10000;
   const int max_depth = 50;
 
   image result_image(image_width, image_height);
+  std::vector<long long> debug_times(image_width * image_height);
+  long long slowest_pixel = 0;
 
   const auto start_ms = get_time_ms();
   size_t pixels = 0;
   std::cout << "Starting render with 1 thread..." << std::endl;
+  const auto pixel_jitters = get_sobol_sequence(2, samples_per_pixel);
   for (int j = 0; j < image_height; ++j) {
     for (int i = 0; i < image_width; ++i) {
+      const auto pixel_start_ns = get_time_ns();
       colour pixel_colour;
-      for (int s = 1; s <= samples_per_pixel; ++s) {
-        const double u = (i + random_double()) / (image_width - 1);
-        const double v = (j + random_double()) / (image_height - 1);
+      for (int s = 0; s < samples_per_pixel; ++s) {
+        const auto &[dx, dy] = pixel_jitters[s];
+        const double u = (i + dx) / (image_width - 1);
+        const double v = (j + dy) / (image_height - 1);
         const ray r = cam.get_ray(u, v);
         pixel_colour += ray_colour(r, world, max_depth);
       }
@@ -65,6 +81,12 @@ void render_singlethreaded(const hittable_list &world, const camera &cam,
 
       static long long last_update_ms = 0;
       const long long current_time_ms = get_time_ms();
+
+      const long long pixel_end_time = get_time_ns();
+      const long long pixel_ns = pixel_end_time - pixel_start_ns;
+      debug_times[j * image_width + i] = pixel_ns;
+      slowest_pixel = std::max(slowest_pixel, pixel_ns);
+
       if (current_time_ms - last_update_ms > 1000) {
         last_update_ms = current_time_ms;
         const double elapsed_ms = current_time_ms - start_ms;
@@ -81,6 +103,16 @@ void render_singlethreaded(const hittable_list &world, const camera &cam,
         result_image.write_png("output/progress.png");
       }
     }
+
+    image debug_image(image_width, image_height);
+    for (int row = 0; row <= j; ++row) {
+      for (int i = 0; i < image_width; ++i) {
+        const double pixel_ns = debug_times[row * image_width + i];
+        const double ratio = pixel_ns / slowest_pixel;
+        debug_image.set(row, i, colour(ratio, ratio, ratio));
+      }
+    }
+    debug_image.write_png("output/debug.png");
   }
 
   const auto end_ms = get_time_ms();
@@ -92,17 +124,11 @@ void render_singlethreaded(const hittable_list &world, const camera &cam,
   result_image.write_png(output);
 }
 
-enum TileProtocol {
-  PER_FRAME,
-  PER_PIXEL,
-  PER_LINE,
-};
-
 void render(const hittable_list &world, const camera &cam,
             const std::string &output, const int image_width,
             const int image_height, const TileProtocol protocol = PER_PIXEL) {
   const int max_threads = 4;
-  const int samples_per_pixel = 1000;
+  const int samples_per_pixel = 10000;
   const int max_depth = 500;
 
   const auto [tile_width, tile_height, tile_weight] = std::invoke(
@@ -114,6 +140,8 @@ void render(const hittable_list &world, const camera &cam,
           return std::make_tuple(1, 1, samples_per_pixel);
         case PER_LINE:
           return std::make_tuple(image_width / max_threads, 1, 32);
+        case PER_TILE:
+          return std::make_tuple(32, 32, samples_per_pixel);
         }
       },
       protocol);
@@ -221,15 +249,13 @@ void render(const hittable_list &world, const camera &cam,
 }
 
 int main(int argc, char *argv[]) {
-  if (false) {
+  if (true) {
     const auto [world, cam, image_width, image_height] = bright_scene();
-    render(world, cam, "bright_scene.png", image_width, image_height,
-           PER_FRAME);
+    render(world, cam, "bright_scene.png", image_width, image_height, PER_TILE);
   }
 
   if (true) {
     const auto [world, cam, image_width, image_height] = simple_scene();
-    render(world, cam, "simple_scene.png", image_width, image_height,
-           PER_FRAME);
+    render(world, cam, "simple_scene.png", image_width, image_height, PER_TILE);
   }
 }

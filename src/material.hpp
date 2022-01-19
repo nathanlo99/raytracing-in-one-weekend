@@ -41,7 +41,7 @@ struct metal : public material {
   colour albedo;
   double fuzz;
 
-  metal(const colour &a, double f) : albedo(a), fuzz(std::min(1.0, f)) {}
+  metal(const colour &a, double f) : albedo(a), fuzz(std::clamp(f, 0.0, 1.0)) {}
   virtual ~metal() = default;
 
   virtual bool scatter(const ray &r_in, const hit_record &rec,
@@ -80,16 +80,16 @@ struct dielectric : public material {
     const double sin_theta = std::sqrt(1 - cos_theta * cos_theta);
 
     const bool cannot_reflect = index_ratio * sin_theta > 1.0;
-    vec3 direction;
     if (cannot_reflect ||
         random_double() < reflectance(cos_theta, index_ratio)) {
-      direction = reflect(unit_direction, rec.normal);
+      const vec3 direction = reflect(unit_direction, rec.normal);
+      scattered = ray(rec.p, direction, r_in.time);
+      return true;
     } else {
-      direction = refract(unit_direction, rec.normal, index_ratio);
+      const vec3 direction = refract(unit_direction, rec.normal, index_ratio);
+      scattered = ray(rec.p, direction, r_in.time);
+      return true;
     }
-
-    scattered = ray(rec.p, direction, r_in.time);
-    return true;
   }
 };
 
