@@ -5,8 +5,8 @@
 
 #include <cmath>
 
-class camera {
-private:
+struct camera {
+  int image_width, image_height;
   double t0, t1;
   point3 origin;
   point3 upper_left_corner;
@@ -15,11 +15,11 @@ private:
   vec3 u, v, w;
   double lens_radius;
 
-public:
-  camera(const point3 &look_from, const point3 &look_at, const vec3 &up,
-         const double vfov, const double aspect_ratio, const double aperture,
+  camera(const int image_width, const int image_height, const point3 &look_from,
+         const point3 &look_at, const vec3 &up, const double vfov,
+         const double aspect_ratio, const double aperture,
          const double focus_dist, const double t0, const double t1)
-      : t0(t0), t1(t1) {
+      : image_width(image_width), image_height(image_height), t0(t0), t1(t1) {
     const double theta = degrees_to_radians(vfov);
     const double h = std::tan(theta / 2);
     const double viewport_height = 2.0 * h;

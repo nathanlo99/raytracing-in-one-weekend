@@ -10,9 +10,10 @@
 #include "hittable_list.hpp"
 #include "image.hpp"
 #include "material.hpp"
+#include "material_manager.hpp"
 #include "sphere.hpp"
 
-#include "material_manager.hpp"
+#include "scene.hpp"
 
 auto bright_scene() {
   // Image
@@ -100,8 +101,8 @@ auto bright_scene() {
   const double dist_to_focus = 10.0;
   const double aperture = 0.1;
 
-  const camera cam(lookfrom, lookat, up, 20, aspect_ratio, aperture,
-                   dist_to_focus, 0.0, 1.0);
+  const camera cam(image_width, image_height, lookfrom, lookat, up, 20,
+                   aspect_ratio, aperture, dist_to_focus, 0.0, 1.0);
 
-  return std::make_tuple(list, cam, image_width, image_height);
+  return scene(list, cam);
 }

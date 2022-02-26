@@ -8,7 +8,7 @@
 #include "hittable_list.hpp"
 #include "image.hpp"
 #include "material.hpp"
-#include "scenes/scenes.hpp"
+#include "scenes/all_scenes.hpp"
 #include "sphere.hpp"
 
 #include <boost/random/sobol.hpp>
@@ -250,12 +250,14 @@ void render(const hittable_list &world, const camera &cam,
 
 int main(int argc, char *argv[]) {
   if (true) {
-    const auto [world, cam, image_width, image_height] = bright_scene();
-    render(world, cam, "bright_scene.png", image_width, image_height, PER_TILE);
+    const auto scene = bright_scene();
+    render(scene.objects, scene.cam, "bright_scene.png", scene.cam.image_width,
+           scene.cam.image_height, PER_TILE);
   }
 
   if (true) {
-    const auto [world, cam, image_width, image_height] = simple_scene();
-    render(world, cam, "simple_scene.png", image_width, image_height, PER_TILE);
+    const auto scene = simple_scene();
+    render(scene.objects, scene.cam, "simple_scene.png", scene.cam.image_width,
+           scene.cam.image_height, PER_TILE);
   }
 }
