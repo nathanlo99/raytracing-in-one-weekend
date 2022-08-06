@@ -14,47 +14,47 @@ struct vec3 {
   constexpr vec3(const double e0, const double e1, const double e2)
       : e{e0, e1, e2} {}
 
-  constexpr double x() const { return e[0]; }
-  constexpr double y() const { return e[1]; }
-  constexpr double z() const { return e[2]; }
+  constexpr inline double x() const { return e[0]; }
+  constexpr inline double y() const { return e[1]; }
+  constexpr inline double z() const { return e[2]; }
 
-  constexpr vec3 operator-() const { return vec3(-e[0], -e[1], -e[2]); }
-  constexpr double operator[](int i) const { return e[i]; }
-  constexpr double &operator[](int i) { return e[i]; }
+  constexpr inline vec3 operator-() const { return vec3(-e[0], -e[1], -e[2]); }
+  constexpr inline double operator[](int i) const { return e[i]; }
+  constexpr inline double &operator[](int i) { return e[i]; }
 
-  constexpr vec3 &operator+=(const vec3 &v) {
+  constexpr inline vec3 &operator+=(const vec3 &v) {
     e[0] += v.e[0];
     e[1] += v.e[1];
     e[2] += v.e[2];
     return *this;
   }
 
-  constexpr vec3 &operator*=(const double t) {
+  constexpr inline vec3 &operator*=(const double t) {
     e[0] *= t;
     e[1] *= t;
     e[2] *= t;
     return *this;
   }
 
-  constexpr vec3 &operator/=(const double t) { return *this *= 1.0 / t; }
+  constexpr inline vec3 &operator/=(const double t) { return *this *= 1.0 / t; }
 
-  constexpr double length() const { return sqrt(length_squared()); }
+  constexpr inline double length() const { return sqrt(length_squared()); }
 
-  constexpr double length_squared() const {
+  constexpr inline double length_squared() const {
     return e[0] * e[0] + e[1] * e[1] + e[2] * e[2];
   }
 
-  constexpr vec3 normalize() const {
+  constexpr inline vec3 normalize() const {
     const double inv_length = 1 / length();
     return vec3(e[0] * inv_length, e[1] * inv_length, e[2] * inv_length);
   }
 
-  constexpr vec3 clamp(const double min, const double max) const {
+  constexpr inline vec3 clamp(const double min, const double max) const {
     return vec3(std::clamp(e[0], min, max), std::clamp(e[1], min, max),
                 std::clamp(e[2], min, max));
   }
 
-  constexpr int largest_axis() const {
+  constexpr inline int largest_axis() const {
     if (e[2] > e[1] && e[2] > e[0])
       return 2;
     if (e[1] > e[0])
@@ -145,15 +145,15 @@ inline vec3 random_in_unit_disk() {
 
 inline vec3 random_unit_vector() { return random_in_unit_sphere().normalize(); }
 
-constexpr inline vec3 reflect(const vec3 &v, const vec3 &n) {
+constexpr inline vec3 reflect(const vec3 v, const vec3 n) {
   return v - 2 * dot(v, n) * n;
 }
 
-constexpr inline vec3 refract(const vec3 &uv, const vec3 &n,
+constexpr inline vec3 refract(const vec3 uv, const vec3 n,
                               const double index_ratio) {
-  const double cos_theta = std::min(dot(-uv, n), 1.0);
-  const vec3 &r_out_perp = index_ratio * (uv + cos_theta * n);
-  const vec3 &r_out_parallel =
+  const double cos_theta = std::min(-dot(uv, n), 1.0);
+  const vec3 r_out_perp = index_ratio * (uv + cos_theta * n);
+  const vec3 r_out_parallel =
       -std::sqrt(std::abs(1.0 - r_out_perp.length_squared())) * n;
   return r_out_perp + r_out_parallel;
 }

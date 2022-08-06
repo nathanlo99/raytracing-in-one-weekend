@@ -25,8 +25,10 @@ struct image {
   }
 
   inline colour get_floored(double u, double v) const {
-    if (pixels.empty())
-      return colour(0, 1, 1);
+    if (pixels.empty()) {
+      // Return magenta to identify loading errors more easily
+      return colour(1.0, 0.0, 1.0);
+    }
 
     u = std::clamp(u, 0.0, 1.0) * width;
     v = (1.0 - std::clamp(v, 0.0, 1.0)) * height;

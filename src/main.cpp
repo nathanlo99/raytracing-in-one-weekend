@@ -71,8 +71,8 @@ void render_singlethreaded(const hittable_list &world, const camera &cam,
       colour pixel_colour;
       for (int s = 0; s < samples_per_pixel; ++s) {
         const auto &[dx, dy] = pixel_jitters[s];
-        const double u = (i + dx) / (image_width - 1);
-        const double v = (j + dy) / (image_height - 1);
+        const double u = (i + dx) / image_width;
+        const double v = (j + dy) / image_height;
         const ray r = cam.get_ray(u, v);
         pixel_colour += ray_colour(r, world, max_depth);
       }
@@ -126,9 +126,9 @@ void render_singlethreaded(const hittable_list &world, const camera &cam,
 
 void render(const hittable_list &world, const camera &cam,
             const std::string &output, const int image_width,
-            const int image_height, const TileProtocol protocol = PER_PIXEL) {
+            const int image_height, const TileProtocol protocol = PER_TILE) {
   const int max_threads = 4;
-  const int samples_per_pixel = 10000;
+  const int samples_per_pixel = 50000;
   const int max_depth = 500;
 
   const auto [tile_width, tile_height, tile_weight] = std::invoke(
@@ -141,7 +141,7 @@ void render(const hittable_list &world, const camera &cam,
         case PER_LINE:
           return std::make_tuple(image_width / max_threads, 1, 32);
         case PER_TILE:
-          return std::make_tuple(32, 32, samples_per_pixel);
+          return std::make_tuple(32, 32, 32);
         }
       },
       protocol);
@@ -164,8 +164,8 @@ void render(const hittable_list &world, const camera &cam,
         colour &pixel_colour = tmp_image[j * image_width + i];
         for (int s = 0; s < tsk.tile_weight; ++s) {
           const auto &[dx, dy] = pixel_jitters[tsk.sample_idx + s];
-          const double u = (i + dx) / (image_width - 1);
-          const double v = (j + dy) / (image_height - 1);
+          const double u = (i + dx) / image_width;
+          const double v = (j + dy) / image_height;
           const ray r = cam.get_ray(u, v);
           pixel_colour += ray_colour(r, world, max_depth);
         }
@@ -190,10 +190,12 @@ void render(const hittable_list &world, const camera &cam,
   for (int samples = 0; samples < samples_per_pixel; samples += tile_weight) {
     for (int tile_row = 0; tile_row < image_height; tile_row += tile_height) {
       for (int tile_col = 0; tile_col < image_width; tile_col += tile_width) {
-        task_list.push_back(
-            {tile_row, tile_col, std::min(image_height - tile_row, tile_height),
-             std::min(image_width - tile_col, tile_width), samples,
-             std::min(samples_per_pixel - samples, tile_weight)});
+        const int task_height = std::min(image_height - tile_row, tile_height);
+        const int task_width = std::min(image_width - tile_col, tile_width);
+        const int task_samples =
+            std::min(samples_per_pixel - samples, tile_weight);
+        task_list.push_back({tile_row, tile_col, task_height, task_width,
+                             samples, task_samples});
       }
     }
   }
@@ -249,7 +251,7 @@ void render(const hittable_list &world, const camera &cam,
 }
 
 int main(int argc, char *argv[]) {
-  if (true) {
+  if (false) {
     const auto scene = bright_scene();
     render(scene.objects, scene.cam, "bright_scene.png", scene.cam.image_width,
            scene.cam.image_height, PER_TILE);

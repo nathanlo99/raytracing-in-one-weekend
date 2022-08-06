@@ -1,5 +1,4 @@
 
-
 #include "image.hpp"
 #include "colour.hpp"
 #include "stb.hpp"
@@ -27,7 +26,7 @@ image::image(const std::string &filename) {
     pixels[idx] = colour(loaded_data[3 * idx + 0], loaded_data[3 * idx + 1],
                          loaded_data[3 * idx + 2]);
   }
-  delete loaded_data;
+  stbi_image_free(loaded_data);
 }
 
 void image::write_png(const std::string &filename) {

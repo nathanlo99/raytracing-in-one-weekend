@@ -28,7 +28,7 @@ auto simple_scene() {
   world.add(make_shared<sphere>(point3(0, -1000, 0), 1000, ground_material));
 
   const auto glass_material =
-      material_manager::instance().create<dielectric>(colour(1.0), 1.5);
+      material_manager::instance().create<dielectric>(colour(1.0), 1.52);
   world.add(make_shared<sphere>(point3(0, 1, 0), 1.0, glass_material));
 
   const auto egg_material =

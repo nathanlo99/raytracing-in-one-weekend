@@ -17,8 +17,8 @@ struct solid_colour : public texture {
       : colour_value(r, g, b) {}
   virtual ~solid_colour() = default;
 
-  virtual colour value(const double u, const double v,
-                       const vec3 &p) const override {
+  virtual inline colour value(const double u, const double v,
+                              const vec3 &p) const override {
     return colour_value;
   }
 };
