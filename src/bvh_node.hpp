@@ -38,10 +38,13 @@ bool bvh_node::hit(const ray &r, const double t_min, const double t_max,
   if (!box.hit(r, t_min, t_max))
     return false;
 
+  // NOTE: We still need to query both children because we care about the
+  // record's hit location, and the distance to the right child may be smaller
+  // than the distance to the left child, despite hitting both children
   const bool hit_left = left->hit(r, t_min, t_max, rec);
   const bool hit_right = right->hit(r, t_min, hit_left ? rec.t : t_max, rec);
 
-  return hit_left || hit_right;
+  return hit_left | hit_right;
 }
 
 shared_ptr<bvh_node> bvh_node::from_list(const hittable_list &list,

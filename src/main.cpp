@@ -251,10 +251,10 @@ void render(const hittable_list &world, const camera &cam,
 }
 
 int main(int argc, char *argv[]) {
-  if (false) {
+  if (true) {
     const auto scene = bright_scene();
     render(scene.objects, scene.cam, "bright_scene.png", scene.cam.image_width,
-           scene.cam.image_height, PER_TILE);
+           scene.cam.image_height, PER_FRAME);
   }
 
   if (true) {

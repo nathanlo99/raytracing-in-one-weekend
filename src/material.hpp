@@ -27,9 +27,9 @@ struct lambertian : public material {
 
   virtual bool scatter(const ray &r_in, const hit_record &rec,
                        colour &attenuation, ray &scattered) const override {
-    vec3 scatter_direction = rec.normal + random_unit_vector();
+    const vec3 scatter_direction = rec.normal + random_unit_vector();
     if (scatter_direction.near_zero())
-      scatter_direction = rec.normal;
+      return false; // scatter_direction = rec.normal;
 
     scattered = ray(rec.p, scatter_direction, r_in.time);
     attenuation = albedo->value(rec.u, rec.v, rec.p);
@@ -76,7 +76,7 @@ struct dielectric : public material {
         rec.front_face ? 1.0 / index_of_refraction : index_of_refraction;
 
     const vec3 unit_direction = r_in.dir.normalize();
-    const double cos_theta = std::min(dot(-unit_direction, rec.normal), 1.0);
+    const double cos_theta = std::min(-dot(unit_direction, rec.normal), 1.0);
     const double sin_theta = std::sqrt(1 - cos_theta * cos_theta);
 
     const bool cannot_reflect = index_ratio * sin_theta > 1.0;

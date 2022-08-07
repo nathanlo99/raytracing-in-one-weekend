@@ -104,7 +104,7 @@ constexpr inline vec3 operator*(const double t, const vec3 &v) {
 constexpr inline vec3 operator*(const vec3 &v, const double t) { return t * v; }
 
 constexpr inline vec3 operator/(const vec3 &v, const double t) {
-  return (1 / t) * v;
+  return (1.0 / t) * v;
 }
 
 constexpr inline vec3 min(const vec3 &u, const vec3 &v) {
@@ -149,10 +149,10 @@ constexpr inline vec3 reflect(const vec3 v, const vec3 n) {
   return v - 2 * dot(v, n) * n;
 }
 
-constexpr inline vec3 refract(const vec3 uv, const vec3 n,
+constexpr inline vec3 refract(const vec3 v, const vec3 n,
                               const double index_ratio) {
-  const double cos_theta = std::min(-dot(uv, n), 1.0);
-  const vec3 r_out_perp = index_ratio * (uv + cos_theta * n);
+  const double cos_theta = -dot(v, n);
+  const vec3 r_out_perp = index_ratio * (v + cos_theta * n);
   const vec3 r_out_parallel =
       -std::sqrt(std::abs(1.0 - r_out_perp.length_squared())) * n;
   return r_out_perp + r_out_parallel;
