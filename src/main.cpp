@@ -53,8 +53,8 @@ enum TileProtocol {
 
 void render_singlethreaded(const hittable_list &world, const camera &cam,
                            const std::string &output, const int image_width,
-                           const int image_height, const TileProtocol) {
-  const int samples_per_pixel = 10000;
+                           const int image_height, const int samples_per_pixel,
+                           const TileProtocol) {
   const int max_depth = 50;
 
   image result_image(image_width, image_height);
@@ -126,10 +126,10 @@ void render_singlethreaded(const hittable_list &world, const camera &cam,
 
 void render(const hittable_list &world, const camera &cam,
             const std::string &output, const int image_width,
-            const int image_height, const TileProtocol protocol = PER_TILE) {
+            const int image_height, const int samples_per_pixel,
+            const TileProtocol protocol = PER_TILE) {
   const int max_threads = 4;
-  const int samples_per_pixel = 50000;
-  const int max_depth = 500;
+  const int max_depth = 50;
 
   const auto [tile_width, tile_height, tile_weight] = std::invoke(
       [&](const TileProtocol protocol) {
@@ -251,15 +251,15 @@ void render(const hittable_list &world, const camera &cam,
 }
 
 int main(int argc, char *argv[]) {
-  if (true) {
+  if (false) {
     const auto scene = bright_scene();
     render(scene.objects, scene.cam, "bright_scene.png", scene.cam.image_width,
-           scene.cam.image_height, PER_FRAME);
+           scene.cam.image_height, 5000, PER_FRAME);
   }
 
   if (true) {
     const auto scene = simple_scene();
     render(scene.objects, scene.cam, "simple_scene.png", scene.cam.image_width,
-           scene.cam.image_height, PER_TILE);
+           scene.cam.image_height, 5000, PER_FRAME);
   }
 }
