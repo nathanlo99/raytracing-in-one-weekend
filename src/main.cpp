@@ -10,6 +10,7 @@
 #include "material.hpp"
 #include "scenes/all_scenes.hpp"
 #include "sphere.hpp"
+#include "triangle.hpp"
 
 #include <boost/random/sobol.hpp>
 

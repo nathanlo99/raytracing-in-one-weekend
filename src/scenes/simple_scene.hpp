@@ -12,6 +12,7 @@
 #include "material.hpp"
 #include "material_manager.hpp"
 #include "sphere.hpp"
+#include "triangle.hpp"
 
 #include "scene.hpp"
 
@@ -38,6 +39,12 @@ auto simple_scene() {
   const auto mirror_material =
       material_manager::instance().create<metal>(colour(0.7, 0.6, 0.5), 0.0);
   world.add(make_shared<sphere>(point3(2.5, 1, 0), 1.0, mirror_material));
+
+  world.add(make_shared<triangle>(point3(-2.5, 2, 0), point3(0, 2, 0),
+                                  point3(-1.25, 4, 0), egg_material));
+
+  world.add(make_shared<triangle>(point3(0, 2, 0), point3(2.5, 2, 0),
+                                  point3(1.25, 4, 0), mirror_material));
 
   auto list = hittable_list(bvh_node::from_list(world, 0.0, 1.0));
   list.add_background_map("../res/hdr_pack/5.hdr");

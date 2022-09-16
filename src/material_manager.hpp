@@ -6,6 +6,7 @@
 
 #include "material.hpp"
 
+// A global singleton material manager to avoid redundant materials
 struct material_manager {
   std::vector<std::unique_ptr<material>> materials;
 
