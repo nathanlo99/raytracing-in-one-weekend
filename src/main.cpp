@@ -10,6 +10,7 @@
 #include "material.hpp"
 #include "scenes/all_scenes.hpp"
 #include "sphere.hpp"
+#include "triangle.hpp"
 
 #include <boost/random/sobol.hpp>
 
@@ -258,8 +259,8 @@ int main(int argc, char *argv[]) {
   }
 
   if (true) {
-    const auto scene = simple_scene();
-    render(scene.objects, scene.cam, "simple_scene.png", scene.cam.image_width,
-           scene.cam.image_height, 5000, PER_FRAME);
+    const auto scene = platonic_scene();
+    render(scene.objects, scene.cam, "platonic.png", scene.cam.image_width,
+           scene.cam.image_height, 50000, PER_FRAME);
   }
 }

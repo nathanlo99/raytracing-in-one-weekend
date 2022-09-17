@@ -17,7 +17,7 @@
 
 #include "scene.hpp"
 
-auto simple_scene() {
+auto platonic_scene() {
   // Image
   const double aspect_ratio = 2.0;
   const int image_width = 1200;
@@ -27,32 +27,27 @@ auto simple_scene() {
 
   const auto ground_material =
       material_manager::instance().create<lambertian>(colour(0.5, 0.5, 0.5));
-  world.add(make_shared<sphere>(point3(0, -1000, 0), 1000, ground_material));
+  world.add(make_shared<sphere>(point3(0, -1001, 0), 1000, ground_material));
 
   const auto glass_material =
       material_manager::instance().create<dielectric>(colour(1.0), 1.52);
-  world.add(make_shared<sphere>(point3(0, 1, 0), 1.0, glass_material));
 
   const auto egg_material =
       material_manager::instance().create<lambertian>(colour(0.4, 0.2, 0.1));
-  world.add(make_shared<sphere>(point3(-2.5, 1, 0), 1.0, egg_material));
+  world.add(make_shared<sphere>(point3(-2.5, 0, 0), 1.0, egg_material));
 
   const auto mirror_material =
-      material_manager::instance().create<metal>(colour(0.7, 0.6, 0.5), 0.0);
-  world.add(make_shared<sphere>(point3(2.5, 1, 0), 1.0, mirror_material));
+      material_manager::instance().create<metal>(colour(0.7, 0.6, 0.5), 0.1);
+  world.add(make_shared<sphere>(point3(2.5, 0, 0), 1.0, mirror_material));
 
-  world.add(make_shared<triangle>(point3(-2.5, 2, 0), point3(0, 2, 0),
-                                  point3(-1.25, 4, 0), egg_material));
-
-  world.add(make_shared<triangle>(point3(0, 2, 0), point3(2.5, 2, 0),
-                                  point3(1.25, 4, 0), mirror_material));
+  world.add(load_obj("../assets/obj/icosa.obj", glass_material));
 
   auto list = hittable_list(bvh_node::from_list(world, 0.0, 1.0));
   list.add_background_map("../res/hdr_pack/5.hdr");
 
   // Camera
-  const point3 lookfrom(0, 3, 6);
-  const point3 lookat(0, 1, 0);
+  const point3 lookfrom(0, 2, 6);
+  const point3 lookat(0, 0, 0);
   const vec3 up(0, 1, 0);
   const double dist_to_focus = 10.0;
   const double aperture = 0.1;

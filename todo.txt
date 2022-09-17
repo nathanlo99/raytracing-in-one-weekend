@@ -1,9 +1,9 @@
 
 - triangle mesh import
-  - write a triangle hittable class
-  - import the vertices and faces of an obj model
+  X write a triangle hittable class
+  X import the vertices and faces of an obj model
   - import the uv coordinates of the obj model
   - integrate normal / bump textures
-- (close to) zero-cost instance transormations
+- (close to) zero-cost instance transformations
 - add a GUI (maybe imgui)
 - add scene lua support (can get inspiration from lux)

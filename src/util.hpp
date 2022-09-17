@@ -5,12 +5,14 @@
 #include <cassert>
 #include <chrono>
 #include <cmath>
+#include <iostream>
 #include <limits>
 #include <memory>
 #include <random>
 #include <utility>
 #include <vector>
 
+#include <boost/assert.hpp>
 #include <boost/random/sobol.hpp>
 #include <boost/random/uniform_real.hpp>
 #include <boost/random/variate_generator.hpp>
