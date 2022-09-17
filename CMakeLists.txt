@@ -18,5 +18,6 @@ find_package(Boost REQUIRED COMPONENTS random)
 include_directories(${Boost_INCLUDE_DIRS})
 
 # add the executable
-add_executable(raytracer src/hittable_list.cpp src/sphere.cpp src/triangle.cpp src/stb.cpp src/image.cpp src/main.cpp)
+file(GLOB raytracer_SRC CONFIGURE_DEPENDS "src/*.cpp")
+add_executable(raytracer ${raytracer_SRC})
 target_link_libraries(raytracer ${Boost_LIBRARIES})

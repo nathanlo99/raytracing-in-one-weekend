@@ -14,6 +14,7 @@ struct hittable_list : public hittable {
   hittable_list() = default;
   hittable_list(shared_ptr<hittable> object) { add(object); }
 
+  constexpr size_t size() const { return objects.size(); }
   void clear() { objects.clear(); }
   void add(shared_ptr<hittable> object) { objects.push_back(object); }
   void add_background_map(const std::string &filename);
