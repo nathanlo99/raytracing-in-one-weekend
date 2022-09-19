@@ -17,7 +17,11 @@
 
 #include "scene.hpp"
 
-auto diamond_scene() {
+auto light_material(const colour &c) {
+  return material_manager::instance().create<diffuse_light>(c);
+}
+
+auto dark_diamond_scene() {
   // Image
   const float aspect_ratio = 1.5;
   const int image_width = 1200;
@@ -29,8 +33,15 @@ auto diamond_scene() {
       material_manager::instance().create<lambertian>(colour(0.5, 0.5, 0.5));
   world.add(make_shared<sphere>(point3(0, -1000, 0), 1000, ground_material));
 
-  const auto diamond_material =
-      material_manager::instance().create<dielectric>(colour(1.0), 2.418);
+  const auto diamond_material = material_manager::instance().create<dielectric>(
+      colour(0.04, 0.12, 0.70), 1.52);
+
+  const auto white_light_material = light_material(colour(1.0));
+  world.add(make_shared<sphere>(point3(0, 10, 0), 1.0, white_light_material));
+  world.add(make_shared<sphere>(point3(3, 10, 3), 1.0, white_light_material));
+  world.add(make_shared<sphere>(point3(-3, 10, 3), 1.0, white_light_material));
+  world.add(make_shared<sphere>(point3(3, 10, -3), 1.0, white_light_material));
+  world.add(make_shared<sphere>(point3(-3, 10, -3), 1.0, white_light_material));
 
   world.add(load_obj("../assets/obj/diamond.obj", diamond_material));
 
