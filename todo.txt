@@ -4,6 +4,7 @@
   X import the vertices and faces of an obj model
   - import the uv coordinates of the obj model
   - integrate normal / bump textures
+- switch to glm::vec's
 - (close to) zero-cost instance transformations
 - add a GUI (maybe imgui)
 - add scene lua support (can get inspiration from lux)
