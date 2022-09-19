@@ -22,13 +22,15 @@
 #include <queue>
 #include <thread>
 
+#include <glm/glm.hpp>
+
 __attribute__((hot)) colour
 ray_colour(const ray &r, const hittable &world, const int depth,
            const colour &contribution = colour(1.0)) {
   if (depth <= 0)
     return colour();
-  if (contribution.length_squared() < 1e-12)
-    return colour::random();
+  if (dot(contribution, contribution) < 1e-10)
+    return util::random_vec3();
 
   hit_record rec;
   if (!world.hit(r, eps, infinity, rec))
@@ -69,16 +71,17 @@ void render_singlethreaded(const hittable_list &world, const camera &cam,
   for (int j = 0; j < image_height; ++j) {
     for (int i = 0; i < image_width; ++i) {
       const auto pixel_start_ns = get_time_ns();
-      colour pixel_colour;
+      colour pixel_colour(0.0);
       for (int s = 0; s < samples_per_pixel; ++s) {
         const auto &[dx, dy] = pixel_jitters[s];
-        const double u = (i + dx) / image_width;
-        const double v = (j + dy) / image_height;
+        const float u = (i + dx) / image_width;
+        const float v = (j + dy) / image_height;
         const ray r = cam.get_ray(u, v);
         pixel_colour += ray_colour(r, world, max_depth);
       }
       pixels++;
-      result_image.set(j, i, pixel_colour / samples_per_pixel);
+      result_image.set(j, i,
+                       pixel_colour / static_cast<float>(samples_per_pixel));
 
       static long long last_update_ms = 0;
       const long long current_time_ms = get_time_ms();
@@ -90,12 +93,12 @@ void render_singlethreaded(const hittable_list &world, const camera &cam,
 
       if (current_time_ms - last_update_ms > 1000) {
         last_update_ms = current_time_ms;
-        const double elapsed_ms = current_time_ms - start_ms;
-        const double done_tasks = pixels;
-        const double num_tasks = image_width * image_height;
-        const double remaining_tasks = num_tasks - done_tasks;
-        const double tasks_per_ms = done_tasks / elapsed_ms;
-        const double estimated_remaining_ms = num_tasks / tasks_per_ms;
+        const float elapsed_ms = current_time_ms - start_ms;
+        const float done_tasks = pixels;
+        const float num_tasks = image_width * image_height;
+        const float remaining_tasks = num_tasks - done_tasks;
+        const float tasks_per_ms = done_tasks / elapsed_ms;
+        const float estimated_remaining_ms = num_tasks / tasks_per_ms;
         std::cout << "\r" << elapsed_ms / 1000 << "s elapsed, "
                   << tasks_per_ms * 1000 << " pixels per sec, "
                   << estimated_remaining_ms / 1000 << "s remaining, "
@@ -108,16 +111,16 @@ void render_singlethreaded(const hittable_list &world, const camera &cam,
     image debug_image(image_width, image_height);
     for (int row = 0; row <= j; ++row) {
       for (int i = 0; i < image_width; ++i) {
-        const double pixel_ns = debug_times[row * image_width + i];
-        const double ratio = pixel_ns / slowest_pixel;
-        debug_image.set(row, i, colour(ratio, ratio, ratio));
+        const float pixel_ns = debug_times[row * image_width + i];
+        const float ratio = pixel_ns / slowest_pixel;
+        debug_image.set(row, i, colour(ratio));
       }
     }
     debug_image.write_png("output/debug.png");
   }
 
   const auto end_ms = get_time_ms();
-  const double elapsed_seconds = (end_ms - start_ms) / 1000.0;
+  const float elapsed_seconds = (end_ms - start_ms) / 1000.0;
   std::cout << std::endl
             << "Done! Took " << elapsed_seconds << " seconds" << std::endl;
 
@@ -165,8 +168,8 @@ void render(const hittable_list &world, const camera &cam,
         colour &pixel_colour = tmp_image[j * image_width + i];
         for (int s = 0; s < tsk.tile_weight; ++s) {
           const auto &[dx, dy] = pixel_jitters[tsk.sample_idx + s];
-          const double u = (i + dx) / image_width;
-          const double v = (j + dy) / image_height;
+          const float u = (i + dx) / image_width;
+          const float v = (j + dy) / image_height;
           const ray r = cam.get_ray(u, v);
           pixel_colour += ray_colour(r, world, max_depth);
         }
@@ -180,7 +183,8 @@ void render(const hittable_list &world, const camera &cam,
         const int idx = j * image_width + i;
         framebuffer[idx] += tmp_image[idx];
         weights[idx] += tsk.tile_weight;
-        result_image.set(j, i, framebuffer[idx] / weights[idx]);
+        result_image.set(j, i,
+                         framebuffer[idx] / static_cast<float>(weights[idx]));
       }
     }
   };
@@ -219,12 +223,12 @@ void render(const hittable_list &world, const camera &cam,
         const long long current_time_ms = get_time_ms();
         if (current_time_ms - last_update_ms > 1000) {
           last_update_ms = current_time_ms;
-          const double elapsed_ms = current_time_ms - start_ms;
+          const float elapsed_ms = current_time_ms - start_ms;
           const size_t done_tasks = std::min<size_t>(num_tasks, next_task_idx);
           const size_t remaining_tasks = num_tasks - done_tasks;
-          const double tasks_per_ms = done_tasks / elapsed_ms;
-          const double samples_per_ms = num_samples / elapsed_ms;
-          const double estimated_remaining_ms =
+          const float tasks_per_ms = done_tasks / elapsed_ms;
+          const float samples_per_ms = num_samples / elapsed_ms;
+          const float estimated_remaining_ms =
               elapsed_ms / done_tasks * remaining_tasks;
           std::cout << "\r" << elapsed_ms / 1000 << "s elapsed, "
                     << tasks_per_ms * 1000 << " tasks per sec, "
@@ -243,7 +247,7 @@ void render(const hittable_list &world, const camera &cam,
   }
 
   const auto end_ms = get_time_ms();
-  const double elapsed_seconds = (end_ms - start_ms) / 1000.0;
+  const float elapsed_seconds = (end_ms - start_ms) / 1000.0;
   std::cout << std::endl
             << "Done! Took " << elapsed_seconds << " seconds" << std::endl;
 
@@ -261,6 +265,6 @@ int main(int argc, char *argv[]) {
   if (true) {
     const auto scene = platonic_scene();
     render(scene.objects, scene.cam, "platonic.png", scene.cam.image_width,
-           scene.cam.image_height, 5000, PER_FRAME);
+           scene.cam.image_height, 50000, PER_FRAME);
   }
 }
