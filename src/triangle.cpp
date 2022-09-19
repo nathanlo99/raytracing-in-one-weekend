@@ -3,8 +3,8 @@
 
 #define OLD_TRIANGLE_HIT 0
 
-__attribute__((hot)) bool triangle::hit(const ray &r, const double t_min,
-                                        const double t_max,
+__attribute__((hot)) bool triangle::hit(const ray &r, const float t_min,
+                                        const float t_max,
                                         hit_record &rec) const {
 #if OLD_TRIANGLE_HIT
   // NOTE: This is almost directly transcribed from
@@ -73,7 +73,7 @@ __attribute__((hot)) bool triangle::hit(const ray &r, const double t_min,
 #endif
 }
 
-bool triangle::bounding_box(const double time0, const double time1,
+bool triangle::bounding_box(const float time0, const float time1,
                             aabb &output_box) const {
   output_box.min = min(p0, min(p1, p2)) - vec3(eps);
   output_box.max = max(p0, max(p1, p2)) + vec3(eps);

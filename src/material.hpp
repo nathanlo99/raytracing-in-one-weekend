@@ -11,8 +11,7 @@ struct material {
   virtual ~material() = default;
   virtual bool scatter(const ray &r_in, const hit_record &rec,
                        colour &attenuation, ray &scattered) const = 0;
-  virtual colour emitted(const double u, const double v,
-                         const point3 &p) const {
+  virtual colour emitted(const float u, const float v, const point3 &p) const {
     return colour(0, 0, 0);
   }
 };
@@ -27,8 +26,8 @@ struct lambertian : public material {
 
   virtual bool scatter(const ray &r_in, const hit_record &rec,
                        colour &attenuation, ray &scattered) const override {
-    const vec3 scatter_direction = rec.normal + random_unit_vector();
-    if (scatter_direction.near_zero())
+    const vec3 scatter_direction = rec.normal + util::random_unit_vector();
+    if (util::near_zero(scatter_direction))
       return false; // scatter_direction = rec.normal;
 
     scattered = ray(rec.p, scatter_direction, r_in.time);
@@ -39,49 +38,50 @@ struct lambertian : public material {
 
 struct metal : public material {
   colour albedo;
-  double fuzz;
+  float fuzz;
 
-  metal(const colour &a, double f) : albedo(a), fuzz(std::clamp(f, 0.0, 1.0)) {}
+  metal(const colour &a, float f)
+      : albedo(a), fuzz(std::clamp<float>(f, 0.0, 1.0)) {}
   virtual ~metal() = default;
 
   virtual bool scatter(const ray &r_in, const hit_record &rec,
                        colour &attenuation, ray &scattered) const override {
-    const vec3 reflected = reflect(r_in.dir.normalize(), rec.normal);
+    const vec3 reflected = reflect(glm::normalize(r_in.dir), rec.normal);
     scattered =
-        ray(rec.p, reflected + fuzz * random_in_unit_sphere(), r_in.time);
+        ray(rec.p, reflected + fuzz * util::random_in_unit_sphere(), r_in.time);
     attenuation = albedo;
-    return dot(scattered.dir, rec.normal) > 0;
+    return glm::dot(scattered.dir, rec.normal) > 0;
   }
 };
 
 struct dielectric : public material {
   colour albedo;
-  double index_of_refraction;
+  float index_of_refraction;
 
-  explicit dielectric(const colour &a, double index_of_refraction)
+  explicit dielectric(const colour &a, float index_of_refraction)
       : albedo(a), index_of_refraction(index_of_refraction) {}
   virtual ~dielectric() = default;
 
-  static inline double reflectance(const double cosine,
-                                   const double index_ratio) {
-    const double sqrt_r0 = (1 - index_ratio) / (1 + index_ratio);
-    const double r0 = sqrt_r0 * sqrt_r0;
+  static inline float reflectance(const float cosine, const float index_ratio) {
+    const float sqrt_r0 = (1 - index_ratio) / (1 + index_ratio);
+    const float r0 = sqrt_r0 * sqrt_r0;
     return r0 + (1 - r0) * pow(1 - cosine, 5);
   }
 
   virtual bool scatter(const ray &r_in, const hit_record &rec,
                        colour &attenuation, ray &scattered) const override {
     attenuation = albedo;
-    const double index_ratio =
+    const float index_ratio =
         rec.front_face ? 1.0 / index_of_refraction : index_of_refraction;
 
-    const vec3 unit_direction = r_in.dir.normalize();
-    const double cos_theta = std::min(-dot(unit_direction, rec.normal), 1.0);
-    const double sin_theta = std::sqrt(1 - cos_theta * cos_theta);
+    const vec3 unit_direction = normalize(r_in.dir);
+    const float cos_theta =
+        std::min<float>(-dot(unit_direction, rec.normal), 1.0);
+    const float sin_theta = std::sqrt(1.0 - cos_theta * cos_theta);
 
     const bool cannot_reflect = index_ratio * sin_theta > 1.0;
     if (cannot_reflect ||
-        random_double() < reflectance(cos_theta, index_ratio)) {
+        random_float() < reflectance(cos_theta, index_ratio)) {
       const vec3 direction = reflect(unit_direction, rec.normal);
       scattered = ray(rec.p, direction, r_in.time);
       return true;
@@ -104,7 +104,7 @@ struct diffuse_light : public material {
     return false;
   }
 
-  virtual colour emitted(const double u, const double v,
+  virtual colour emitted(const float u, const float v,
                          const point3 &p) const override {
     return emit->value(u, v, p);
   }

@@ -2,7 +2,7 @@
 #include "bvh_node.hpp"
 #include "hittable_list.hpp"
 #include "triangle.hpp"
-#include "vec3.hpp"
+
 #include <boost/algorithm/string.hpp>
 #include <fstream>
 
@@ -25,7 +25,7 @@ std::shared_ptr<hittable> load_obj(std::string_view filename, material *mat) {
 
     if (code == "v") {
       point3 pt;
-      ss >> pt.e[0] >> pt.e[1] >> pt.e[2];
+      ss >> pt.x >> pt.y >> pt.z;
       vertices.push_back(pt);
     } else if (code == "f") {
       // TODO: Remove assumption that a face has 3 points

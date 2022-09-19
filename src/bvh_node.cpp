@@ -1,7 +1,7 @@
 
 #include "bvh_node.hpp"
 
-bool bvh_node::hit(const ray &r, const double t_min, const double t_max,
+bool bvh_node::hit(const ray &r, const float t_min, const float t_max,
                    hit_record &rec) const {
   if (!box.hit(r, t_min, t_max))
     return false;
@@ -16,8 +16,8 @@ bool bvh_node::hit(const ray &r, const double t_min, const double t_max,
 }
 
 shared_ptr<hittable> bvh_node::from_list(const hittable_list &list,
-                                         const double time0,
-                                         const double time1) {
+                                         const float time0,
+                                         const float time1) {
   if (list.size() == 1)
     return list.objects[0];
 
@@ -36,7 +36,7 @@ shared_ptr<hittable> bvh_node::from_list(const hittable_list &list,
 }
 
 bvh_node::bvh_node(std::vector<hittable_with_box> &objects, const size_t start,
-                   const size_t end, const double time0, const double time1) {
+                   const size_t end, const float time0, const float time1) {
 
   const size_t span = end - start;
   assert(span >= 2);
@@ -59,7 +59,7 @@ bvh_node::bvh_node(std::vector<hittable_with_box> &objects, const size_t start,
   for (size_t i = start; i < end; ++i)
     total_box = surrounding_box(total_box, objects[i].box);
   const vec3 box_span = total_box.max - total_box.min;
-  const int axis = box_span.largest_axis();
+  const int axis = util::largest_axis(box_span);
 
   std::sort(objects.begin() + start, objects.begin() + end,
             [axis](const hittable_with_box &a, const hittable_with_box &b) {

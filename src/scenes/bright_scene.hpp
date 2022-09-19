@@ -17,7 +17,7 @@
 
 auto bright_scene() {
   // Image
-  const double aspect_ratio = 16.0 / 9.0;
+  const float aspect_ratio = 16.0 / 9.0;
   const int image_width = 1200;
   const int image_height = static_cast<int>(image_width / aspect_ratio);
 
@@ -31,12 +31,12 @@ auto bright_scene() {
 
   for (int a = -11; a < 11; a++) {
     for (int b = -11; b < 11; b++) {
-      const double choose_mat = random_double();
-      const double ball_height = 0.2;
-      const point3 center(a + 0.9 * random_double(), ball_height,
-                          b + 0.9 * random_double());
+      const float choose_mat = random_float();
+      const float ball_height = 0.2;
+      const point3 center(a + 0.9 * random_float(), ball_height,
+                          b + 0.9 * random_float());
 
-      if ((center - point3(4, 0.2, 0)).length() > 0.9) {
+      if (length(center - point3(4, 0.2, 0)) > 0.9) {
         if (choose_mat < 0.1) {
           // diffuse earth
           const auto sphere_material =
@@ -44,24 +44,24 @@ auto bright_scene() {
           world.add(make_shared<sphere>(center, 0.2, sphere_material));
         } else if (choose_mat < 0.4) {
           // diffuse
-          const colour albedo = colour::random() * colour::random();
+          const colour albedo = util::random_vec3() * util::random_vec3();
           const auto sphere_material =
               material_manager::instance().create<lambertian>(albedo);
-          const point3 center2 = center + vec3(0, random_double(0, .5), 0);
+          const point3 center2 = center + vec3(0, random_float(0, .5), 0);
           world.add(make_shared<animated_sphere>(center, center2, 0.0, 1.0, 0.2,
                                                  sphere_material));
         } else if (choose_mat < 0.8) {
           // diffuse
-          const colour albedo = colour::random() * colour::random();
+          const colour albedo = util::random_vec3() * util::random_vec3();
           const auto sphere_material =
               material_manager::instance().create<lambertian>(albedo);
-          const point3 center2 = center + vec3(0, random_double(0, .5), 0);
+          const point3 center2 = center + vec3(0, random_float(0, .5), 0);
           world.add(make_shared<animated_sphere>(center, center2, 0.0, 1.0, 0.2,
                                                  sphere_material));
         } else if (choose_mat < 0.95) {
           // metal
-          const colour albedo = colour::random(0.5, 1);
-          const double fuzz = random_double(0, 0.5);
+          const colour albedo = util::random_vec3(0.5, 1);
+          const float fuzz = random_float(0, 0.5);
           const auto sphere_material =
               material_manager::instance().create<metal>(albedo, fuzz);
           world.add(make_shared<sphere>(center, 0.2, sphere_material));
@@ -98,8 +98,8 @@ auto bright_scene() {
   const point3 lookfrom(13, 2, 3);
   const point3 lookat(0, 0, 0);
   const vec3 up(0, 1, 0);
-  const double dist_to_focus = 10.0;
-  const double aperture = 0.1;
+  const float dist_to_focus = 10.0;
+  const float aperture = 0.1;
 
   const camera cam(image_width, image_height, lookfrom, lookat, up, 20,
                    aspect_ratio, aperture, dist_to_focus, 0.0, 1.0);

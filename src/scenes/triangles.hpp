@@ -19,7 +19,7 @@
 
 auto triangles_scene() {
   // Image
-  const double aspect_ratio = 1.0;
+  const float aspect_ratio = 1.0;
   const int image_width = 800;
   const int image_height = static_cast<int>(image_width / aspect_ratio);
 
@@ -41,8 +41,8 @@ auto triangles_scene() {
   const point3 lookfrom(0, 1, 3);
   const point3 lookat(0, 0, 0);
   const vec3 up(0, 1, 0);
-  const double dist_to_focus = (lookfrom - lookat).length();
-  const double aperture = 0.1;
+  const float dist_to_focus = length(lookfrom - lookat);
+  const float aperture = 0.1;
 
   const camera cam(image_width, image_height, lookfrom, lookat, up, 50,
                    aspect_ratio, aperture, dist_to_focus, 0.0, 1.0);
