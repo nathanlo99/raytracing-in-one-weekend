@@ -263,8 +263,8 @@ int main(int argc, char *argv[]) {
   }
 
   if (true) {
-    const auto scene = platonic_scene();
-    render(scene.objects, scene.cam, "platonic.png", scene.cam.image_width,
+    const auto scene = glass_test_scene();
+    render(scene.objects, scene.cam, "glass_test.png", scene.cam.image_width,
            scene.cam.image_height, 50000, PER_FRAME);
   }
 }

@@ -17,29 +17,32 @@
 
 #include "scene.hpp"
 
-auto triangles_scene() {
+auto diamond_scene() {
   // Image
-  const float aspect_ratio = 1.0;
-  const int image_width = 800;
+  const float aspect_ratio = 1.5;
+  const int image_width = 1200;
   const int image_height = static_cast<int>(image_width / aspect_ratio);
 
   hittable_list world;
 
   const auto ground_material =
       material_manager::instance().create<lambertian>(colour(0.5, 0.5, 0.5));
-  world.add(make_shared<sphere>(point3(0, -1001, 0), 1000, ground_material));
+  world.add(make_shared<sphere>(point3(0, -1000, 0), 1000, ground_material));
 
-  const auto glass_material = material_manager::instance().create<dielectric>(
-      colour(0.2, 0.3, 0.8), 1.52);
+  const auto diamond_material =
+      material_manager::instance().create<dielectric>(colour(1.0), 2.418);
+  // const auto diamond_material =
+  // material_manager::instance().create<dielectric>(
+  //     colour(0.04, 0.12, 0.70), 1.52);
 
-  world.add(load_obj("../assets/obj/icosa.obj", glass_material));
+  world.add(load_obj("../assets/obj/diamond.obj", diamond_material));
 
   auto list = hittable_list(bvh_node::from_list(world, 0.0, 1.0));
   list.add_background_map("../res/hdr_pack/5.hdr");
 
   // Camera
-  const point3 lookfrom(0, 1, 3);
-  const point3 lookat(0, 0, 0);
+  const point3 lookfrom(0, 2.5, 5);
+  const point3 lookat(0, 0.7, 0);
   const vec3 up(0, 1, 0);
   const float dist_to_focus = length(lookfrom - lookat);
   const float aperture = 0.1;
