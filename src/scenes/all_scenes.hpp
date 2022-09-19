@@ -6,3 +6,4 @@
 #include "earth.hpp"
 #include "platonic.hpp"
 #include "simple_scene.hpp"
+#include "triangles.hpp"

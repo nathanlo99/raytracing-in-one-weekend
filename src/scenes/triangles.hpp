@@ -17,9 +17,9 @@
 
 #include "scene.hpp"
 
-auto platonic_scene() {
+auto triangles_scene() {
   // Image
-  const double aspect_ratio = 2.0;
+  const double aspect_ratio = 1.0;
   const int image_width = 800;
   const int image_height = static_cast<int>(image_width / aspect_ratio);
 
@@ -30,17 +30,7 @@ auto platonic_scene() {
   world.add(make_shared<sphere>(point3(0, -1001, 0), 1000, ground_material));
 
   const auto glass_material = material_manager::instance().create<dielectric>(
-      colour(0.8, 0.2, 0.2), 1.52);
-  // const auto glass_material =
-  //     material_manager::instance().create<dielectric>(colour(1.0), 1.52);
-
-  const auto egg_material =
-      material_manager::instance().create<lambertian>(colour(0.4, 0.2, 0.1));
-  world.add(make_shared<sphere>(point3(-2.5, 0, 0), 1.0, egg_material));
-
-  const auto mirror_material =
-      material_manager::instance().create<metal>(colour(0.7, 0.6, 0.5), 0.1);
-  world.add(make_shared<sphere>(point3(2.5, 0, 0), 1.0, mirror_material));
+      colour(0.2, 0.3, 0.8), 1.52);
 
   world.add(load_obj("../assets/obj/icosa.obj", glass_material));
 
@@ -48,7 +38,7 @@ auto platonic_scene() {
   list.add_background_map("../res/hdr_pack/5.hdr");
 
   // Camera
-  const point3 lookfrom(0, 2, 6);
+  const point3 lookfrom(0, 1, 3);
   const point3 lookat(0, 0, 0);
   const vec3 up(0, 1, 0);
   const double dist_to_focus = (lookfrom - lookat).length();

@@ -54,7 +54,7 @@ auto simple_scene() {
   const point3 lookfrom(0, 3, 6);
   const point3 lookat(0, 1, 0);
   const vec3 up(0, 1, 0);
-  const double dist_to_focus = 10.0;
+  const double dist_to_focus = (lookfrom - lookat).length();
   const double aperture = 0.1;
 
   const camera cam(image_width, image_height, lookfrom, lookat, up, 50,
