@@ -3,7 +3,7 @@
 
 #include "util.hpp"
 
-#include "animated_sphere.hpp"
+
 #include "bvh_node.hpp"
 #include "camera.hpp"
 #include "colour.hpp"

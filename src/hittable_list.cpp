@@ -23,14 +23,13 @@ bool hittable_list::hit(const ray &r, const float t_min, const float t_max,
   return hit_anything;
 }
 
-bool hittable_list::bounding_box(const float time0, const float time1,
-                                 aabb &output_box) const {
+bool hittable_list::bounding_box(aabb &output_box) const {
   if (objects.empty())
     return false;
 
   aabb temp_box;
   for (const auto &object : objects) {
-    if (!object->bounding_box(time0, time1, temp_box))
+    if (!object->bounding_box(temp_box))
       return false;
     output_box = surrounding_box(output_box, temp_box);
   }

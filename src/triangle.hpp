@@ -18,6 +18,5 @@ struct triangle : public hittable {
 
   virtual bool hit(const ray &r, const float t_min, const float t_max,
                    hit_record &rec) const override;
-  virtual bool bounding_box(const float time0, const float time1,
-                            aabb &output_box) const override;
+  virtual bool bounding_box(aabb &output_box) const override;
 };

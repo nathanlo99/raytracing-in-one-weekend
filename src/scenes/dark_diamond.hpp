@@ -3,7 +3,6 @@
 
 #include "util.hpp"
 
-#include "animated_sphere.hpp"
 #include "bvh_node.hpp"
 #include "camera.hpp"
 #include "colour.hpp"
@@ -45,7 +44,7 @@ auto dark_diamond_scene() {
 
   world.add(load_obj("../assets/obj/diamond.obj", diamond_material));
 
-  auto list = hittable_list(bvh_node::from_list(world, 0.0, 1.0));
+  auto list = hittable_list(bvh_node::from_list(world));
   list.add_background_map("../res/hdr_pack/5.hdr");
 
   // Camera
@@ -56,7 +55,7 @@ auto dark_diamond_scene() {
   const float aperture = 0.1;
 
   const camera cam(image_width, image_height, lookfrom, lookat, up, 50,
-                   aspect_ratio, aperture, dist_to_focus, 0.0, 1.0);
+                   aspect_ratio, aperture, dist_to_focus);
 
   return scene(list, cam);
 }

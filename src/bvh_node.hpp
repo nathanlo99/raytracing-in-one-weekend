@@ -18,16 +18,14 @@ struct bvh_node : public hittable {
   aabb box;
 
   bvh_node(std::vector<hittable_with_box> &src_objects, const size_t start,
-           const size_t end, const float time0, const float time1);
+           const size_t end);
   virtual ~bvh_node() = default;
 
-  static shared_ptr<hittable> from_list(const hittable_list &list,
-                                        const float time0, const float time1);
+  static shared_ptr<hittable> from_list(const hittable_list &list);
 
   virtual bool hit(const ray &r, const float t_min, const float t_max,
                    hit_record &rec) const override;
-  virtual bool bounding_box(const float time0, const float time1,
-                            aabb &output_box) const override {
+  virtual bool bounding_box(aabb &output_box) const override {
     output_box = box;
     return true;
   }

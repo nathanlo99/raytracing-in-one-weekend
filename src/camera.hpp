@@ -7,7 +7,6 @@
 
 struct camera {
   int image_width, image_height;
-  float t0, t1;
   point3 origin;
   point3 upper_left_corner;
   vec3 horizontal;
@@ -17,9 +16,8 @@ struct camera {
 
   camera(const int image_width, const int image_height, const point3 &look_from,
          const point3 &look_at, const vec3 &up, const float vfov,
-         const float aspect_ratio, const float aperture, const float focus_dist,
-         const float t0, const float t1)
-      : image_width(image_width), image_height(image_height), t0(t0), t1(t1) {
+         const float aspect_ratio, const float aperture, const float focus_dist)
+      : image_width(image_width), image_height(image_height) {
     const float theta = degrees_to_radians(vfov);
     const float h = std::tan(theta / 2);
     const float viewport_height = 2.0 * h;
@@ -44,9 +42,7 @@ struct camera {
     const vec3 rd = lens_radius * util::random_in_unit_disk();
     const vec3 offset = u * rd.x + v * rd.y;
 
-    return ray(origin + offset,
-               upper_left_corner + s * horizontal - t * vertical - origin -
-                   offset,
-               random_float(t0, t1));
+    return ray(origin + offset, upper_left_corner + s * horizontal -
+                                    t * vertical - origin - offset);
   }
 };

@@ -1,7 +1,6 @@
 
 #include "util.hpp"
 
-#include "animated_sphere.hpp"
 #include "bvh_node.hpp"
 #include "camera.hpp"
 #include "colour.hpp"
@@ -221,7 +220,7 @@ void render(const hittable_list &world, const camera &cam,
 
         static long long last_update_ms = 0;
         const long long current_time_ms = get_time_ms();
-        if (current_time_ms - last_update_ms > 500) {
+        if (current_time_ms - last_update_ms > 1000) {
           last_update_ms = current_time_ms;
           const float elapsed_ms = current_time_ms - start_ms;
           const size_t done_tasks = std::min<size_t>(num_tasks, next_task_idx);
@@ -230,13 +229,13 @@ void render(const hittable_list &world, const camera &cam,
           const float samples_per_ms = num_samples / elapsed_ms;
           const float estimated_remaining_ms =
               elapsed_ms / done_tasks * remaining_tasks;
+          result_image.write_png("output/progress.png");
           std::cout << "\r" << elapsed_ms / 1000 << "s elapsed, "
                     << tasks_per_ms * 1000 << " tasks per sec, "
                     << samples_per_ms << " samples per ms, "
                     << estimated_remaining_ms / 1000 << "s remaining, "
                     << remaining_tasks << "/" << num_tasks
                     << " tasks remaining... " << std::flush;
-          result_image.write_png("output/progress.png");
         }
       }
     });
@@ -264,8 +263,8 @@ int main(int argc, char *argv[]) {
   }
 
   if (true) {
-    const auto scene = diamond_scene();
-    render(scene.objects, scene.cam, "diamond.png", scene.cam.image_width,
-           scene.cam.image_height, 5000, PER_FRAME);
+    const auto scene = dark_diamond_scene();
+    render(scene.objects, scene.cam, "dark_diamond.png", scene.cam.image_width,
+           scene.cam.image_height, 50000, PER_FRAME);
   }
 }

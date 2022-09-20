@@ -56,5 +56,5 @@ std::shared_ptr<hittable> load_obj(std::string_view filename, material *mat) {
 
   std::cout << "Loaded " << result.size() << " triangles" << std::endl;
 
-  return bvh_node::from_list(result, 0.0, 0.0);
+  return bvh_node::from_list(result);
 }

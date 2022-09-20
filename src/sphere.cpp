@@ -32,8 +32,7 @@ __attribute__((hot)) bool sphere::hit(const ray &r, const float t_min,
   return true;
 }
 
-bool sphere::bounding_box(const float time0, const float time1,
-                          aabb &output_box) const {
+bool sphere::bounding_box(aabb &output_box) const {
   output_box = aabb(centre - vec3(radius), centre + vec3(radius));
   return true;
 }

@@ -4,7 +4,6 @@
 
 #include "util.hpp"
 
-#include "animated_sphere.hpp"
 #include "bvh_node.hpp"
 #include "camera.hpp"
 #include "colour.hpp"
@@ -26,12 +25,8 @@ auto glass_test_scene() {
 
   hittable_list world;
 
-  const auto ground_material =
-      material_manager::instance().create<lambertian>(colour(0.5, 0.5, 0.5));
-  // world.add(make_shared<sphere>(point3(0, -1000, 0), 1000, ground_material));
-
   std::vector<float> iors = {1.0, 1.16, 1.33, 1.5, 1.66, 1.85, 2.0};
-  for (int i = 0; i < iors.size(); ++i) {
+  for (size_t i = 0; i < iors.size(); ++i) {
     const float ior = iors[i];
     const auto white_glass_material =
         material_manager::instance().create<dielectric>(colour(1.0), ior);
@@ -49,7 +44,7 @@ auto glass_test_scene() {
                                        blue_glass_material));
   }
 
-  auto list = hittable_list(bvh_node::from_list(world, 0.0, 1.0));
+  auto list = hittable_list(bvh_node::from_list(world));
   list.add_background_map("../res/hdr_pack/5.hdr");
 
   // Camera
@@ -60,7 +55,7 @@ auto glass_test_scene() {
   const float aperture = 0.1;
 
   const camera cam(image_width, image_height, lookfrom, lookat, up, 50,
-                   aspect_ratio, aperture, dist_to_focus, 0.0, 1.0);
+                   aspect_ratio, aperture, dist_to_focus);
 
   return scene(list, cam);
 }

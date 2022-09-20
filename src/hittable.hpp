@@ -27,8 +27,7 @@ public:
   virtual bool hit(const ray &r, const float t_min, const float t_max,
                    hit_record &rec) const = 0;
 
-  // Return true if the object has a bounding box across the entire region
-  // [time0, time1], with output variable output_box, and false otherwise.
-  virtual bool bounding_box(const float time0, const float time1,
-                            aabb &output_box) const = 0;
+  // Return true if the object has a bounding box, with output variable
+  // output_box, and false otherwise.
+  virtual bool bounding_box(aabb &output_box) const = 0;
 };

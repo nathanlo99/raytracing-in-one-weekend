@@ -30,7 +30,7 @@ struct lambertian : public material {
     if (util::near_zero(scatter_direction))
       return false; // scatter_direction = rec.normal;
 
-    scattered = ray(rec.p, scatter_direction, r_in.time);
+    scattered = ray(rec.p, scatter_direction);
     attenuation = albedo->value(rec.u, rec.v, rec.p);
     return true;
   }
@@ -47,8 +47,7 @@ struct metal : public material {
   virtual bool scatter(const ray &r_in, const hit_record &rec,
                        colour &attenuation, ray &scattered) const override {
     const vec3 reflected = reflect(glm::normalize(r_in.dir), rec.normal);
-    scattered =
-        ray(rec.p, reflected + fuzz * util::random_in_unit_sphere(), r_in.time);
+    scattered = ray(rec.p, reflected + fuzz * util::random_in_unit_sphere());
     attenuation = albedo;
     return glm::dot(scattered.dir, rec.normal) > 0;
   }
@@ -83,11 +82,11 @@ struct dielectric : public material {
     if (cannot_reflect ||
         random_float() < reflectance(cos_theta, index_ratio)) {
       const vec3 direction = reflect(unit_direction, rec.normal);
-      scattered = ray(rec.p, direction, r_in.time);
+      scattered = ray(rec.p, direction);
       return true;
     } else {
       const vec3 direction = refract(unit_direction, rec.normal, index_ratio);
-      scattered = ray(rec.p, direction, r_in.time);
+      scattered = ray(rec.p, direction);
       return true;
     }
   }

@@ -73,8 +73,7 @@ __attribute__((hot)) bool triangle::hit(const ray &r, const float t_min,
 #endif
 }
 
-bool triangle::bounding_box(const float time0, const float time1,
-                            aabb &output_box) const {
+bool triangle::bounding_box(aabb &output_box) const {
   output_box.min = min(p0, min(p1, p2)) - vec3(eps);
   output_box.max = max(p0, max(p1, p2)) + vec3(eps);
   return true;

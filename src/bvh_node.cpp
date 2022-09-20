@@ -14,8 +14,7 @@ bool bvh_node::hit(const ray &r, const float t_min, const float t_max,
   return hit_left | hit_right;
 }
 
-shared_ptr<hittable> bvh_node::from_list(const hittable_list &list,
-                                         const float time0, const float time1) {
+shared_ptr<hittable> bvh_node::from_list(const hittable_list &list) {
   if (list.size() == 1)
     return list.objects[0];
 
@@ -23,18 +22,18 @@ shared_ptr<hittable> bvh_node::from_list(const hittable_list &list,
   objects.reserve(list.objects.size());
   std::transform(
       list.objects.begin(), list.objects.end(), std::back_inserter(objects),
-      [time0, time1](const shared_ptr<hittable> &obj) -> hittable_with_box {
+      [](const shared_ptr<hittable> &obj) -> hittable_with_box {
         aabb box;
-        if (!obj->bounding_box(time0, time1, box)) {
+        if (!obj->bounding_box(box)) {
           std::cerr << "Cannot create BVH from unbounded object" << std::endl;
         }
         return {obj, box};
       });
-  return make_shared<bvh_node>(objects, 0, objects.size(), time0, time1);
+  return make_shared<bvh_node>(objects, 0, objects.size());
 }
 
 bvh_node::bvh_node(std::vector<hittable_with_box> &objects, const size_t start,
-                   const size_t end, const float time0, const float time1) {
+                   const size_t end) {
 
   const size_t span = end - start;
   assert(span >= 2);
@@ -44,7 +43,7 @@ bvh_node::bvh_node(std::vector<hittable_with_box> &objects, const size_t start,
     box = surrounding_box(objects[start].box, objects[start + 1].box);
     return;
   } else if (span == 3) {
-    left = make_shared<bvh_node>(objects, start, start + 2, time0, time1);
+    left = make_shared<bvh_node>(objects, start, start + 2);
     right = objects[end - 1].object;
     box = surrounding_box(
         objects[start].box,
@@ -64,7 +63,7 @@ bvh_node::bvh_node(std::vector<hittable_with_box> &objects, const size_t start,
               return a.box.min[axis] < b.box.min[axis];
             });
   const size_t mid = start + span / 2;
-  left = make_shared<bvh_node>(objects, start, mid, time0, time1);
-  right = make_shared<bvh_node>(objects, mid, end, time0, time1);
+  left = make_shared<bvh_node>(objects, start, mid);
+  right = make_shared<bvh_node>(objects, mid, end);
   box = total_box;
 }

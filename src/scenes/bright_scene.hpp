@@ -3,7 +3,6 @@
 
 #include "util.hpp"
 
-#include "animated_sphere.hpp"
 #include "bvh_node.hpp"
 #include "camera.hpp"
 #include "colour.hpp"
@@ -47,17 +46,13 @@ auto bright_scene() {
           const colour albedo = util::random_vec3() * util::random_vec3();
           const auto sphere_material =
               material_manager::instance().create<lambertian>(albedo);
-          const point3 center2 = center + vec3(0, random_float(0, .5), 0);
-          world.add(make_shared<animated_sphere>(center, center2, 0.0, 1.0, 0.2,
-                                                 sphere_material));
+          world.add(make_shared<sphere>(center, 0.2, sphere_material));
         } else if (choose_mat < 0.8) {
           // diffuse
           const colour albedo = util::random_vec3() * util::random_vec3();
           const auto sphere_material =
               material_manager::instance().create<lambertian>(albedo);
-          const point3 center2 = center + vec3(0, random_float(0, .5), 0);
-          world.add(make_shared<animated_sphere>(center, center2, 0.0, 1.0, 0.2,
-                                                 sphere_material));
+          world.add(make_shared<sphere>(center, 0.2, sphere_material));
         } else if (choose_mat < 0.95) {
           // metal
           const colour albedo = util::random_vec3(0.5, 1);
@@ -87,7 +82,7 @@ auto bright_scene() {
       material_manager::instance().create<metal>(colour(0.7, 0.6, 0.5), 0.0);
   world.add(make_shared<sphere>(point3(4, 1, 0), 1.0, material3));
 
-  auto list = hittable_list(bvh_node::from_list(world, 0.0, 1.0));
+  auto list = hittable_list(bvh_node::from_list(world));
 
   const auto skybox_image = make_shared<image_texture>("../res/hdr_pack/5.hdr");
   const auto skybox_texture =
@@ -102,7 +97,7 @@ auto bright_scene() {
   const float aperture = 0.1;
 
   const camera cam(image_width, image_height, lookfrom, lookat, up, 20,
-                   aspect_ratio, aperture, dist_to_focus, 0.0, 1.0);
+                   aspect_ratio, aperture, dist_to_focus);
 
   return scene(list, cam);
 }
