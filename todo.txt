@@ -1,9 +1,12 @@
 
-- (close to) zero-cost instance transformations
-- add a GUI (maybe imgui)
+- cheap instance transformations
+- add imgui
 - triangle mesh import
   X write a triangle hittable class
   X import the vertices and faces of an obj model
   - import the uv coordinates of the obj model
   - integrate normal / bump textures
 - add scene lua support (can get inspiration from lux)
+  - consider gltf
+- spectral rendering
+- importance sampling

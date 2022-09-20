@@ -25,7 +25,7 @@ using std::sqrt;
 
 // Constants
 
-constexpr float infinity = std::numeric_limits<float>::infinity();
+constexpr float inf = std::numeric_limits<float>::infinity();
 constexpr float pi = 3.1415926535897932385;
 constexpr float eps = 0.001;
 

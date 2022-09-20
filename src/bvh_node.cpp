@@ -3,7 +3,7 @@
 
 bool bvh_node::hit(const ray &r, const float t_min, const float t_max,
                    hit_record &rec) const {
-  if (!box.hit(r, t_min, t_max))
+  if (!box.does_hit(r, t_min, t_max))
     return false;
 
   // NOTE: We still need to query both children because we care about the
@@ -11,13 +11,11 @@ bool bvh_node::hit(const ray &r, const float t_min, const float t_max,
   // than the distance to the left child, despite hitting both children
   const bool hit_left = left->hit(r, t_min, t_max, rec);
   const bool hit_right = right->hit(r, t_min, hit_left ? rec.t : t_max, rec);
-
   return hit_left | hit_right;
 }
 
 shared_ptr<hittable> bvh_node::from_list(const hittable_list &list,
-                                         const float time0,
-                                         const float time1) {
+                                         const float time0, const float time1) {
   if (list.size() == 1)
     return list.objects[0];
 
@@ -59,7 +57,7 @@ bvh_node::bvh_node(std::vector<hittable_with_box> &objects, const size_t start,
   for (size_t i = start; i < end; ++i)
     total_box = surrounding_box(total_box, objects[i].box);
   const vec3 box_span = total_box.max - total_box.min;
-  const int axis = util::largest_axis(box_span);
+  const size_t axis = util::largest_axis(box_span);
 
   std::sort(objects.begin() + start, objects.begin() + end,
             [axis](const hittable_with_box &a, const hittable_with_box &b) {

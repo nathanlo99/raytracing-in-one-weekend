@@ -33,7 +33,7 @@ ray_colour(const ray &r, const hittable &world, const int depth,
     return util::random_vec3();
 
   hit_record rec;
-  if (!world.hit(r, eps, infinity, rec))
+  if (!world.hit(r, eps, inf, rec))
     return colour();
 
   const colour emitted = rec.mat_ptr->emitted(rec.u, rec.v, rec.p);
@@ -221,7 +221,7 @@ void render(const hittable_list &world, const camera &cam,
 
         static long long last_update_ms = 0;
         const long long current_time_ms = get_time_ms();
-        if (current_time_ms - last_update_ms > 1000) {
+        if (current_time_ms - last_update_ms > 500) {
           last_update_ms = current_time_ms;
           const float elapsed_ms = current_time_ms - start_ms;
           const size_t done_tasks = std::min<size_t>(num_tasks, next_task_idx);
@@ -258,8 +258,9 @@ void render(const hittable_list &world, const camera &cam,
 int main(int argc, char *argv[]) {
   if (false) {
     const auto scene = bright_scene();
-    render(scene.objects, scene.cam, "bright_scene.png", scene.cam.image_width,
-           scene.cam.image_height, 5000, PER_FRAME);
+    render_singlethreaded(scene.objects, scene.cam, "bright_scene.png",
+                          scene.cam.image_width, scene.cam.image_height, 50,
+                          PER_FRAME);
   }
 
   if (true) {
