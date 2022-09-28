@@ -15,7 +15,7 @@
 auto earth() {
   const auto earth_texture = make_shared<image_texture>("../res/earthmap.jpg");
   const auto earth_surface =
-      material_manager::instance().create<lambertian>(earth_texture);
+      material_manager::create<lambertian>(earth_texture);
   const auto globe = make_shared<sphere>(point3(), 2.0, earth_surface);
 
   return hittable_list(globe);

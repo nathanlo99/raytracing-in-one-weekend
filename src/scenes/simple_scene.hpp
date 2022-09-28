@@ -26,19 +26,19 @@ auto simple_scene() {
   hittable_list world;
 
   const auto ground_material =
-      material_manager::instance().create<lambertian>(colour(0.5, 0.5, 0.5));
+      material_manager::create<lambertian>(colour(0.5, 0.5, 0.5));
   world.add(make_shared<sphere>(point3(0, -1000, 0), 1000, ground_material));
 
   const auto glass_material =
-      material_manager::instance().create<dielectric>(colour(1.0), 1.52);
+      material_manager::create<dielectric>(colour(1.0), 1.52);
   world.add(make_shared<sphere>(point3(0, 1, 0), 1.0, glass_material));
 
   const auto egg_material =
-      material_manager::instance().create<lambertian>(colour(0.4, 0.2, 0.1));
+      material_manager::create<lambertian>(colour(0.4, 0.2, 0.1));
   world.add(make_shared<sphere>(point3(-2.5, 1, 0), 1.0, egg_material));
 
   const auto mirror_material =
-      material_manager::instance().create<metal>(colour(0.7, 0.6, 0.5), 0.0);
+      material_manager::create<metal>(colour(0.7, 0.6, 0.5), 0.0);
   world.add(make_shared<sphere>(point3(2.5, 1, 0), 1.0, mirror_material));
 
   world.add(make_shared<triangle>(point3(-2.5, 2, 0), point3(0, 2, 0),

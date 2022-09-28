@@ -26,21 +26,19 @@ auto glass_test_scene() {
 
   hittable_list world;
 
-  const auto ground_material =
-      material_manager::instance().create<lambertian>(colour(0.5, 0.5, 0.5));
+  // const auto ground_material =
+  //     material_manager::create<lambertian>(colour(0.5, 0.5, 0.5));
   // world.add(make_shared<sphere>(point3(0, -1000, 0), 1000, ground_material));
 
   std::vector<float> iors = {1.0, 1.16, 1.33, 1.5, 1.66, 1.85, 2.0};
-  for (int i = 0; i < iors.size(); ++i) {
+  for (size_t i = 0; i < iors.size(); ++i) {
     const float ior = iors[i];
     const auto white_glass_material =
-        material_manager::instance().create<dielectric>(colour(1.0), ior);
+        material_manager::create<dielectric>(colour(1.0), ior);
     const auto red_glass_material =
-        material_manager::instance().create<dielectric>(colour(1.0, 0.5, 0.5),
-                                                        ior);
+        material_manager::create<dielectric>(colour(1.0, 0.5, 0.5), ior);
     const auto blue_glass_material =
-        material_manager::instance().create<dielectric>(colour(0.5, 0.5, 1.0),
-                                                        ior);
+        material_manager::create<dielectric>(colour(0.5, 0.5, 1.0), ior);
     world.add(std::make_shared<sphere>(vec3(i - 3, 0.5, 0), 0.5,
                                        white_glass_material));
     world.add(

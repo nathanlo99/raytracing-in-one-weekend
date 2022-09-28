@@ -26,11 +26,11 @@ auto diamond_scene() {
   hittable_list world;
 
   const auto ground_material =
-      material_manager::instance().create<lambertian>(colour(0.5, 0.5, 0.5));
+      material_manager::create<lambertian>(colour(0.5, 0.5, 0.5));
   world.add(make_shared<sphere>(point3(0, -1000, 0), 1000, ground_material));
 
   const auto diamond_material =
-      material_manager::instance().create<dielectric>(colour(1.0), 2.418);
+      material_manager::create<dielectric>(colour(1.0), 2.418);
 
   world.add(load_obj("../assets/obj/diamond.obj", diamond_material));
 

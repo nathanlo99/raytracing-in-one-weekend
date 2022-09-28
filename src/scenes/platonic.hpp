@@ -26,20 +26,20 @@ auto platonic_scene() {
   hittable_list world;
 
   const auto ground_material =
-      material_manager::instance().create<lambertian>(colour(0.5, 0.5, 0.5));
+      material_manager::create<lambertian>(colour(0.5, 0.5, 0.5));
   world.add(make_shared<sphere>(point3(0, -1001, 0), 1000, ground_material));
 
-  const auto glass_material = material_manager::instance().create<dielectric>(
+  const auto glass_material = material_manager::create<dielectric>(
       colour(0.8, 0.2, 0.2), 1.52);
   // const auto glass_material =
-  //     material_manager::instance().create<dielectric>(colour(1.0), 1.52);
+  //     material_manager::create<dielectric>(colour(1.0), 1.52);
 
   const auto egg_material =
-      material_manager::instance().create<lambertian>(colour(0.4, 0.2, 0.1));
+      material_manager::create<lambertian>(colour(0.4, 0.2, 0.1));
   world.add(make_shared<sphere>(point3(-2.5, 0, 0), 1.0, egg_material));
 
   const auto mirror_material =
-      material_manager::instance().create<metal>(colour(0.7, 0.6, 0.5), 0.1);
+      material_manager::create<metal>(colour(0.7, 0.6, 0.5), 0.1);
   world.add(make_shared<sphere>(point3(2.5, 0, 0), 1.0, mirror_material));
 
   world.add(load_obj("../assets/obj/icosa.obj", glass_material));

@@ -10,16 +10,16 @@
 struct material_manager {
   std::vector<std::unique_ptr<material>> materials;
 
-  static material_manager &instance() {
+  static inline material_manager &instance() {
     static material_manager m_instance;
     return m_instance;
   }
 
   template <class MaterialClass, class... Args>
-  material *create(Args &&...args) {
-    materials.push_back(
+  static material *create(Args &&...args) {
+    instance().materials.push_back(
         std::make_unique<MaterialClass>(std::forward<Args>(args)...));
-    return materials.back().get();
+    return instance().materials.back().get();
   }
 
 private:

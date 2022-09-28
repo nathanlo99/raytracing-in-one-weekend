@@ -18,7 +18,7 @@
 #include "scene.hpp"
 
 auto light_material(const colour &c) {
-  return material_manager::instance().create<diffuse_light>(c);
+  return material_manager::create<diffuse_light>(c);
 }
 
 auto dark_diamond_scene() {
@@ -30,10 +30,10 @@ auto dark_diamond_scene() {
   hittable_list world;
 
   const auto ground_material =
-      material_manager::instance().create<lambertian>(colour(0.5, 0.5, 0.5));
+      material_manager::create<lambertian>(colour(0.5, 0.5, 0.5));
   world.add(make_shared<sphere>(point3(0, -1000, 0), 1000, ground_material));
 
-  const auto diamond_material = material_manager::instance().create<dielectric>(
+  const auto diamond_material = material_manager::create<dielectric>(
       colour(0.04, 0.12, 0.70), 1.52);
 
   const auto white_light_material = light_material(colour(1.0));

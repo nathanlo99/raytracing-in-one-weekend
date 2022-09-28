@@ -16,7 +16,7 @@ auto dark_scene() {
   hittable_list world;
 
   const auto ground_material =
-      material_manager::instance().create<lambertian>(colour(0.5, 0.5, 0.5));
+      material_manager::create<lambertian>(colour(0.5, 0.5, 0.5));
   world.add(make_shared<sphere>(point3(0, -1000, 0), 1000, ground_material));
 
   const auto earth_texture = make_shared<image_texture>("../res/earthmap.jpg");
@@ -32,13 +32,13 @@ auto dark_scene() {
         if (choose_mat < 0.1) {
           // diffuse
           const auto sphere_material =
-              material_manager::instance().create<diffuse_light>(earth_texture);
+              material_manager::create<diffuse_light>(earth_texture);
           world.add(make_shared<sphere>(center, 0.2, sphere_material));
         } else if (choose_mat < 0.4) {
           // diffuse
           const colour albedo = util::random_vec3() * util::random_vec3();
           const auto sphere_material =
-              material_manager::instance().create<diffuse_light>(albedo);
+              material_manager::create<diffuse_light>(albedo);
           const point3 center2 = center + vec3(0, random_float(0, .5), 0);
           world.add(make_shared<animated_sphere>(center, center2, 0.0, 1.0, 0.2,
                                                  sphere_material));
@@ -46,7 +46,7 @@ auto dark_scene() {
           // diffuse
           const colour albedo = util::random_vec3() * util::random_vec3();
           const auto sphere_material =
-              material_manager::instance().create<lambertian>(albedo);
+              material_manager::create<lambertian>(albedo);
           const point3 center2 = center + vec3(0, random_float(0, 0.5), 0);
           world.add(make_shared<animated_sphere>(center, center2, 0.0, 1.0, 0.2,
                                                  sphere_material));
@@ -55,12 +55,12 @@ auto dark_scene() {
           const colour albedo = util::random_vec3(0.5, 1);
           const float fuzz = random_float(0, 0.5);
           const auto sphere_material =
-              material_manager::instance().create<metal>(albedo, fuzz);
+              material_manager::create<metal>(albedo, fuzz);
           world.add(make_shared<sphere>(center, 0.2, sphere_material));
         } else {
           // glass
           const auto sphere_material =
-              material_manager::instance().create<dielectric>(colour(1.0), 1.5);
+              material_manager::create<dielectric>(colour(1.0), 1.5);
           world.add(make_shared<sphere>(center, 0.2, sphere_material));
         }
       }
@@ -68,15 +68,15 @@ auto dark_scene() {
   }
 
   const auto material1 =
-      material_manager::instance().create<dielectric>(colour(1.0), 1.5);
+      material_manager::create<dielectric>(colour(1.0), 1.5);
   world.add(make_shared<sphere>(point3(0, 1, 0), 1.0, material1));
 
   const auto material2 =
-      material_manager::instance().create<diffuse_light>(colour(0.4, 0.2, 0.1));
+      material_manager::create<diffuse_light>(colour(0.4, 0.2, 0.1));
   world.add(make_shared<sphere>(point3(-4, 1, 0), 1.0, material2));
 
   const auto material3 =
-      material_manager::instance().create<metal>(colour(0.7, 0.6, 0.5), 0.0);
+      material_manager::create<metal>(colour(0.7, 0.6, 0.5), 0.0);
   world.add(make_shared<sphere>(point3(4, 1, 0), 1.0, material3));
 
   return hittable_list(bvh_node::from_list(world, 0.0, 1.0));
