@@ -61,8 +61,10 @@ bvh_node::bvh_node(std::vector<hittable_with_box> &objects, const size_t start,
 
   std::sort(objects.begin() + start, objects.begin() + end,
             [axis](const hittable_with_box &a, const hittable_with_box &b) {
-              return a.box.min[axis] < b.box.min[axis];
+              return (a.box.min[axis] + a.box.max[axis]) / 2 <
+                     (b.box.min[axis] + b.box.max[axis]) / 2;
             });
+
   const size_t mid = start + span / 2;
   left = make_shared<bvh_node>(objects, start, mid, time0, time1);
   right = make_shared<bvh_node>(objects, mid, end, time0, time1);

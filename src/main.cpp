@@ -221,7 +221,7 @@ void render(const hittable_list &world, const camera &cam,
 
         static long long last_update_ms = 0;
         const long long current_time_ms = get_time_ms();
-        if (current_time_ms - last_update_ms > 500) {
+        if (current_time_ms - last_update_ms > 1000) {
           last_update_ms = current_time_ms;
           const float elapsed_ms = current_time_ms - start_ms;
           const size_t done_tasks = std::min<size_t>(num_tasks, next_task_idx);
@@ -230,12 +230,18 @@ void render(const hittable_list &world, const camera &cam,
           const float samples_per_ms = num_samples / elapsed_ms;
           const float estimated_remaining_ms =
               elapsed_ms / done_tasks * remaining_tasks;
-          std::cout << "\r" << elapsed_ms / 1000 << "s elapsed, "
-                    << tasks_per_ms * 1000 << " tasks per sec, "
-                    << samples_per_ms << " samples per ms, "
-                    << estimated_remaining_ms / 1000 << "s remaining, "
-                    << remaining_tasks << "/" << num_tasks
-                    << " tasks remaining... " << std::flush;
+          std::stringstream output_line;
+          output_line << "\r" << elapsed_ms / 1000 << "s elapsed, "
+                      << tasks_per_ms * 1000 << " tasks per sec, "
+                      << samples_per_ms << " samples per ms, "
+                      << estimated_remaining_ms / 1000 << "s remaining, "
+                      << remaining_tasks << "/" << num_tasks
+                      << " tasks remaining... ";
+          const size_t line_length = 120;
+          const size_t output_length = output_line.str().size();
+          if (output_length < line_length)
+            output_line << std::string(line_length - output_length, ' ');
+          std::cout << output_line.str() << std::flush;
           result_image.write_png("output/progress.png");
         }
       }
