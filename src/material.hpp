@@ -12,7 +12,7 @@ struct material {
   virtual bool scatter(const ray &r_in, const hit_record &rec,
                        colour &attenuation, ray &scattered) const = 0;
   virtual colour emitted(const float u, const float v, const point3 &p) const {
-    return colour(0, 0, 0);
+    return colour(0.0f, 0.0f, 0.0f);
   }
 };
 
@@ -58,7 +58,7 @@ struct dielectric : public material {
   colour albedo;
   float index_of_refraction;
 
-  explicit dielectric(const colour &a, float index_of_refraction)
+  explicit dielectric(const colour &a, const float index_of_refraction)
       : albedo(a), index_of_refraction(index_of_refraction) {}
   virtual ~dielectric() = default;
 

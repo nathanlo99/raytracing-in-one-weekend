@@ -3,7 +3,6 @@
 
 #include "util.hpp"
 
-
 #include <iostream>
 
 inline constexpr float gamma_correct_float(const float d) {
@@ -16,6 +15,6 @@ inline constexpr colour gamma_correct(const colour &c) {
                 gamma_correct_float(c[2]));
 }
 
-inline unsigned char to_byte(const float d) { return 255.0 * d; }
+inline constexpr unsigned char to_byte(const float d) { return 255.0 * d; }
 
-inline float from_byte(const unsigned char c) { return c / 255.0; }
+inline constexpr float from_byte(const unsigned char c) { return c / 255.0; }

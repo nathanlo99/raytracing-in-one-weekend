@@ -19,16 +19,11 @@
 #include "scene.hpp"
 
 auto glass_test_scene() {
-  // Image
   const float aspect_ratio = 1.5;
   const int image_width = 1200;
   const int image_height = static_cast<int>(image_width / aspect_ratio);
 
   hittable_list world;
-
-  // const auto ground_material =
-  //     material_manager::create<lambertian>(colour(0.5, 0.5, 0.5));
-  // world.add(make_shared<sphere>(point3(0, -1000, 0), 1000, ground_material));
 
   std::vector<float> iors = {1.0, 1.16, 1.33, 1.5, 1.66, 1.85, 2.0};
   for (size_t i = 0; i < iors.size(); ++i) {

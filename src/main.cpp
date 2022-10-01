@@ -1,22 +1,13 @@
 
 #include "util.hpp"
 
-#include "animated_sphere.hpp"
-#include "bvh_node.hpp"
-#include "camera.hpp"
 #include "colour.hpp"
-#include "hittable_list.hpp"
 #include "image.hpp"
-#include "material.hpp"
 #include "scenes/all_scenes.hpp"
-#include "sphere.hpp"
-#include "triangle.hpp"
 
 #include <boost/random/sobol.hpp>
 
 #include <atomic>
-#include <fstream>
-#include <iomanip>
 #include <iostream>
 #include <mutex>
 #include <queue>

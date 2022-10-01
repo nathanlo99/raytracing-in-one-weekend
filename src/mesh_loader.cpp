@@ -6,7 +6,8 @@
 #include <boost/algorithm/string.hpp>
 #include <fstream>
 
-std::shared_ptr<hittable> load_obj(std::string_view filename, material *mat) {
+std::shared_ptr<hittable> load_obj(const std::string_view &filename,
+                                   material *mat) {
   hittable_list result;
 
   std::cout << "Loading OBJ file @ " << filename << std::endl;
@@ -56,5 +57,5 @@ std::shared_ptr<hittable> load_obj(std::string_view filename, material *mat) {
 
   std::cout << "Loaded " << result.size() << " triangles" << std::endl;
 
-  return bvh_node::from_list(result, 0.0, 0.0);
+  return bvh_node::from_list(result, 0.0, 1.0);
 }

@@ -43,5 +43,5 @@ void hittable_list::add_background_map(const std::string &filename) {
   const auto skybox_image = make_shared<image_texture>(filename);
   const auto skybox_texture =
       material_manager::create<diffuse_light>(skybox_image);
-  add(make_shared<sphere>(point3(), radius, skybox_texture));
+  add(make_shared<sphere>(point3(0.0), radius, skybox_texture));
 }

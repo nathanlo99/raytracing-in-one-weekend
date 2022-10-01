@@ -33,8 +33,8 @@ auto dark_diamond_scene() {
       material_manager::create<lambertian>(colour(0.5, 0.5, 0.5));
   world.add(make_shared<sphere>(point3(0, -1000, 0), 1000, ground_material));
 
-  const auto diamond_material = material_manager::create<dielectric>(
-      colour(0.04, 0.12, 0.70), 1.52);
+  const auto diamond_material =
+      material_manager::create<dielectric>(colour(0.04, 0.12, 0.70), 1.52);
 
   const auto white_light_material = light_material(colour(1.0));
   world.add(make_shared<sphere>(point3(0, 10, 0), 1.0, white_light_material));
@@ -43,7 +43,7 @@ auto dark_diamond_scene() {
   world.add(make_shared<sphere>(point3(3, 10, -3), 1.0, white_light_material));
   world.add(make_shared<sphere>(point3(-3, 10, -3), 1.0, white_light_material));
 
-  world.add(load_obj("../assets/obj/diamond.obj", diamond_material));
+  world.add(load_obj("../res/obj/diamond.obj", diamond_material));
 
   auto list = hittable_list(bvh_node::from_list(world, 0.0, 1.0));
   list.add_background_map("../res/hdr_pack/5.hdr");

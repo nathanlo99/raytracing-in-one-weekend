@@ -21,15 +21,13 @@ shared_ptr<hittable> bvh_node::from_list(const hittable_list &list,
 
   std::vector<hittable_with_box> objects;
   objects.reserve(list.objects.size());
-  std::transform(
-      list.objects.begin(), list.objects.end(), std::back_inserter(objects),
-      [time0, time1](const shared_ptr<hittable> &obj) -> hittable_with_box {
-        aabb box;
-        if (!obj->bounding_box(time0, time1, box)) {
-          std::cerr << "Cannot create BVH from unbounded object" << std::endl;
-        }
-        return {obj, box};
-      });
+  for (const shared_ptr<hittable> &obj : list.objects) {
+    aabb box;
+    if (!obj->bounding_box(time0, time1, box)) {
+      std::cerr << "Cannot create BVH from unbounded object" << std::endl;
+    }
+    objects.push_back({obj, box});
+  }
   return make_shared<bvh_node>(objects, 0, objects.size(), time0, time1);
 }
 

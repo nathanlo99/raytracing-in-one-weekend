@@ -3,7 +3,6 @@
 
 #include "util.hpp"
 
-#include "animated_sphere.hpp"
 #include "bvh_node.hpp"
 #include "camera.hpp"
 #include "colour.hpp"
@@ -13,7 +12,6 @@
 #include "material_manager.hpp"
 #include "mesh_loader.hpp"
 #include "sphere.hpp"
-#include "triangle.hpp"
 
 #include "scene.hpp"
 
@@ -32,7 +30,7 @@ auto diamond_scene() {
   const auto diamond_material =
       material_manager::create<dielectric>(colour(1.0), 2.418);
 
-  world.add(load_obj("../assets/obj/diamond.obj", diamond_material));
+  world.add(load_obj("../res/obj/diamond.obj", diamond_material));
 
   auto list = hittable_list(bvh_node::from_list(world, 0.0, 1.0));
   list.add_background_map("../res/hdr_pack/5.hdr");

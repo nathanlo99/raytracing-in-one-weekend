@@ -5,8 +5,7 @@
 #include "util.hpp"
 
 struct texture {
-  virtual colour value(const float u, const float v,
-                       const point3 &p) const = 0;
+  virtual colour value(const float u, const float v, const point3 &p) const = 0;
 };
 
 struct solid_colour : public texture {

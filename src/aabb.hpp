@@ -11,32 +11,28 @@ struct aabb {
 
   constexpr inline bool does_hit(const ray &r, float t_min, float t_max) const {
     for (int a = 0; a < 3; a++) {
-      const float invD = 1.0f / r.dir[a];
-      float t0 = (min[a] - r.orig[a]) * invD;
-      float t1 = (max[a] - r.orig[a]) * invD;
-      if (invD < 0.0f)
+      float t0 = (min[a] - r.orig[a]) / r.dir[a];
+      float t1 = (max[a] - r.orig[a]) / r.dir[a];
+      if (r.dir[a] < 0.0f)
         std::swap(t0, t1);
       t_min = std::max(t0, t_min);
       t_max = std::min(t1, t_max);
       if (t_max <= t_min)
         return false;
     }
-    return true;
+    return t_max > t_min;
   }
 
   constexpr inline float hit(const ray &r, float t_min, float t_max) const {
     for (int a = 0; a < 3; a++) {
-      const float invD = 1.0f / r.dir[a];
-      float t0 = (min[a] - r.orig[a]) * invD;
-      float t1 = (max[a] - r.orig[a]) * invD;
-      if (invD < 0.0f)
+      float t0 = (min[a] - r.orig[a]) / r.dir[a];
+      float t1 = (max[a] - r.orig[a]) / r.dir[a];
+      if (r.dir[a] < 0.0f)
         std::swap(t0, t1);
       t_min = std::max(t0, t_min);
       t_max = std::min(t1, t_max);
     }
-    if (t_max <= t_min)
-      return inf;
-    return t_min;
+    return (t_max > t_min) ? t_min : inf;
   }
 };
 

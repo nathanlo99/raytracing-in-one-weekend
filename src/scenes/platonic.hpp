@@ -42,7 +42,7 @@ auto platonic_scene() {
       material_manager::create<metal>(colour(0.7, 0.6, 0.5), 0.1);
   world.add(make_shared<sphere>(point3(2.5, 0, 0), 1.0, mirror_material));
 
-  world.add(load_obj("../assets/obj/icosa.obj", glass_material));
+  world.add(load_obj("../res/obj/icosa.obj", glass_material));
 
   auto list = hittable_list(bvh_node::from_list(world, 0.0, 1.0));
   list.add_background_map("../res/hdr_pack/5.hdr");

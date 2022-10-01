@@ -36,9 +36,10 @@ constexpr inline float degrees_to_radians(float degrees) {
 }
 
 inline float random_float() {
-  static std::uniform_real_distribution<float> distribution(0.0, 1.0);
-  static std::mt19937 generator(127);
-  return distribution(generator);
+  return rand() / (RAND_MAX + 1.0);
+  // static std::uniform_real_distribution<float> distribution(0.0, 1.0);
+  // static std::mt19937 generator(127);
+  // return distribution(generator);
 }
 
 inline float random_float(const float min, const float max) {

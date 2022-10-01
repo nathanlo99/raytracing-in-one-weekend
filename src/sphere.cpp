@@ -16,9 +16,9 @@ __attribute__((hot)) bool sphere::hit(const ray &r, const float t_min,
 
   // Find the nearest root that lies in the acceptable range.
   float root = (-half_b - sqrtd) / a;
-  if (root < t_min || t_max < root) {
+  if (root < t_min || root > t_max) {
     root = (-half_b + sqrtd) / a;
-    if (root < t_min || t_max < root)
+    if (root < t_min || root > t_max)
       return false;
   }
 

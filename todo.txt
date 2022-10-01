@@ -1,4 +1,6 @@
 
+- make image.hpp store contiguous unsigned bytes instead of floats
+- transition to using matrices instead of ad hoc math
 - cheap instance transformations
 - add imgui
 - triangle mesh import
