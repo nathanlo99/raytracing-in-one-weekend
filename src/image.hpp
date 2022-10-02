@@ -24,28 +24,28 @@ struct image {
     return pixels[idx];
   }
 
-  inline colour get_floored(float u, float v) const {
+  inline colour get_floored(real u, real v) const {
     if (pixels.empty()) {
       // Return magenta to identify loading errors more easily
       return colour(1.0, 0.0, 1.0);
     }
 
-    u = std::clamp<float>(u, 0.0, 1.0) * width;
-    v = (1.0 - std::clamp<float>(v, 0.0, 1.0)) * height;
+    u = std::clamp<real>(u, 0.0, 1.0) * width;
+    v = (1.0 - std::clamp<real>(v, 0.0, 1.0)) * height;
 
     return get(static_cast<int>(v), static_cast<int>(u));
   }
 
   // Bilinear interpolation
-  inline colour get_interpolated(float u, float v) const {
+  inline colour get_interpolated(real u, real v) const {
     if (pixels.empty())
       return colour(0, 1, 1);
 
-    u = std::clamp<float>(u, 0.0, 1.0) * width;
-    v = (1.0 - std::clamp<float>(v, 0.0, 1.0)) * height;
+    u = std::clamp<real>(u, 0.0, 1.0) * width;
+    v = (1.0 - std::clamp<real>(v, 0.0, 1.0)) * height;
 
-    float floor_ud = 0.0, floor_vd = 0.0;
-    const float frac_u = modf(u, &floor_ud), frac_v = modf(v, &floor_vd);
+    real floor_ud = 0.0, floor_vd = 0.0;
+    const real frac_u = modf(u, &floor_ud), frac_v = modf(v, &floor_vd);
     const int floor_u = static_cast<int>(floor_ud);
     const int floor_v = static_cast<int>(floor_vd);
 

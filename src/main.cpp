@@ -55,41 +55,41 @@ void render_singlethreaded(const hittable_list &world, const camera &cam,
   std::vector<long long> debug_times(image_width * image_height);
   long long slowest_pixel = 0;
 
-  const auto start_ms = get_time_ms();
+  const auto start_ms = util::get_time_ms();
   size_t pixels = 0;
   std::cout << "Starting render with 1 thread..." << std::endl;
-  const auto pixel_jitters = get_sobol_sequence(2, samples_per_pixel);
+  const auto pixel_jitters = util::get_sobol_sequence(2, samples_per_pixel);
   for (int j = 0; j < image_height; ++j) {
     for (int i = 0; i < image_width; ++i) {
-      const auto pixel_start_ns = get_time_ns();
+      const auto pixel_start_ns = util::get_time_ns();
       colour pixel_colour(0.0);
       for (int s = 0; s < samples_per_pixel; ++s) {
         const auto &[dx, dy] = pixel_jitters[s];
-        const float u = (i + dx) / image_width;
-        const float v = (j + dy) / image_height;
+        const real u = (i + dx) / image_width;
+        const real v = (j + dy) / image_height;
         const ray r = cam.get_ray(u, v);
         pixel_colour += ray_colour(r, world, max_depth);
       }
       pixels++;
       result_image.set(j, i,
-                       pixel_colour / static_cast<float>(samples_per_pixel));
+                       pixel_colour / static_cast<real>(samples_per_pixel));
 
       static long long last_update_ms = 0;
-      const long long current_time_ms = get_time_ms();
+      const long long current_time_ms = util::get_time_ms();
 
-      const long long pixel_end_time = get_time_ns();
+      const long long pixel_end_time = util::get_time_ns();
       const long long pixel_ns = pixel_end_time - pixel_start_ns;
       debug_times[j * image_width + i] = pixel_ns;
       slowest_pixel = std::max(slowest_pixel, pixel_ns);
 
       if (current_time_ms - last_update_ms > 1000) {
         last_update_ms = current_time_ms;
-        const float elapsed_ms = current_time_ms - start_ms;
-        const float done_tasks = pixels;
-        const float num_tasks = image_width * image_height;
-        const float remaining_tasks = num_tasks - done_tasks;
-        const float tasks_per_ms = done_tasks / elapsed_ms;
-        const float estimated_remaining_ms = num_tasks / tasks_per_ms;
+        const real elapsed_ms = current_time_ms - start_ms;
+        const real done_tasks = pixels;
+        const real num_tasks = image_width * image_height;
+        const real remaining_tasks = num_tasks - done_tasks;
+        const real tasks_per_ms = done_tasks / elapsed_ms;
+        const real estimated_remaining_ms = num_tasks / tasks_per_ms;
         std::cout << "\r" << elapsed_ms / 1000 << "s elapsed, "
                   << tasks_per_ms * 1000 << " pixels per sec, "
                   << estimated_remaining_ms / 1000 << "s remaining, "
@@ -102,16 +102,16 @@ void render_singlethreaded(const hittable_list &world, const camera &cam,
     image debug_image(image_width, image_height);
     for (int row = 0; row <= j; ++row) {
       for (int i = 0; i < image_width; ++i) {
-        const float pixel_ns = debug_times[row * image_width + i];
-        const float ratio = pixel_ns / slowest_pixel;
+        const real pixel_ns = debug_times[row * image_width + i];
+        const real ratio = pixel_ns / slowest_pixel;
         debug_image.set(row, i, colour(ratio));
       }
     }
     debug_image.write_png("output/debug.png");
   }
 
-  const auto end_ms = get_time_ms();
-  const float elapsed_seconds = (end_ms - start_ms) / 1000.0;
+  const auto end_ms = util::get_time_ms();
+  const real elapsed_seconds = (end_ms - start_ms) / 1000.0;
   std::cout << std::endl
             << "Done! Took " << elapsed_seconds << " seconds" << std::endl;
 
@@ -150,7 +150,7 @@ void render(const hittable_list &world, const camera &cam,
   std::vector<int> weights(image_width * image_height);
   std::mutex image_mutex;
   std::atomic<long long> num_samples = 0;
-  const auto pixel_jitters = get_sobol_sequence(2, samples_per_pixel);
+  const auto pixel_jitters = util::get_sobol_sequence(2, samples_per_pixel);
 
   auto compute_tile = [&](const task &tsk) {
     std::vector<colour> tmp_image(image_width * image_height);
@@ -159,8 +159,8 @@ void render(const hittable_list &world, const camera &cam,
         colour &pixel_colour = tmp_image[j * image_width + i];
         for (int s = 0; s < tsk.tile_weight; ++s) {
           const auto &[dx, dy] = pixel_jitters[tsk.sample_idx + s];
-          const float u = (i + dx) / image_width;
-          const float v = (j + dy) / image_height;
+          const real u = (i + dx) / image_width;
+          const real v = (j + dy) / image_height;
           const ray r = cam.get_ray(u, v);
           pixel_colour += ray_colour(r, world, max_depth);
         }
@@ -175,7 +175,7 @@ void render(const hittable_list &world, const camera &cam,
         framebuffer[idx] += tmp_image[idx];
         weights[idx] += tsk.tile_weight;
         result_image.set(j, i,
-                         framebuffer[idx] / static_cast<float>(weights[idx]));
+                         framebuffer[idx] / static_cast<real>(weights[idx]));
       }
     }
   };
@@ -198,7 +198,7 @@ void render(const hittable_list &world, const camera &cam,
 
   std::cerr << "Starting render with " << task_list.size() << " tasks and "
             << max_threads << " threads..." << std::endl;
-  const auto start_ms = get_time_ms();
+  const auto start_ms = util::get_time_ms();
   const size_t num_tasks = task_list.size();
 
   std::vector<std::thread> threads;
@@ -211,15 +211,15 @@ void render(const hittable_list &world, const camera &cam,
         compute_tile(task_list[task_idx]);
 
         static long long last_update_ms = 0;
-        const long long current_time_ms = get_time_ms();
+        const long long current_time_ms = util::get_time_ms();
         if (current_time_ms - last_update_ms > 1000) {
           last_update_ms = current_time_ms;
-          const float elapsed_ms = current_time_ms - start_ms;
+          const real elapsed_ms = current_time_ms - start_ms;
           const size_t done_tasks = std::min<size_t>(num_tasks, next_task_idx);
           const size_t remaining_tasks = num_tasks - done_tasks;
-          const float tasks_per_ms = done_tasks / elapsed_ms;
-          const float samples_per_ms = num_samples / elapsed_ms;
-          const float estimated_remaining_ms =
+          const real tasks_per_ms = done_tasks / elapsed_ms;
+          const real samples_per_ms = num_samples / elapsed_ms;
+          const real estimated_remaining_ms =
               elapsed_ms / done_tasks * remaining_tasks;
           std::stringstream output_line;
           output_line << "\r" << elapsed_ms / 1000 << "s elapsed, "
@@ -243,8 +243,8 @@ void render(const hittable_list &world, const camera &cam,
     thread.join();
   }
 
-  const auto end_ms = get_time_ms();
-  const float elapsed_seconds = (end_ms - start_ms) / 1000.0;
+  const auto end_ms = util::get_time_ms();
+  const real elapsed_seconds = (end_ms - start_ms) / 1000.0;
   std::cout << std::endl
             << "Done! Took " << elapsed_seconds << " seconds" << std::endl;
 

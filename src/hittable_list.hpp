@@ -19,8 +19,8 @@ struct hittable_list : public hittable {
   void add(shared_ptr<hittable> object) { objects.push_back(object); }
   void add_background_map(const std::string &filename);
 
-  virtual bool hit(const ray &r, const float t_min, const float t_max,
+  virtual bool hit(const ray &r, const real t_min, const real t_max,
                    hit_record &rec) const override;
-  virtual bool bounding_box(const float time0, const float time1,
+  virtual bool bounding_box(const real time0, const real time1,
                             aabb &output_box) const override;
 };

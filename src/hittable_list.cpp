@@ -6,11 +6,11 @@
 #include "sphere.hpp"
 #include "texture.hpp"
 
-bool hittable_list::hit(const ray &r, const float t_min, const float t_max,
+bool hittable_list::hit(const ray &r, const real t_min, const real t_max,
                         hit_record &rec) const {
   hit_record temp_rec;
   bool hit_anything = false;
-  float closest_so_far = t_max;
+  real closest_so_far = t_max;
 
   for (const auto &object : objects) {
     if (object->hit(r, t_min, closest_so_far, temp_rec)) {
@@ -23,7 +23,7 @@ bool hittable_list::hit(const ray &r, const float t_min, const float t_max,
   return hit_anything;
 }
 
-bool hittable_list::bounding_box(const float time0, const float time1,
+bool hittable_list::bounding_box(const real time0, const real time1,
                                  aabb &output_box) const {
   if (objects.empty())
     return false;

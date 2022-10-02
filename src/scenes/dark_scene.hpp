@@ -23,10 +23,10 @@ auto dark_scene() {
 
   for (int a = -11; a < 11; a++) {
     for (int b = -11; b < 11; b++) {
-      const float choose_mat = random_float();
-      const float ball_height = 0.2;
-      const point3 center(a + 0.9 * random_float(), ball_height,
-                          b + 0.9 * random_float());
+      const real choose_mat = util::random_real();
+      const real ball_height = 0.2;
+      const point3 center(a + 0.9 * util::random_real(), ball_height,
+                          b + 0.9 * util::random_real());
 
       if (length(center - point3(4, 0.2, 0)) > 0.9) {
         if (choose_mat < 0.1) {
@@ -39,7 +39,7 @@ auto dark_scene() {
           const colour albedo = util::random_vec3() * util::random_vec3();
           const auto sphere_material =
               material_manager::create<diffuse_light>(albedo);
-          const point3 center2 = center + vec3(0, random_float(0, .5), 0);
+          const point3 center2 = center + vec3(0, util::random_real(0, .5), 0);
           world.add(make_shared<animated_sphere>(center, center2, 0.0, 1.0, 0.2,
                                                  sphere_material));
         } else if (choose_mat < 0.8) {
@@ -47,13 +47,13 @@ auto dark_scene() {
           const colour albedo = util::random_vec3() * util::random_vec3();
           const auto sphere_material =
               material_manager::create<lambertian>(albedo);
-          const point3 center2 = center + vec3(0, random_float(0, 0.5), 0);
+          const point3 center2 = center + vec3(0, util::random_real(0, 0.5), 0);
           world.add(make_shared<animated_sphere>(center, center2, 0.0, 1.0, 0.2,
                                                  sphere_material));
         } else if (choose_mat < 0.95) {
           // metal
           const colour albedo = util::random_vec3(0.5, 1);
-          const float fuzz = random_float(0, 0.5);
+          const real fuzz = util::random_real(0, 0.5);
           const auto sphere_material =
               material_manager::create<metal>(albedo, fuzz);
           world.add(make_shared<sphere>(center, 0.2, sphere_material));
@@ -67,8 +67,7 @@ auto dark_scene() {
     }
   }
 
-  const auto material1 =
-      material_manager::create<dielectric>(colour(1.0), 1.5);
+  const auto material1 = material_manager::create<dielectric>(colour(1.0), 1.5);
   world.add(make_shared<sphere>(point3(0, 1, 0), 1.0, material1));
 
   const auto material2 =

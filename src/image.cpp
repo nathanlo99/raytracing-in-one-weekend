@@ -34,11 +34,11 @@ void image::write_png(const std::string &filename) {
                                                   height);
   for (int i = 0; i < width * height; ++i) {
     gamma_corrected_data[3 * i + 0] =
-        to_byte(gamma_correct_float(std::clamp<float>(pixels[i][0], 0.0, 1.0)));
+        to_byte(gamma_correct_real(std::clamp<real>(pixels[i][0], 0.0, 1.0)));
     gamma_corrected_data[3 * i + 1] =
-        to_byte(gamma_correct_float(std::clamp<float>(pixels[i][1], 0.0, 1.0)));
+        to_byte(gamma_correct_real(std::clamp<real>(pixels[i][1], 0.0, 1.0)));
     gamma_corrected_data[3 * i + 2] =
-        to_byte(gamma_correct_float(std::clamp<float>(pixels[i][2], 0.0, 1.0)));
+        to_byte(gamma_correct_real(std::clamp<real>(pixels[i][2], 0.0, 1.0)));
   }
 
   const int result =

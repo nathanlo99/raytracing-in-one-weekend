@@ -11,7 +11,7 @@ struct material {
   virtual ~material() = default;
   virtual bool scatter(const ray &r_in, const hit_record &rec,
                        colour &attenuation, ray &scattered) const = 0;
-  virtual colour emitted(const float u, const float v, const point3 &p) const {
+  virtual colour emitted(const real u, const real v, const point3 &p) const {
     return colour(0.0f, 0.0f, 0.0f);
   }
 };
@@ -38,10 +38,10 @@ struct lambertian : public material {
 
 struct metal : public material {
   colour albedo;
-  float fuzz;
+  real fuzz;
 
-  metal(const colour &a, float f)
-      : albedo(a), fuzz(std::clamp<float>(f, 0.0, 1.0)) {}
+  metal(const colour &a, real f)
+      : albedo(a), fuzz(std::clamp<real>(f, 0.0, 1.0)) {}
   virtual ~metal() = default;
 
   virtual bool scatter(const ray &r_in, const hit_record &rec,
@@ -56,32 +56,32 @@ struct metal : public material {
 
 struct dielectric : public material {
   colour albedo;
-  float index_of_refraction;
+  real index_of_refraction;
 
-  explicit dielectric(const colour &a, const float index_of_refraction)
+  explicit dielectric(const colour &a, const real index_of_refraction)
       : albedo(a), index_of_refraction(index_of_refraction) {}
   virtual ~dielectric() = default;
 
-  static inline float reflectance(const float cosine, const float index_ratio) {
-    const float sqrt_r0 = (1 - index_ratio) / (1 + index_ratio);
-    const float r0 = sqrt_r0 * sqrt_r0;
+  static inline real reflectance(const real cosine, const real index_ratio) {
+    const real sqrt_r0 = (1 - index_ratio) / (1 + index_ratio);
+    const real r0 = sqrt_r0 * sqrt_r0;
     return r0 + (1 - r0) * pow(1 - cosine, 5);
   }
 
   virtual bool scatter(const ray &r_in, const hit_record &rec,
                        colour &attenuation, ray &scattered) const override {
     attenuation = albedo;
-    const float index_ratio =
+    const real index_ratio =
         rec.front_face ? 1.0 / index_of_refraction : index_of_refraction;
 
     const vec3 unit_direction = normalize(r_in.dir);
-    const float cos_theta =
-        std::min<float>(-dot(unit_direction, rec.normal), 1.0);
-    const float sin_theta = std::sqrt(1.0 - cos_theta * cos_theta);
+    const real cos_theta =
+        std::min<real>(-dot(unit_direction, rec.normal), 1.0);
+    const real sin_theta = std::sqrt(1.0 - cos_theta * cos_theta);
 
     const bool cannot_reflect = index_ratio * sin_theta > 1.0;
     if (cannot_reflect ||
-        random_float() < reflectance(cos_theta, index_ratio)) {
+        util::random_real() < reflectance(cos_theta, index_ratio)) {
       const vec3 direction = reflect(unit_direction, rec.normal);
       scattered = ray(rec.p, direction, r_in.time);
       return true;
@@ -104,7 +104,7 @@ struct diffuse_light : public material {
     return false;
   }
 
-  virtual colour emitted(const float u, const float v,
+  virtual colour emitted(const real u, const real v,
                          const point3 &p) const override {
     return emit->value(u, v, p);
   }
