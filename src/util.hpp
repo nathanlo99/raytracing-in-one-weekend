@@ -2,7 +2,6 @@
 #pragma once
 
 #include <algorithm>
-#include <atomic>
 #include <cassert>
 #include <chrono>
 #include <cmath>
@@ -21,9 +20,6 @@
 #include <glm/glm.hpp>
 
 // Usings
-
-using std::make_shared;
-using std::shared_ptr;
 
 #if USE_FLOATS
 using real = float;

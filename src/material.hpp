@@ -1,8 +1,10 @@
 
 #pragma once
 
+#include "hittable.hpp"
 #include "util.hpp"
 
+#include "ray.hpp"
 #include "texture.hpp"
 
 struct hit_record;
@@ -17,10 +19,10 @@ struct material {
 };
 
 struct lambertian : public material {
-  shared_ptr<texture> albedo;
+  std::shared_ptr<texture> albedo;
 
-  lambertian(const colour &a) : albedo(make_shared<solid_colour>(a)) {}
-  lambertian(shared_ptr<texture> a) : albedo(a) {}
+  lambertian(const colour &a) : albedo(std::make_shared<solid_colour>(a)) {}
+  lambertian(std::shared_ptr<texture> a) : albedo(a) {}
 
   virtual ~lambertian() = default;
 
@@ -94,10 +96,10 @@ struct dielectric : public material {
 };
 
 struct diffuse_light : public material {
-  shared_ptr<texture> emit;
+  std::shared_ptr<texture> emit;
 
-  diffuse_light(shared_ptr<texture> a) : emit(a) {}
-  diffuse_light(const colour &a) : emit(make_shared<solid_colour>(a)) {}
+  diffuse_light(std::shared_ptr<texture> a) : emit(a) {}
+  diffuse_light(const colour &a) : emit(std::make_shared<solid_colour>(a)) {}
 
   virtual bool scatter(const ray &r_in, const hit_record &rec,
                        colour &attenuation, ray &scattered) const override {

@@ -4,8 +4,8 @@
 #include "util.hpp"
 
 struct ray {
-  point3 orig;
-  vec3 dir;
+  point3 orig = point3(0.0);
+  vec3 dir = vec3(0.0);
   real time = 0.0;
 
   constexpr ray() = default;

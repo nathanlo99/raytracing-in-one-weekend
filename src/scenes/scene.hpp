@@ -3,6 +3,7 @@
 
 #include "camera.hpp"
 #include "hittable.hpp"
+#include "hittable_list.hpp"
 
 struct scene {
   hittable_list objects;

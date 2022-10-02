@@ -3,8 +3,6 @@
 
 #include "util.hpp"
 
-#include <iostream>
-
 inline constexpr real gamma_correct_real(const real d) {
   constexpr real gamma = 2.2, gamma_exp = 1.0 / gamma;
   return pow(d, gamma_exp);

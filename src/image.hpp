@@ -8,8 +8,7 @@
 #include <vector>
 
 struct image {
-  int width;
-  int height;
+  int width, height;
   std::vector<colour> pixels;
 
   const static int bytes_per_pixel = 3;
@@ -20,7 +19,7 @@ struct image {
 
   inline colour get(const int row, const int col) const {
     // Take row mod height and col mod width to wrap the texture on overflow
-    const int idx = (row % height) * width + (col % width);
+    const size_t idx = (row % height) * width + (col % width);
     return pixels[idx];
   }
 
@@ -56,7 +55,7 @@ struct image {
   }
 
   inline void set(const int row, const int col, const colour &c) {
-    const int idx = row * width + col;
+    const size_t idx = row * width + col;
     pixels[idx] = c;
   }
 

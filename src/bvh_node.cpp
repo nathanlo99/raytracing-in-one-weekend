@@ -14,21 +14,22 @@ bool bvh_node::hit(const ray &r, const real t_min, const real t_max,
   return hit_left | hit_right;
 }
 
-shared_ptr<hittable> bvh_node::from_list(const hittable_list &list,
-                                         const real time0, const real time1) {
+std::shared_ptr<hittable> bvh_node::from_list(const hittable_list &list,
+                                              const real time0,
+                                              const real time1) {
   if (list.size() == 1)
     return list.objects[0];
 
   std::vector<hittable_with_box> objects;
   objects.reserve(list.objects.size());
-  for (const shared_ptr<hittable> &obj : list.objects) {
+  for (const std::shared_ptr<hittable> &obj : list.objects) {
     aabb box;
     if (!obj->bounding_box(time0, time1, box)) {
       std::cerr << "Cannot create BVH from unbounded object" << std::endl;
     }
     objects.push_back({obj, box});
   }
-  return make_shared<bvh_node>(objects, 0, objects.size(), time0, time1);
+  return std::make_shared<bvh_node>(objects, 0, objects.size(), time0, time1);
 }
 
 bvh_node::bvh_node(std::vector<hittable_with_box> &objects, const size_t start,
@@ -42,7 +43,7 @@ bvh_node::bvh_node(std::vector<hittable_with_box> &objects, const size_t start,
     box = surrounding_box(objects[start].box, objects[start + 1].box);
     return;
   } else if (span == 3) {
-    left = make_shared<bvh_node>(objects, start, start + 2, time0, time1);
+    left = std::make_shared<bvh_node>(objects, start, start + 2, time0, time1);
     right = objects[end - 1].object;
     box = surrounding_box(
         objects[start].box,
@@ -64,7 +65,7 @@ bvh_node::bvh_node(std::vector<hittable_with_box> &objects, const size_t start,
             });
 
   const size_t mid = start + span / 2;
-  left = make_shared<bvh_node>(objects, start, mid, time0, time1);
-  right = make_shared<bvh_node>(objects, mid, end, time0, time1);
+  left = std::make_shared<bvh_node>(objects, start, mid, time0, time1);
+  right = std::make_shared<bvh_node>(objects, mid, end, time0, time1);
   box = total_box;
 }

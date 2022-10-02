@@ -17,14 +17,14 @@
 
 #include "scene.hpp"
 
-auto glass_test_scene() {
+inline auto glass_test_scene() {
   const real aspect_ratio = 1.5;
   const int image_width = 1200;
   const int image_height = image_width / aspect_ratio;
 
   hittable_list world;
 
-  std::vector<real> iors = {1.0, 1.16, 1.33, 1.5, 1.66, 1.85, 2.0};
+  const std::vector<real> iors = {1.0, 1.16, 1.33, 1.5, 1.66, 1.85, 2.0};
   for (size_t i = 0; i < iors.size(); ++i) {
     const real ior = iors[i];
     const auto white_glass_material =

@@ -263,6 +263,6 @@ int main(int argc, char *argv[]) {
   if (true) {
     const auto scene = diamond_scene();
     render(scene.objects, scene.cam, "diamond.png", scene.cam.image_width,
-           scene.cam.image_height, 50000, PER_FRAME);
+           scene.cam.image_height, 500, PER_FRAME);
   }
 }

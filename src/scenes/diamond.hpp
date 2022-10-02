@@ -14,7 +14,7 @@
 
 #include "scene.hpp"
 
-auto diamond_scene() {
+inline auto diamond_scene() {
   // Image
   const real aspect_ratio = 1.5;
   const int image_width = 1200;
@@ -24,7 +24,8 @@ auto diamond_scene() {
 
   const auto ground_material =
       material_manager::create<lambertian>(colour(0.5, 0.5, 0.5));
-  world.add(make_shared<sphere>(point3(0, -1000, 0), 1000, ground_material));
+  world.add(
+      std::make_shared<sphere>(point3(0, -1000, 0), 1000, ground_material));
 
   const auto diamond_material =
       material_manager::create<dielectric>(colour(1.0), 2.418);
