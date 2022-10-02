@@ -5,12 +5,12 @@
 #include "hittable.hpp"
 
 struct sphere : public hittable {
-  point3 centre;
-  real radius;
-  material *mat_ptr;
+  point3 centre = point3(0.0);
+  real radius = 1.0;
+  material *mat_ptr = nullptr;
 
-  sphere() : centre(), radius(0.0), mat_ptr(nullptr) {}
-  sphere(const point3 &centre, const real r, material *mat)
+  constexpr sphere() = default;
+  constexpr sphere(const point3 &centre, const real r, material *mat)
       : centre(centre), radius(r), mat_ptr(mat) {}
   virtual ~sphere() {}
 

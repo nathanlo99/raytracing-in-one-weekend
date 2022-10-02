@@ -21,8 +21,9 @@ struct material {
 struct lambertian : public material {
   std::shared_ptr<texture> albedo;
 
-  lambertian(const colour &a) : albedo(std::make_shared<solid_colour>(a)) {}
-  lambertian(std::shared_ptr<texture> a) : albedo(a) {}
+  explicit lambertian(const colour &a)
+      : albedo(std::make_shared<solid_colour>(a)) {}
+  explicit lambertian(std::shared_ptr<texture> a) : albedo(a) {}
 
   virtual ~lambertian() = default;
 
@@ -39,10 +40,10 @@ struct lambertian : public material {
 };
 
 struct metal : public material {
-  colour albedo;
-  real fuzz;
+  colour albedo = colour(1.0);
+  real fuzz = 0.0;
 
-  metal(const colour &a, real f)
+  constexpr explicit metal(const colour &a, const real f)
       : albedo(a), fuzz(std::clamp<real>(f, 0.0, 1.0)) {}
   virtual ~metal() = default;
 
@@ -57,15 +58,15 @@ struct metal : public material {
 };
 
 struct dielectric : public material {
-  colour albedo;
-  real index_of_refraction;
+  colour albedo = colour(1.0);
+  real index_of_refraction = 1.0;
 
-  explicit dielectric(const colour &a, const real index_of_refraction)
+  constexpr explicit dielectric(const colour &a, const real index_of_refraction)
       : albedo(a), index_of_refraction(index_of_refraction) {}
   virtual ~dielectric() = default;
 
   static inline real reflectance(const real cosine, const real index_ratio) {
-    const real sqrt_r0 = (1 - index_ratio) / (1 + index_ratio);
+    const real sqrt_r0 = (1.0 - index_ratio) / (1.0 + index_ratio);
     const real r0 = sqrt_r0 * sqrt_r0;
     return r0 + (1 - r0) * pow(1 - cosine, 5);
   }
@@ -76,9 +77,9 @@ struct dielectric : public material {
     const real index_ratio =
         rec.front_face ? 1.0 / index_of_refraction : index_of_refraction;
 
-    const vec3 unit_direction = normalize(r_in.dir);
+    const vec3 unit_direction = glm::normalize(r_in.dir);
     const real cos_theta =
-        std::min<real>(-dot(unit_direction, rec.normal), 1.0);
+        std::min<real>(-glm::dot(unit_direction, rec.normal), 1.0);
     const real sin_theta = std::sqrt(1.0 - cos_theta * cos_theta);
 
     const bool cannot_reflect = index_ratio * sin_theta > 1.0;
@@ -98,8 +99,9 @@ struct dielectric : public material {
 struct diffuse_light : public material {
   std::shared_ptr<texture> emit;
 
-  diffuse_light(std::shared_ptr<texture> a) : emit(a) {}
-  diffuse_light(const colour &a) : emit(std::make_shared<solid_colour>(a)) {}
+  explicit diffuse_light(std::shared_ptr<texture> a) : emit(a) {}
+  explicit diffuse_light(const colour &a)
+      : emit(std::make_shared<solid_colour>(a)) {}
 
   virtual bool scatter(const ray &r_in, const hit_record &rec,
                        colour &attenuation, ray &scattered) const override {

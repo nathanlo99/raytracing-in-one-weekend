@@ -22,13 +22,13 @@ struct camera {
          const real t0, const real t1)
       : image_width(image_width), image_height(image_height), t0(t0), t1(t1) {
     const real theta = util::degrees_to_radians(vfov);
-    const real h = std::tan(theta / 2);
+    const real h = std::tan(theta / 2.0);
     const real viewport_height = 2.0 * h;
     const real viewport_width = aspect_ratio * viewport_height;
 
-    w = normalize(look_from - look_at);
-    u = normalize(cross(up, w));
-    v = cross(w, u);
+    w = glm::normalize(look_from - look_at);
+    u = glm::normalize(glm::cross(up, w));
+    v = glm::cross(w, u);
 
     const real two = 2.0;
 

@@ -16,7 +16,7 @@ struct hittable_list : public hittable {
 
   constexpr size_t size() const { return objects.size(); }
   void clear() { objects.clear(); }
-  void add(std::shared_ptr<hittable> object) { objects.push_back(object); }
+  void add(std::shared_ptr<hittable> object) { objects.emplace_back(object); }
   void add_background_map(const std::string &filename);
 
   virtual bool hit(const ray &r, const real t_min, const real t_max,

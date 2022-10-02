@@ -39,7 +39,7 @@ bool hittable_list::bounding_box(const real time0, const real time1,
 }
 
 void hittable_list::add_background_map(const std::string &filename) {
-  const auto radius = 90000.0;
+  const real radius = 1e5;
   const auto skybox_image = std::make_shared<image_texture>(filename);
   const auto skybox_texture =
       material_manager::create<diffuse_light>(skybox_image);

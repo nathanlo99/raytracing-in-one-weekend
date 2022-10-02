@@ -15,17 +15,14 @@
 
 #include <glm/glm.hpp>
 
-__attribute__((hot)) colour
-ray_colour(const ray &r, const hittable &world, const int depth,
-           const colour &contribution = colour(1.0)) {
+__attribute__((hot)) colour ray_colour(const ray &r, const hittable &world,
+                                       const int depth) {
   if (depth <= 0)
-    return colour();
-  if (dot(contribution, contribution) < 1e-10)
-    return util::random_vec3();
+    return colour(0.0);
 
   hit_record rec;
   if (!world.hit(r, eps, inf, rec))
-    return colour();
+    return colour(0.0);
 
   const colour emitted = rec.mat_ptr->emitted(rec.u, rec.v, rec.p);
 
@@ -34,8 +31,7 @@ ray_colour(const ray &r, const hittable &world, const int depth,
   if (!rec.mat_ptr->scatter(r, rec, attenuation, scattered))
     return emitted;
 
-  return emitted + attenuation * ray_colour(scattered, world, depth - 1,
-                                            contribution * attenuation);
+  return emitted + attenuation * ray_colour(scattered, world, depth - 1);
 }
 
 enum TileProtocol {

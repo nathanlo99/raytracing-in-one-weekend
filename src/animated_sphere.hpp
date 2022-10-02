@@ -12,8 +12,10 @@ struct animated_sphere : public hittable {
   real radius = 1.0;
   material *mat_ptr = nullptr;
 
-  animated_sphere(const point3 &centre0, const point3 &centre1, const real t0,
-                  const real t1, const real radius, material *mat_ptr)
+  constexpr animated_sphere() = default;
+  constexpr animated_sphere(const point3 &centre0, const point3 &centre1,
+                            const real t0, const real t1, const real radius,
+                            material *mat_ptr)
       : centre0(centre0), centre1(centre1), t0(t0), t1(t1), radius(radius),
         mat_ptr(mat_ptr) {}
   virtual ~animated_sphere() = default;
