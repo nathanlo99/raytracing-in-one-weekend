@@ -8,7 +8,6 @@
 #include "camera.hpp"
 #include "colour.hpp"
 #include "hittable_list.hpp"
-#include "image.hpp"
 #include "material.hpp"
 #include "sphere.hpp"
 

@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 3.10)
 
+# enable exporting commands for use with vscode
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 # set the project name
 project(raytracer)
 include_directories(raytracer PUBLIC src include)

@@ -7,7 +7,6 @@
 #include "camera.hpp"
 #include "colour.hpp"
 #include "hittable_list.hpp"
-#include "image.hpp"
 #include "material.hpp"
 #include "material_manager.hpp"
 #include "mesh_loader.hpp"
@@ -19,7 +18,7 @@ auto diamond_scene() {
   // Image
   const real aspect_ratio = 1.5;
   const int image_width = 1200;
-  const int image_height = static_cast<int>(image_width / aspect_ratio);
+  const int image_height = image_width / aspect_ratio;
 
   hittable_list world;
 

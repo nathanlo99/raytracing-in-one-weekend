@@ -8,7 +8,6 @@
 #include "camera.hpp"
 #include "colour.hpp"
 #include "hittable_list.hpp"
-#include "image.hpp"
 #include "material.hpp"
 #include "material_manager.hpp"
 #include "mesh_loader.hpp"
@@ -21,7 +20,7 @@ auto platonic_scene() {
   // Image
   const real aspect_ratio = 2.0;
   const int image_width = 800;
-  const int image_height = static_cast<int>(image_width / aspect_ratio);
+  const int image_height = image_width / aspect_ratio;
 
   hittable_list world;
 
@@ -29,8 +28,8 @@ auto platonic_scene() {
       material_manager::create<lambertian>(colour(0.5, 0.5, 0.5));
   world.add(make_shared<sphere>(point3(0, -1001, 0), 1000, ground_material));
 
-  const auto glass_material = material_manager::create<dielectric>(
-      colour(0.8, 0.2, 0.2), 1.52);
+  const auto glass_material =
+      material_manager::create<dielectric>(colour(0.8, 0.2, 0.2), 1.52);
   // const auto glass_material =
   //     material_manager::create<dielectric>(colour(1.0), 1.52);
 

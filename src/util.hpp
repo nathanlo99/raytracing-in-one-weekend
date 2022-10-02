@@ -2,10 +2,10 @@
 #pragma once
 
 #include <algorithm>
+#include <atomic>
 #include <cassert>
 #include <chrono>
 #include <cmath>
-#include <glm/glm.hpp>
 #include <iostream>
 #include <limits>
 #include <memory>
@@ -17,6 +17,8 @@
 #include <boost/random/sobol.hpp>
 #include <boost/random/uniform_real.hpp>
 #include <boost/random/variate_generator.hpp>
+
+#include <glm/glm.hpp>
 
 // Usings
 
@@ -48,10 +50,10 @@ constexpr inline real degrees_to_radians(real degrees) {
 }
 
 inline real random_real() {
-  return rand() / (RAND_MAX + 1.0);
-  // static std::uniform_real_distribution<real> distribution(0.0, 1.0);
-  // static std::mt19937 generator(127);
-  // return distribution(generator);
+  // return rand() / (RAND_MAX + 1.0);
+  static std::uniform_real_distribution<real> distribution(0.0, 1.0);
+  static std::mt19937 generator(127);
+  return distribution(generator);
 }
 
 inline real random_real(const real min, const real max) {
@@ -98,7 +100,7 @@ inline size_t largest_axis(const vec3 &v) {
 }
 
 inline vec3 random_vec3() {
-  return vec3(random_real(), util::random_real(), util::random_real());
+  return vec3(random_real(), random_real(), random_real());
 }
 
 inline vec3 random_vec3(const real min, const real max) {
