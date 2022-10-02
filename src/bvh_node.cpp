@@ -1,7 +1,7 @@
 
 #include "bvh_node.hpp"
 
-bool bvh_node::hit(const ray &r, const float t_min, const float t_max,
+bool bvh_node::hit(const ray &r, const real t_min, const real t_max,
                    hit_record &rec) const {
   if (!box.does_hit(r, t_min, t_max))
     return false;
@@ -15,7 +15,7 @@ bool bvh_node::hit(const ray &r, const float t_min, const float t_max,
 }
 
 shared_ptr<hittable> bvh_node::from_list(const hittable_list &list,
-                                         const float time0, const float time1) {
+                                         const real time0, const real time1) {
   if (list.size() == 1)
     return list.objects[0];
 
@@ -32,7 +32,7 @@ shared_ptr<hittable> bvh_node::from_list(const hittable_list &list,
 }
 
 bvh_node::bvh_node(std::vector<hittable_with_box> &objects, const size_t start,
-                   const size_t end, const float time0, const float time1) {
+                   const size_t end, const real time0, const real time1) {
 
   const size_t span = end - start;
   assert(span >= 2);

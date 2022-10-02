@@ -17,7 +17,7 @@
 
 auto diamond_scene() {
   // Image
-  const float aspect_ratio = 1.5;
+  const real aspect_ratio = 1.5;
   const int image_width = 1200;
   const int image_height = static_cast<int>(image_width / aspect_ratio);
 
@@ -39,8 +39,8 @@ auto diamond_scene() {
   const point3 lookfrom(-0.5, 0.8, 4.5);
   const point3 lookat(0, 0.7, 0);
   const vec3 up(0, 1, 0);
-  const float dist_to_focus = length(lookfrom - lookat);
-  const float aperture = 0.1;
+  const real dist_to_focus = length(lookfrom - lookat);
+  const real aperture = 0.1;
 
   const camera cam(image_width, image_height, lookfrom, lookat, up, 50,
                    aspect_ratio, aperture, dist_to_focus, 0.0, 1.0);

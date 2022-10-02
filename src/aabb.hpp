@@ -1,6 +1,7 @@
 
 #pragma once
 
+#include "ray.hpp"
 #include "util.hpp"
 
 struct aabb {
@@ -9,10 +10,10 @@ struct aabb {
   constexpr aabb(const point3 &min, const point3 &max) : min(min), max(max) {}
   constexpr aabb() : min(inf), max(-inf) {}
 
-  constexpr inline bool does_hit(const ray &r, float t_min, float t_max) const {
+  constexpr inline bool does_hit(const ray &r, real t_min, real t_max) const {
     for (int a = 0; a < 3; a++) {
-      float t0 = (min[a] - r.orig[a]) / r.dir[a];
-      float t1 = (max[a] - r.orig[a]) / r.dir[a];
+      real t0 = (min[a] - r.orig[a]) / r.dir[a];
+      real t1 = (max[a] - r.orig[a]) / r.dir[a];
       if (r.dir[a] < 0.0f)
         std::swap(t0, t1);
       t_min = std::max(t0, t_min);
@@ -23,10 +24,10 @@ struct aabb {
     return t_max > t_min;
   }
 
-  constexpr inline float hit(const ray &r, float t_min, float t_max) const {
+  constexpr inline real hit(const ray &r, real t_min, real t_max) const {
     for (int a = 0; a < 3; a++) {
-      float t0 = (min[a] - r.orig[a]) / r.dir[a];
-      float t1 = (max[a] - r.orig[a]) / r.dir[a];
+      real t0 = (min[a] - r.orig[a]) / r.dir[a];
+      real t1 = (max[a] - r.orig[a]) / r.dir[a];
       if (r.dir[a] < 0.0f)
         std::swap(t0, t1);
       t_min = std::max(t0, t_min);
