@@ -206,17 +206,23 @@ void render(const hittable_list &world, const camera &cam,
           break;
         compute_tile(task_list[task_idx]);
 
-        static long long last_update_ms = 0;
+        static long long last_update_ms = util::get_time_ms();
+        static size_t last_tasks = 0;
+        static size_t last_samples = 0;
         const long long current_time_ms = util::get_time_ms();
         if (current_time_ms - last_update_ms > 1000) {
+          const real update_ms = current_time_ms - last_update_ms;
           last_update_ms = current_time_ms;
           const real elapsed_ms = current_time_ms - start_ms;
-          const size_t done_tasks = std::min<size_t>(num_tasks, next_task_idx);
+          const size_t done_tasks = next_task_idx;
           const size_t remaining_tasks = num_tasks - done_tasks;
-          const real tasks_per_ms = done_tasks / elapsed_ms;
-          const real samples_per_ms = num_samples / elapsed_ms;
-          const real estimated_remaining_ms =
-              elapsed_ms / done_tasks * remaining_tasks;
+          const size_t this_updates_tasks = done_tasks - last_tasks;
+          const size_t this_updates_samples = num_samples - last_samples;
+          last_tasks = done_tasks;
+          last_samples = num_samples;
+          const real tasks_per_ms = this_updates_tasks / update_ms;
+          const real samples_per_ms = this_updates_samples / update_ms;
+          const real estimated_remaining_ms = remaining_tasks / tasks_per_ms;
           std::stringstream output_line;
           output_line << "\r" << elapsed_ms / 1000 << "s elapsed, "
                       << tasks_per_ms * 1000 << " tasks per sec, "
@@ -259,6 +265,6 @@ int main(int argc, char *argv[]) {
   if (true) {
     const auto scene = diamond_scene();
     render(scene.objects, scene.cam, "diamond.png", scene.cam.image_width,
-           scene.cam.image_height, 500, PER_FRAME);
+           scene.cam.image_height, 50000, PER_FRAME);
   }
 }

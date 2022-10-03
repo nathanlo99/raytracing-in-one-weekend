@@ -87,7 +87,7 @@ inline auto get_sobol_sequence(const size_t dimensions,
   return result;
 }
 
-inline size_t largest_axis(const vec3 &v) {
+inline constexpr size_t largest_axis(const vec3 &v) {
   if (v[0] >= v[1] && v[0] >= v[2])
     return 0;
   if (v[1] >= v[2])
@@ -120,8 +120,12 @@ inline vec3 random_in_unit_sphere() {
   }
 }
 
-inline vec3 random_unit_vector() { return normalize(random_in_unit_sphere()); }
+inline vec3 random_unit_vector() {
+  return glm::normalize(random_in_unit_sphere());
+}
 
-inline bool near_zero(const vec3 &v) { return glm::dot(v, v) < eps * eps; }
+inline constexpr bool near_zero(const vec3 &v) {
+  return glm::dot(v, v) < eps * eps;
+}
 
 }; // namespace util

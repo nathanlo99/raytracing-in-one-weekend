@@ -55,9 +55,9 @@ inline auto dark_diamond_scene() {
 
   // Camera
   const point3 lookfrom(-0.5, 0.8, 4.5);
-  const point3 lookat(0, 0.7, 0);
+  const point3 lookat(0.0, 0.7, 0.0);
   const vec3 up(0, 1, 0);
-  const real dist_to_focus = length(lookfrom - lookat);
+  const real dist_to_focus = glm::length(lookfrom - lookat);
   const real aperture = 0.1;
 
   const camera cam(image_width, image_height, lookfrom, lookat, up, 50,
