@@ -1,7 +1,7 @@
-
-- transition to using matrices instead of ad hoc math
 - cheap instance transformations
+- transition to using matrices instead of ad hoc math
 - add imgui
+- importance sampling
 - triangle mesh import
   X write a triangle hittable class
   X import the vertices and faces of an obj model
@@ -10,4 +10,3 @@
 - add scene lua support (can get inspiration from lux)
   - consider gltf
 - spectral rendering
-- importance sampling

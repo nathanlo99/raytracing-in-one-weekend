@@ -21,7 +21,7 @@ inline auto dark_scene() {
       std::make_shared<sphere>(point3(0, -1000, 0), 1000, ground_material));
 
   const auto earth_texture =
-      std::make_shared<image_texture>("../res/earthmap.jpg");
+      std::make_shared<image_texture>("res/earthmap.jpg");
 
   for (int a = -11; a < 11; a++) {
     for (int b = -11; b < 11; b++) {

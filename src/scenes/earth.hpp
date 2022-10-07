@@ -14,7 +14,7 @@
 
 inline auto earth() {
   const auto earth_texture =
-      std::make_shared<image_texture>("../res/earthmap.jpg");
+      std::make_shared<image_texture>("res/earthmap.jpg");
   const auto earth_surface =
       material_manager::create<lambertian>(earth_texture);
   const auto globe = std::make_shared<sphere>(point3(0.0), 2.0, earth_surface);

@@ -48,7 +48,7 @@ inline auto simple_scene() {
                                        point3(1.25, 4, 0), mirror_material));
 
   auto list = hittable_list(bvh_node::from_list(world, 0.0, 1.0));
-  list.add_background_map("../res/hdr_pack/5.hdr");
+  list.add_background_map("res/hdr_pack/5.hdr");
 
   // Camera
   const point3 lookfrom(0, 3, 6);

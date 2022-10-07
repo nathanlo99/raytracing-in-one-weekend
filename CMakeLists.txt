@@ -7,6 +7,8 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 project(raytracer)
 include_directories(raytracer PUBLIC src include)
 
+find_package(OpenMP REQUIRED)
+
 # specify the C++ standard
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
@@ -24,3 +26,4 @@ include_directories(${Boost_INCLUDE_DIRS})
 file(GLOB raytracer_SRC CONFIGURE_DEPENDS "src/*.cpp")
 add_executable(raytracer ${raytracer_SRC})
 target_link_libraries(raytracer ${Boost_LIBRARIES})
+target_link_libraries(raytracer OpenMP::OpenMP_CXX)

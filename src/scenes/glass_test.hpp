@@ -25,7 +25,7 @@ inline auto glass_test_scene() {
   hittable_list world;
 
   const std::vector<real> iors = {1.0, 1.16, 1.33, 1.5, 1.66, 1.85, 2.0};
-  for (size_t i = 0; i < iors.size(); ++i) {
+  for (int i = 0; i < static_cast<int>(iors.size()); ++i) {
     const real ior = iors[i];
     const auto white_glass_material =
         material_manager::create<dielectric>(colour(1.0), ior);
@@ -42,7 +42,7 @@ inline auto glass_test_scene() {
   }
 
   auto list = hittable_list(bvh_node::from_list(world, 0.0, 1.0));
-  list.add_background_map("../res/hdr_pack/5.hdr");
+  list.add_background_map("res/hdr_pack/5.hdr");
 
   // Camera
   const point3 lookfrom(0, 0.5, 5);

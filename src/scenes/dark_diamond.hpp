@@ -48,10 +48,10 @@ inline auto dark_diamond_scene() {
   world.add(
       std::make_shared<sphere>(point3(-3, 10, -3), 1.0, white_light_material));
 
-  world.add(load_obj("../res/obj/diamond.obj", diamond_material));
+  world.add(load_obj("res/obj/diamond.obj", diamond_material));
 
   auto list = hittable_list(bvh_node::from_list(world, 0.0, 1.0));
-  list.add_background_map("../res/hdr_pack/5.hdr");
+  list.add_background_map("res/hdr_pack/5.hdr");
 
   // Camera
   const point3 lookfrom(-0.5, 0.8, 4.5);

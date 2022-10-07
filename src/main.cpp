@@ -48,13 +48,15 @@ void render_singlethreaded(const hittable_list &world, const camera &cam,
   const int max_depth = 100;
 
   image result_image(image_width, image_height);
-  std::vector<long long> debug_times(image_width * image_height);
+  std::vector<long long> debug_times(image_width * image_height, 0);
   long long slowest_pixel = 0;
 
   const auto start_ms = util::get_time_ms();
   size_t pixels = 0;
   std::cout << "Starting render with 1 thread..." << std::endl;
   const auto pixel_jitters = util::get_sobol_sequence(2, samples_per_pixel);
+
+#pragma omp parallel for
   for (int j = 0; j < image_height; ++j) {
     for (int i = 0; i < image_width; ++i) {
       const auto pixel_start_ns = util::get_time_ns();
@@ -91,19 +93,20 @@ void render_singlethreaded(const hittable_list &world, const camera &cam,
                   << estimated_remaining_ms / 1000 << "s remaining, "
                   << remaining_tasks << "/" << num_tasks
                   << " pixels remaining... " << std::flush;
-        result_image.write_png("output/progress.png");
+        result_image.write_png("build/output/progress.png");
       }
     }
 
     image debug_image(image_width, image_height);
-    for (int row = 0; row <= j; ++row) {
+#pragma omp parallel for
+    for (int row = 0; row < image_height; ++row) {
       for (int i = 0; i < image_width; ++i) {
         const real pixel_ns = debug_times[row * image_width + i];
         const real ratio = pixel_ns / slowest_pixel;
         debug_image.set(row, i, colour(ratio));
       }
     }
-    debug_image.write_png("output/debug.png");
+    debug_image.write_png("build/output/debug.png");
   }
 
   const auto end_ms = util::get_time_ms();
@@ -111,7 +114,7 @@ void render_singlethreaded(const hittable_list &world, const camera &cam,
   std::cout << std::endl
             << "Done! Took " << elapsed_seconds << " seconds" << std::endl;
 
-  result_image.write_png("output/progress.png");
+  result_image.write_png("build/output/progress.png");
   result_image.write_png(output);
 }
 
@@ -235,7 +238,7 @@ void render(const hittable_list &world, const camera &cam,
           if (output_length < line_length)
             output_line << std::string(line_length - output_length, ' ');
           std::cout << output_line.str() << std::flush;
-          result_image.write_png("output/progress.png");
+          result_image.write_png("build/output/progress.png");
         }
       }
     });
@@ -254,17 +257,18 @@ void render(const hittable_list &world, const camera &cam,
   result_image.write_png(output);
 }
 
-int main(int argc, char *argv[]) {
+int main() {
   if (false) {
     const auto scene = bright_scene();
-    render_singlethreaded(scene.objects, scene.cam, "bright_scene.png",
+    render_singlethreaded(scene.objects, scene.cam, "build/bright_scene.png",
                           scene.cam.image_width, scene.cam.image_height, 50,
                           PER_FRAME);
   }
 
   if (true) {
     const auto scene = diamond_scene();
-    render(scene.objects, scene.cam, "diamond.png", scene.cam.image_width,
-           scene.cam.image_height, 50000, PER_FRAME);
+    render_singlethreaded(scene.objects, scene.cam, "build/diamond_scene.png",
+                          scene.cam.image_width, scene.cam.image_height, 1000,
+                          PER_FRAME);
   }
 }

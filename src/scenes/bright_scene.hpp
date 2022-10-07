@@ -28,7 +28,7 @@ inline auto bright_scene() {
       std::make_shared<sphere>(point3(0, -1000, 0), 1000, ground_material));
 
   const auto earth_texture =
-      std::make_shared<image_texture>("../res/earthmap.jpg");
+      std::make_shared<image_texture>("res/earthmap.jpg");
 
   for (int a = -11; a < 11; a++) {
     for (int b = -11; b < 11; b++) {
@@ -90,7 +90,7 @@ inline auto bright_scene() {
   auto list = hittable_list(bvh_node::from_list(world, 0.0, 1.0));
 
   const auto skybox_image =
-      std::make_shared<image_texture>("../res/hdr_pack/5.hdr");
+      std::make_shared<image_texture>("res/hdr_pack/5.hdr");
   const auto skybox_texture =
       material_manager::create<diffuse_light>(skybox_image);
   list.add(std::make_shared<sphere>(point3(0, 0, 0), 9000, skybox_texture));
