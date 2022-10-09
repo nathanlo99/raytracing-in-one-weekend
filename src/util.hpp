@@ -23,10 +23,12 @@
 #if USE_FLOATS
 using real = float;
 using vec3 = glm::vec3;
+using vec4 = glm::vec4;
 using mat4 = glm::mat4;
 #else
 using real = double;
 using vec3 = glm::dvec3;
+using vec4 = glm::dvec4;
 using mat4 = glm::dmat4;
 #endif // USE_FLOATS
 

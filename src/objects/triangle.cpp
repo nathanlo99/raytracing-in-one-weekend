@@ -1,9 +1,8 @@
 
 #include "triangle.hpp"
 
-__attribute__((hot)) bool triangle::hit(const ray &r, const real t_min,
-                                        const real t_max,
-                                        hit_record &rec) const {
+bool triangle::hit(const ray &r, const real t_min, const real t_max,
+                   hit_record &rec) const {
   const vec3 edge1 = m_p1 - m_p0;
   const vec3 edge2 = m_p2 - m_p0;
   const vec3 rop0 = r.orig - m_p0;
@@ -26,7 +25,7 @@ __attribute__((hot)) bool triangle::hit(const ray &r, const real t_min,
 
   rec.t = t;
   rec.p = r.at(t);
-  rec.set_face_normal(r, glm::normalize(n));
+  rec.set_face_normal(r, n);
   // TODO: fix uv's for cases where the triangle comes with uv's
   rec.u = u;
   rec.v = v;

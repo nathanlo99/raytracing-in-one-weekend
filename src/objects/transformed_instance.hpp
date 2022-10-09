@@ -20,23 +20,30 @@ public:
 
   virtual bool hit(const ray &r, const real t_min, const real t_max,
                    hit_record &rec) const override {
-    /* TODO
-    1. Transform ray
-    2. Hit the instance with that transformed_ray
-    3. If missed, return false
-    4. If hit, transform everything in the hit_record accordingly and return
-       true.
-    */
-    return false;
+    // 1. Transform ray with the inverse model matrix
+    const vec3 new_origin =
+        glm::transpose(m_inv_trans_matrix) * vec4(r.orig, 1.0);
+    const vec3 new_direction =
+        glm::transpose(m_inv_trans_matrix) * vec4(r.dir, 0.0);
+    const ray new_ray(new_origin, new_direction, r.time);
+
+    // 2. Hit the instance with that transformed_ray
+    // 3. If missed, return false
+    if (!m_instance->hit(new_ray, t_min, t_max, rec))
+      return false;
+
+    // 4. Transform everything in the hit_record accordingly and return true
+    rec.p = m_model_matrix * vec4(rec.p, 1.0);
+    rec.set_face_normal(r, m_inv_trans_matrix * vec4(rec.normal, 0.0));
+
+    return true;
   }
+
   virtual bool bounding_box(const real time0, const real time1,
                             aabb &output_box) const override {
-    /* TODO
-    1. If the instance is unbounded (cached), return false
-    2. If we have a bounding box cached, return it
-    3. Otherwise, compute the bounding box by transforming the instance's
-       bounding box, cache a yes answer, and return it
-    */
-    return false;
+    if (!m_instance->bounding_box(time0, time1, output_box))
+      return false;
+    output_box = output_box.apply(m_model_matrix);
+    return true;
   }
 };

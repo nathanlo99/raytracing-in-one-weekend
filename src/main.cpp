@@ -11,10 +11,19 @@
 #include <queue>
 #include <thread>
 
-__attribute__((hot)) colour ray_colour(const ray &r, const hittable &world,
-                                       const int depth) {
-  if (depth <= 0)
+__attribute__((hot)) colour
+ray_colour(const ray &r, const hittable &world, const int depth,
+           const colour &contribution = colour(1.0)) {
+  if (depth <= 0 || glm::length(contribution) < 1e-12) {
+    // static std::atomic<int> early_exits = 0;
+    // static int last_update = 0;
+    // early_exits += depth;
+    // if (early_exits >= last_update + 1000000) {
+    //   last_update = early_exits;
+    //   std::cout << early_exits << " early exits" << std::endl;
+    // }
     return colour(0.0);
+  }
 
   hit_record rec;
   if (!world.hit(r, eps, inf, rec))
@@ -27,7 +36,8 @@ __attribute__((hot)) colour ray_colour(const ray &r, const hittable &world,
   if (!rec.mat_ptr->scatter(r, rec, attenuation, scattered))
     return emitted;
 
-  return emitted + attenuation * ray_colour(scattered, world, depth - 1);
+  return emitted + attenuation * ray_colour(scattered, world, depth - 1,
+                                            attenuation * contribution);
 }
 
 enum TileProtocol {

@@ -40,6 +40,10 @@ inline void add_yz_rect(hittable_list &lst, double y0, double y1, double z0,
   lst.add(std::make_shared<triangle>(p0, p2, p3, mat));
 }
 
+inline void add_box(hittable_list &lst, point3 min, point3 max, material *mat) {
+  lst.add(std::make_shared<box>(min, max, mat));
+}
+
 inline hittable_list cornell_box_objects() {
   hittable_list objects;
 
@@ -59,10 +63,8 @@ inline hittable_list cornell_box_objects() {
   add_xz_rect(objects, 0, 555, 0, 555, 555, white);
   add_xy_rect(objects, 0, 555, 0, 555, 555, white);
 
-  objects.add(
-      std::make_shared<box>(point3(130, 0, 65), point3(295, 165, 230), white));
-  objects.add(
-      std::make_shared<box>(point3(265, 0, 295), point3(430, 330, 460), white));
+  add_box(objects, point3(130, 0, 65), point3(295, 165, 230), white);
+  add_box(objects, point3(265, 0, 295), point3(430, 330, 460), white);
 
   return objects;
 }
