@@ -27,6 +27,6 @@ struct animated_sphere : public hittable {
 
   constexpr inline point3 get_centre(const real time) const {
     const real t = (time - m_time0) / (m_time1 - m_time0);
-    return (1 - t) * m_centre0 + t * m_centre1;
+    return (1.0 - t) * m_centre0 + t * m_centre1;
   }
 };
