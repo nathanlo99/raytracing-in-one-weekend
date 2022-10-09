@@ -23,7 +23,7 @@ struct lambertian : public material {
 
   explicit lambertian(const colour &a)
       : albedo(std::make_shared<solid_colour>(a)) {}
-  explicit lambertian(std::shared_ptr<texture> a) : albedo(a) {}
+  explicit lambertian(const std::shared_ptr<texture> &a) : albedo(a) {}
 
   virtual ~lambertian() = default;
 
@@ -99,7 +99,7 @@ struct dielectric : public material {
 struct diffuse_light : public material {
   std::shared_ptr<texture> emit;
 
-  explicit diffuse_light(std::shared_ptr<texture> a) : emit(a) {}
+  explicit diffuse_light(const std::shared_ptr<texture> &a) : emit(a) {}
   explicit diffuse_light(const colour &a)
       : emit(std::make_shared<solid_colour>(a)) {}
 

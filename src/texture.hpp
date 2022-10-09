@@ -9,27 +9,27 @@ struct texture {
 };
 
 struct solid_colour : public texture {
-  colour colour_value;
+  colour m_colour;
 
-  explicit solid_colour(const colour &c) : colour_value(c) {}
+  explicit solid_colour(const colour &c) : m_colour(c) {}
   explicit solid_colour(const real r, const real g, const real b)
-      : colour_value(r, g, b) {}
+      : m_colour(r, g, b) {}
   virtual ~solid_colour() = default;
 
   virtual inline colour value(const real u, const real v,
                               const vec3 &p) const override {
-    return colour_value;
+    return m_colour;
   }
 };
 
 struct image_texture : public texture {
-  image img;
+  image m_image;
 
-  explicit image_texture(const std::string &filename) : img(filename) {}
+  explicit image_texture(const std::string &filename) : m_image(filename) {}
   virtual ~image_texture() = default;
 
   virtual inline colour value(const real u, const real v,
                               const vec3 &p) const override {
-    return img.get_interpolated(u, v);
+    return m_image.get_interpolated(u, v);
   }
 };

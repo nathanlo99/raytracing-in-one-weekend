@@ -14,8 +14,8 @@ struct hittable_with_box {
 };
 
 struct bvh_node : public hittable {
-  std::shared_ptr<hittable> left, right;
-  aabb box;
+  std::shared_ptr<hittable> m_left, m_right;
+  aabb m_box;
 
   bvh_node(std::vector<hittable_with_box> &src_objects, const size_t start,
            const size_t end, const real time0, const real time1);
@@ -28,7 +28,7 @@ struct bvh_node : public hittable {
                    hit_record &rec) const override;
   virtual bool bounding_box(const real time0, const real time1,
                             aabb &output_box) const override {
-    output_box = box;
+    output_box = m_box;
     return true;
   }
 };

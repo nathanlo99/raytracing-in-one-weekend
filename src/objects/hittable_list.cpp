@@ -13,7 +13,7 @@ bool hittable_list::hit(const ray &r, const real t_min, const real t_max,
   real closest_so_far = t_max;
   aabb bounding_box;
 
-  for (const auto &object : objects) {
+  for (const auto &object : m_objects) {
     if (object->bounding_box(r.time, r.time, bounding_box) &&
         !bounding_box.does_hit(r, t_min, t_max))
       continue;
@@ -30,11 +30,11 @@ bool hittable_list::hit(const ray &r, const real t_min, const real t_max,
 
 bool hittable_list::bounding_box(const real time0, const real time1,
                                  aabb &output_box) const {
-  if (objects.empty())
+  if (m_objects.empty())
     return false;
 
   aabb temp_box;
-  for (const auto &object : objects) {
+  for (const auto &object : m_objects) {
     if (!object->bounding_box(time0, time1, temp_box))
       return false;
     output_box = surrounding_box(output_box, temp_box);
