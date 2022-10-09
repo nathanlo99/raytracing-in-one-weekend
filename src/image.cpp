@@ -8,9 +8,9 @@
 #include <string>
 #include <vector>
 
-image::image(const std::string &filename) {
+image::image(const std::string_view &filename) {
   int components_per_pixel = bytes_per_pixel;
-  float *loaded_data = stbi_loadf(filename.c_str(), &m_width, &m_height,
+  float *loaded_data = stbi_loadf(filename.data(), &m_width, &m_height,
                                   &components_per_pixel, components_per_pixel);
   if (loaded_data == nullptr) {
     std::cerr << "ERROR: Could not load texture image file '" << filename << "'"
@@ -29,7 +29,7 @@ image::image(const std::string &filename) {
   stbi_image_free(loaded_data);
 }
 
-void image::write_png(const std::string &filename) {
+void image::write_png(const std::string_view &filename) {
   std::vector<unsigned char> gamma_corrected_data(bytes_per_pixel * m_width *
                                                   m_height);
   for (int i = 0; i < m_width * m_height; ++i) {
@@ -42,7 +42,7 @@ void image::write_png(const std::string &filename) {
   }
 
   const int result =
-      stbi_write_png(filename.c_str(), m_width, m_height, bytes_per_pixel,
+      stbi_write_png(filename.data(), m_width, m_height, bytes_per_pixel,
                      gamma_corrected_data.data(), bytes_per_pixel * m_width);
   if (result == 0) {
     std::cerr << "write_png(" << filename << ") failed" << std::endl;

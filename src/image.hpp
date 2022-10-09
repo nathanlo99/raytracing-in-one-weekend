@@ -13,7 +13,7 @@ struct image {
 
   const static int bytes_per_pixel = 3;
 
-  image(const std::string &filename);
+  image(const std::string_view &filename);
   image(const int width, const int height)
       : m_width(width), m_height(height), m_pixels(width * height) {}
 
@@ -60,5 +60,5 @@ struct image {
     m_pixels[idx] = c;
   }
 
-  void write_png(const std::string &filename);
+  void write_png(const std::string_view &filename);
 };

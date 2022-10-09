@@ -19,7 +19,7 @@ struct hittable_list : public hittable {
   void add(const std::shared_ptr<hittable> &object) {
     m_objects.emplace_back(object);
   }
-  void add_background_map(const std::string &filename);
+  void add_background_map(const std::string_view &filename);
 
   virtual bool hit(const ray &r, const real t_min, const real t_max,
                    hit_record &rec) const override;

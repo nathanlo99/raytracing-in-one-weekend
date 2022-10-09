@@ -5,15 +5,11 @@
 #include "image.hpp"
 #include "scenes/all_scenes.hpp"
 
-#include <boost/random/sobol.hpp>
-
 #include <atomic>
 #include <iostream>
 #include <mutex>
 #include <queue>
 #include <thread>
-
-#include <glm/glm.hpp>
 
 __attribute__((hot)) colour ray_colour(const ray &r, const hittable &world,
                                        const int depth) {
@@ -42,9 +38,9 @@ enum TileProtocol {
 };
 
 void render_singlethreaded(const hittable_list &world, const camera &cam,
-                           const std::string &output, const int image_width,
-                           const int image_height, const int samples_per_pixel,
-                           const TileProtocol) {
+                           const std::string_view &output,
+                           const int image_width, const int image_height,
+                           const int samples_per_pixel, const TileProtocol) {
   const int max_depth = 100;
 
   image result_image(image_width, image_height);
@@ -119,7 +115,7 @@ void render_singlethreaded(const hittable_list &world, const camera &cam,
 }
 
 void render(const hittable_list &world, const camera &cam,
-            const std::string &output, const int image_width,
+            const std::string_view &output, const int image_width,
             const int image_height, const int samples_per_pixel,
             const TileProtocol protocol = PER_TILE) {
   const int max_threads = 4;
