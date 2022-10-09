@@ -253,7 +253,7 @@ void render(const hittable_list &world, const camera &cam,
   std::cout << std::endl
             << "Done! Took " << elapsed_seconds << " seconds" << std::endl;
 
-  result_image.write_png("output/progress.png");
+  result_image.write_png("build/output/progress.png");
   result_image.write_png(output);
 }
 
@@ -266,9 +266,8 @@ int main() {
   }
 
   if (true) {
-    const auto scene = diamond_scene();
-    render_singlethreaded(scene.objects, scene.cam, "build/diamond_scene.png",
-                          scene.cam.image_width, scene.cam.image_height, 1000,
-                          PER_FRAME);
+    const auto scene = cornell_scene();
+    render(scene.objects, scene.cam, "build/cornell_scene.png",
+           scene.cam.image_width, scene.cam.image_height, 100000, PER_FRAME);
   }
 }

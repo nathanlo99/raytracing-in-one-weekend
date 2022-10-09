@@ -44,5 +44,8 @@ void image::write_png(const std::string &filename) {
   const int result =
       stbi_write_png(filename.c_str(), width, height, bytes_per_pixel,
                      gamma_corrected_data.data(), bytes_per_pixel * width);
-  assert(result != 0);
+  if (result == 0) {
+    std::cerr << "write_png(" << filename << ") failed" << std::endl;
+    assert(false);
+  }
 }
