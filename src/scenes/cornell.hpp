@@ -4,6 +4,7 @@
 #include "util.hpp"
 
 #include "animated_sphere.hpp"
+#include "box.hpp"
 #include "bvh_node.hpp"
 #include "camera.hpp"
 #include "colour.hpp"
@@ -49,7 +50,7 @@ inline hittable_list cornell_box_objects() {
   const auto green =
       material_manager::create<lambertian>(colour(0.12, 0.45, 0.15));
   const auto light =
-      material_manager::create<diffuse_light>(colour(15.0, 15.5, 15.5));
+      material_manager::create<diffuse_light>(colour(25.0, 25.0, 12.5));
 
   add_yz_rect(objects, 0, 555, 0, 555, 555, red);
   add_yz_rect(objects, 0, 555, 0, 555, 0, green);
@@ -57,6 +58,11 @@ inline hittable_list cornell_box_objects() {
   add_xz_rect(objects, 0, 555, 0, 555, 0, white);
   add_xz_rect(objects, 0, 555, 0, 555, 555, white);
   add_xy_rect(objects, 0, 555, 0, 555, 555, white);
+
+  objects.add(
+      std::make_shared<box>(point3(130, 0, 65), point3(295, 165, 230), white));
+  objects.add(
+      std::make_shared<box>(point3(265, 0, 295), point3(430, 330, 460), white));
 
   return objects;
 }

@@ -36,15 +36,16 @@ struct image {
   }
 
   // Bilinear interpolation
-  inline colour get_interpolated(real u, real v) const {
+  inline colour get_interpolated(const real u, const real v) const {
     if (pixels.empty())
       return colour(0, 1, 1);
 
-    u = std::clamp<real>(u, 0.0, 1.0) * width;
-    v = (1.0 - std::clamp<real>(v, 0.0, 1.0)) * height;
+    const real scaled_u = std::clamp<real>(u, 0.0, 1.0) * width;
+    const real scaled_v = (1.0 - std::clamp<real>(v, 0.0, 1.0)) * height;
 
     real floor_ud = 0.0, floor_vd = 0.0;
-    const real frac_u = modf(u, &floor_ud), frac_v = modf(v, &floor_vd);
+    const real frac_u = modf(scaled_u, &floor_ud),
+               frac_v = modf(scaled_v, &floor_vd);
     const int floor_u = static_cast<int>(floor_ud);
     const int floor_v = static_cast<int>(floor_vd);
 

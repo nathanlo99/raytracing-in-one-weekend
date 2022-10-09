@@ -75,8 +75,8 @@ void render_singlethreaded(const hittable_list &world, const camera &cam,
       static long long last_update_ms = 0;
       const long long current_time_ms = util::get_time_ms();
 
-      const long long pixel_end_time = util::get_time_ns();
-      const long long pixel_ns = pixel_end_time - pixel_start_ns;
+      const long long pixel_end_ns = util::get_time_ns();
+      const long long pixel_ns = pixel_end_ns - pixel_start_ns;
       debug_times[j * image_width + i] = pixel_ns;
       slowest_pixel = std::max(slowest_pixel, pixel_ns);
 
@@ -129,13 +129,13 @@ void render(const hittable_list &world, const camera &cam,
       [&](const TileProtocol protocol) {
         switch (protocol) {
         case PER_FRAME:
-          return std::make_tuple(image_width, image_height / max_threads, 1);
+          return std::make_tuple(image_width, image_height / max_threads, 8);
         case PER_PIXEL:
           return std::make_tuple(1, 1, samples_per_pixel);
         case PER_LINE:
           return std::make_tuple(image_width / max_threads, 1, 32);
         case PER_TILE:
-          return std::make_tuple(32, 32, 32);
+          return std::make_tuple(16, 16, samples_per_pixel / 256);
         }
       },
       protocol);
