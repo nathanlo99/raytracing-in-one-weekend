@@ -10,7 +10,7 @@ struct box : public hittable {
   aabb m_bounding_box;
   hittable_list m_objects;
 
-  box(material *mat) : box(point3(-1.0), point3(1.0), mat) {}
+  box(material *mat) : box(point3(0.0), point3(1.0), mat) {}
   box(const point3 &p0, const point3 &p1, material *mat)
       : m_bounding_box(p0, p1) {
     const real x0 = p0.x, y0 = p0.y, z0 = p0.z;
