@@ -23,7 +23,8 @@ find_package(Boost REQUIRED COMPONENTS random)
 include_directories(${Boost_INCLUDE_DIRS})
 
 # add the executable
-file(GLOB raytracer_SRC CONFIGURE_DEPENDS "src/*.cpp")
+file(GLOB raytracer_SRC CONFIGURE_DEPENDS "src/*.cpp" "src/objects/*.cpp")
+include_directories(src/objects/ src/scenes/)
 add_executable(raytracer ${raytracer_SRC})
 target_link_libraries(raytracer ${Boost_LIBRARIES})
 target_link_libraries(raytracer OpenMP::OpenMP_CXX)

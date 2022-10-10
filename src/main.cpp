@@ -5,20 +5,25 @@
 #include "image.hpp"
 #include "scenes/all_scenes.hpp"
 
-#include <boost/random/sobol.hpp>
-
 #include <atomic>
 #include <iostream>
 #include <mutex>
 #include <queue>
 #include <thread>
 
-#include <glm/glm.hpp>
-
-__attribute__((hot)) colour ray_colour(const ray &r, const hittable &world,
-                                       const int depth) {
-  if (depth <= 0)
+__attribute__((hot)) colour
+ray_colour(const ray &r, const hittable &world, const int depth,
+           const colour &contribution = colour(1.0)) {
+  if (depth <= 0 || glm::length(contribution) < 1e-12) {
+    // static std::atomic<int> early_exits = 0;
+    // static int last_update = 0;
+    // early_exits += depth;
+    // if (early_exits >= last_update + 1000000) {
+    //   last_update = early_exits;
+    //   std::cout << early_exits << " early exits" << std::endl;
+    // }
     return colour(0.0);
+  }
 
   hit_record rec;
   if (!world.hit(r, eps, inf, rec))
@@ -31,7 +36,8 @@ __attribute__((hot)) colour ray_colour(const ray &r, const hittable &world,
   if (!rec.mat_ptr->scatter(r, rec, attenuation, scattered))
     return emitted;
 
-  return emitted + attenuation * ray_colour(scattered, world, depth - 1);
+  return emitted + attenuation * ray_colour(scattered, world, depth - 1,
+                                            attenuation * contribution);
 }
 
 enum TileProtocol {
@@ -42,9 +48,9 @@ enum TileProtocol {
 };
 
 void render_singlethreaded(const hittable_list &world, const camera &cam,
-                           const std::string &output, const int image_width,
-                           const int image_height, const int samples_per_pixel,
-                           const TileProtocol) {
+                           const std::string_view &output,
+                           const int image_width, const int image_height,
+                           const int samples_per_pixel, const TileProtocol) {
   const int max_depth = 100;
 
   image result_image(image_width, image_height);
@@ -75,8 +81,8 @@ void render_singlethreaded(const hittable_list &world, const camera &cam,
       static long long last_update_ms = 0;
       const long long current_time_ms = util::get_time_ms();
 
-      const long long pixel_end_time = util::get_time_ns();
-      const long long pixel_ns = pixel_end_time - pixel_start_ns;
+      const long long pixel_end_ns = util::get_time_ns();
+      const long long pixel_ns = pixel_end_ns - pixel_start_ns;
       debug_times[j * image_width + i] = pixel_ns;
       slowest_pixel = std::max(slowest_pixel, pixel_ns);
 
@@ -119,7 +125,7 @@ void render_singlethreaded(const hittable_list &world, const camera &cam,
 }
 
 void render(const hittable_list &world, const camera &cam,
-            const std::string &output, const int image_width,
+            const std::string_view &output, const int image_width,
             const int image_height, const int samples_per_pixel,
             const TileProtocol protocol = PER_TILE) {
   const int max_threads = 4;
@@ -129,13 +135,13 @@ void render(const hittable_list &world, const camera &cam,
       [&](const TileProtocol protocol) {
         switch (protocol) {
         case PER_FRAME:
-          return std::make_tuple(image_width, image_height / max_threads, 1);
+          return std::make_tuple(image_width, image_height / max_threads, 8);
         case PER_PIXEL:
           return std::make_tuple(1, 1, samples_per_pixel);
         case PER_LINE:
           return std::make_tuple(image_width / max_threads, 1, 32);
         case PER_TILE:
-          return std::make_tuple(32, 32, 32);
+          return std::make_tuple(16, 16, samples_per_pixel / 256);
         }
       },
       protocol);
@@ -253,7 +259,7 @@ void render(const hittable_list &world, const camera &cam,
   std::cout << std::endl
             << "Done! Took " << elapsed_seconds << " seconds" << std::endl;
 
-  result_image.write_png("output/progress.png");
+  result_image.write_png("build/output/progress.png");
   result_image.write_png(output);
 }
 
@@ -261,14 +267,14 @@ int main() {
   if (false) {
     const auto scene = bright_scene();
     render_singlethreaded(scene.objects, scene.cam, "build/bright_scene.png",
-                          scene.cam.image_width, scene.cam.image_height, 50,
+                          scene.cam.m_image_width, scene.cam.m_image_height, 50,
                           PER_FRAME);
   }
 
   if (true) {
-    const auto scene = diamond_scene();
-    render_singlethreaded(scene.objects, scene.cam, "build/diamond_scene.png",
-                          scene.cam.image_width, scene.cam.image_height, 1000,
-                          PER_FRAME);
+    const auto scene = cornell_scene();
+    render(scene.objects, scene.cam, "build/cornell_scene.png",
+           scene.cam.m_image_width, scene.cam.m_image_height, 100000,
+           PER_FRAME);
   }
 }

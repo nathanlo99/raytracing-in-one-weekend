@@ -11,8 +11,13 @@ bool hittable_list::hit(const ray &r, const real t_min, const real t_max,
   hit_record temp_rec;
   bool hit_anything = false;
   real closest_so_far = t_max;
+  aabb bounding_box;
 
-  for (const auto &object : objects) {
+  for (const auto &object : m_objects) {
+    if (object->bounding_box(r.time, r.time, bounding_box) &&
+        !bounding_box.does_hit(r, t_min, t_max))
+      continue;
+
     if (object->hit(r, t_min, closest_so_far, temp_rec)) {
       hit_anything = true;
       closest_so_far = temp_rec.t;
@@ -25,11 +30,11 @@ bool hittable_list::hit(const ray &r, const real t_min, const real t_max,
 
 bool hittable_list::bounding_box(const real time0, const real time1,
                                  aabb &output_box) const {
-  if (objects.empty())
+  if (m_objects.empty())
     return false;
 
   aabb temp_box;
-  for (const auto &object : objects) {
+  for (const auto &object : m_objects) {
     if (!object->bounding_box(time0, time1, temp_box))
       return false;
     output_box = surrounding_box(output_box, temp_box);
@@ -38,7 +43,7 @@ bool hittable_list::bounding_box(const real time0, const real time1,
   return true;
 }
 
-void hittable_list::add_background_map(const std::string &filename) {
+void hittable_list::add_background_map(const std::string_view &filename) {
   const real radius = 1e5;
   const auto skybox_image = std::make_shared<image_texture>(filename);
   const auto skybox_texture =

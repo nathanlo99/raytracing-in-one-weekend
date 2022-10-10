@@ -6,12 +6,12 @@
 #include "material.hpp"
 
 struct triangle : public hittable {
-  point3 p0, p1, p2;
-  material *mat_ptr;
+  point3 m_p0, m_p1, m_p2;
+  material *m_mat_ptr;
 
   constexpr triangle(const point3 &p0, const point3 &p1, const point3 &p2,
                      material *mat)
-      : p0(p0), p1(p1), p2(p2), mat_ptr(mat) {}
+      : m_p0(p0), m_p1(p1), m_p2(p2), m_mat_ptr(mat) {}
 
   virtual ~triangle() {}
 

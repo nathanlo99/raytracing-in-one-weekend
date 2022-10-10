@@ -8,9 +8,9 @@
 #include <string>
 #include <vector>
 
-image::image(const std::string &filename) {
+image::image(const std::string_view &filename) {
   int components_per_pixel = bytes_per_pixel;
-  float *loaded_data = stbi_loadf(filename.c_str(), &width, &height,
+  float *loaded_data = stbi_loadf(filename.data(), &m_width, &m_height,
                                   &components_per_pixel, components_per_pixel);
   if (loaded_data == nullptr) {
     std::cerr << "ERROR: Could not load texture image file '" << filename << "'"
@@ -19,30 +19,33 @@ image::image(const std::string &filename) {
     return;
   }
 
-  std::cout << "Loaded image '" << filename << "' with size " << width << " by "
-            << height << std::endl;
-  pixels.resize(width * height);
-  for (int idx = 0; idx < width * height; ++idx) {
-    pixels[idx] = colour(loaded_data[3 * idx + 0], loaded_data[3 * idx + 1],
-                         loaded_data[3 * idx + 2]);
+  std::cout << "Loaded image '" << filename << "' with size " << m_width
+            << " by " << m_height << std::endl;
+  m_pixels.resize(m_width * m_height);
+  for (int idx = 0; idx < m_width * m_height; ++idx) {
+    m_pixels[idx] = colour(loaded_data[3 * idx + 0], loaded_data[3 * idx + 1],
+                           loaded_data[3 * idx + 2]);
   }
   stbi_image_free(loaded_data);
 }
 
-void image::write_png(const std::string &filename) {
-  std::vector<unsigned char> gamma_corrected_data(bytes_per_pixel * width *
-                                                  height);
-  for (int i = 0; i < width * height; ++i) {
-    gamma_corrected_data[3 * i + 0] =
-        to_byte(gamma_correct_real(std::clamp<float>(pixels[i][0], 0.0, 1.0)));
-    gamma_corrected_data[3 * i + 1] =
-        to_byte(gamma_correct_real(std::clamp<float>(pixels[i][1], 0.0, 1.0)));
-    gamma_corrected_data[3 * i + 2] =
-        to_byte(gamma_correct_real(std::clamp<float>(pixels[i][2], 0.0, 1.0)));
+void image::write_png(const std::string_view &filename) {
+  std::vector<unsigned char> gamma_corrected_data(bytes_per_pixel * m_width *
+                                                  m_height);
+  for (int i = 0; i < m_width * m_height; ++i) {
+    gamma_corrected_data[3 * i + 0] = to_byte(
+        gamma_correct_real(std::clamp<float>(m_pixels[i][0], 0.0, 1.0)));
+    gamma_corrected_data[3 * i + 1] = to_byte(
+        gamma_correct_real(std::clamp<float>(m_pixels[i][1], 0.0, 1.0)));
+    gamma_corrected_data[3 * i + 2] = to_byte(
+        gamma_correct_real(std::clamp<float>(m_pixels[i][2], 0.0, 1.0)));
   }
 
   const int result =
-      stbi_write_png(filename.c_str(), width, height, bytes_per_pixel,
-                     gamma_corrected_data.data(), bytes_per_pixel * width);
-  assert(result != 0);
+      stbi_write_png(filename.data(), m_width, m_height, bytes_per_pixel,
+                     gamma_corrected_data.data(), bytes_per_pixel * m_width);
+  if (result == 0) {
+    std::cerr << "write_png(" << filename << ") failed" << std::endl;
+    assert(false);
+  }
 }

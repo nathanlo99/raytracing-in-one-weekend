@@ -1,12 +1,11 @@
 
 #include "triangle.hpp"
 
-__attribute__((hot)) bool triangle::hit(const ray &r, const real t_min,
-                                        const real t_max,
-                                        hit_record &rec) const {
-  const vec3 edge1 = p1 - p0;
-  const vec3 edge2 = p2 - p0;
-  const vec3 rop0 = r.orig - p0;
+bool triangle::hit(const ray &r, const real t_min, const real t_max,
+                   hit_record &rec) const {
+  const vec3 edge1 = m_p1 - m_p0;
+  const vec3 edge2 = m_p2 - m_p0;
+  const vec3 rop0 = r.orig - m_p0;
   const vec3 n = glm::cross(edge1, edge2);
   const real a = glm::dot(r.dir, n);
   // if (a > -eps && a < eps)
@@ -26,17 +25,17 @@ __attribute__((hot)) bool triangle::hit(const ray &r, const real t_min,
 
   rec.t = t;
   rec.p = r.at(t);
-  rec.set_face_normal(r, glm::normalize(n));
+  rec.set_face_normal(r, n);
   // TODO: fix uv's for cases where the triangle comes with uv's
   rec.u = u;
   rec.v = v;
-  rec.mat_ptr = mat_ptr;
+  rec.mat_ptr = m_mat_ptr;
   return true;
 }
 
 bool triangle::bounding_box(const real time0, const real time1,
                             aabb &output_box) const {
-  output_box.min = glm::min(p0, glm::min(p1, p2)) - vec3(eps);
-  output_box.max = glm::max(p0, glm::max(p1, p2)) + vec3(eps);
+  output_box.min = glm::min(m_p0, glm::min(m_p1, m_p2)) - vec3(eps);
+  output_box.max = glm::max(m_p0, glm::max(m_p1, m_p2)) + vec3(eps);
   return true;
 }

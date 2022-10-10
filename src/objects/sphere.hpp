@@ -5,13 +5,13 @@
 #include "hittable.hpp"
 
 struct sphere : public hittable {
-  point3 centre = point3(0.0);
-  real radius = 1.0;
-  material *mat_ptr = nullptr;
+  point3 m_centre = point3(0.0);
+  real m_radius = 1.0;
+  material *m_mat_ptr = nullptr;
 
   constexpr sphere() = default;
   constexpr sphere(const point3 &centre, const real r, material *mat)
-      : centre(centre), radius(r), mat_ptr(mat) {}
+      : m_centre(centre), m_radius(r), m_mat_ptr(mat) {}
   virtual ~sphere() {}
 
   virtual bool hit(const ray &r, const real t_min, const real t_max,

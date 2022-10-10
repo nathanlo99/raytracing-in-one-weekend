@@ -7,16 +7,18 @@
 #include <fstream>
 #include <stdexcept>
 
-std::shared_ptr<hittable> load_obj(const std::string &filename, material *mat) {
+std::shared_ptr<hittable> load_obj(const std::string_view &filename,
+                                   material *mat) {
   hittable_list result;
 
   std::cout << "Loading OBJ file @ " << filename << std::endl;
 
   std::string code, line;
   std::ifstream ifs(filename);
-  if (!ifs.is_open())
-    throw std::runtime_error(std::string("Could not open file '") + filename +
-                             "'");
+  if (!ifs.is_open()) {
+    std::cerr << "ERROR: Could not open file '" << filename << "'" << std::endl;
+    throw std::runtime_error("");
+  }
 
   std::vector<point3> vertices(1); // Since OBJ is 1-indexed
 

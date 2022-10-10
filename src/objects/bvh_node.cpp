@@ -3,14 +3,14 @@
 
 bool bvh_node::hit(const ray &r, const real t_min, const real t_max,
                    hit_record &rec) const {
-  if (!box.does_hit(r, t_min, t_max))
+  if (!m_box.does_hit(r, t_min, t_max))
     return false;
 
   // NOTE: We still need to query both children because we care about the
   // record's hit location, and the distance to the right child may be smaller
   // than the distance to the left child, despite hitting both children
-  const bool hit_left = left->hit(r, t_min, t_max, rec);
-  const bool hit_right = right->hit(r, t_min, hit_left ? rec.t : t_max, rec);
+  const bool hit_left = m_left->hit(r, t_min, t_max, rec);
+  const bool hit_right = m_right->hit(r, t_min, hit_left ? rec.t : t_max, rec);
   return hit_left | hit_right;
 }
 
@@ -18,12 +18,12 @@ std::shared_ptr<hittable> bvh_node::from_list(const hittable_list &list,
                                               const real time0,
                                               const real time1) {
   if (list.size() == 1)
-    return list.objects[0];
+    return list.m_objects[0];
 
   std::vector<hittable_with_box> objects;
-  objects.reserve(list.objects.size());
+  objects.reserve(list.m_objects.size());
   aabb tmp_box;
-  for (const std::shared_ptr<hittable> &obj : list.objects) {
+  for (const std::shared_ptr<hittable> &obj : list.m_objects) {
     if (!obj->bounding_box(time0, time1, tmp_box)) {
       std::cerr << "Cannot create BVH from unbounded object" << std::endl;
     }
@@ -38,14 +38,15 @@ bvh_node::bvh_node(std::vector<hittable_with_box> &objects, const size_t start,
   const size_t span = end - start;
   assert(span >= 2);
   if (span == 2) {
-    left = objects[start].object;
-    right = objects[start + 1].object;
-    box = surrounding_box(objects[start].box, objects[start + 1].box);
+    m_left = objects[start].object;
+    m_right = objects[start + 1].object;
+    m_box = surrounding_box(objects[start].box, objects[start + 1].box);
     return;
   } else if (span == 3) {
-    left = std::make_shared<bvh_node>(objects, start, start + 2, time0, time1);
-    right = objects[start + 2].object;
-    box = surrounding_box(
+    m_left =
+        std::make_shared<bvh_node>(objects, start, start + 2, time0, time1);
+    m_right = objects[start + 2].object;
+    m_box = surrounding_box(
         objects[start].box,
         surrounding_box(objects[start + 1].box, objects[start + 2].box));
     return;
@@ -65,7 +66,7 @@ bvh_node::bvh_node(std::vector<hittable_with_box> &objects, const size_t start,
             });
 
   const size_t mid = start + span / 2;
-  left = std::make_shared<bvh_node>(objects, start, mid, time0, time1);
-  right = std::make_shared<bvh_node>(objects, mid, end, time0, time1);
-  box = total_box;
+  m_left = std::make_shared<bvh_node>(objects, start, mid, time0, time1);
+  m_right = std::make_shared<bvh_node>(objects, mid, end, time0, time1);
+  m_box = total_box;
 }
