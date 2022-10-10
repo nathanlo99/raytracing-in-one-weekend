@@ -19,6 +19,11 @@ struct hittable_list : public hittable {
   void add(const std::shared_ptr<hittable> &object) {
     m_objects.emplace_back(object);
   }
+
+  template <class T, class... Args> void emplace_back(Args &&...args) {
+    m_objects.emplace_back(std::make_shared<T>(std::forward<Args>(args)...));
+  }
+
   void add_background_map(const std::string_view &filename);
 
   virtual bool hit(const ray &r, const real t_min, const real t_max,

@@ -33,12 +33,9 @@ inline auto glass_test_scene() {
         material_manager::create<dielectric>(colour(1.0, 0.5, 0.5), ior);
     const auto blue_glass_material =
         material_manager::create<dielectric>(colour(0.5, 0.5, 1.0), ior);
-    world.add(std::make_shared<sphere>(vec3(i - 3, 0.5, 0), 0.5,
-                                       white_glass_material));
-    world.add(
-        std::make_shared<sphere>(vec3(i - 3, 1.5, 0), 0.5, red_glass_material));
-    world.add(std::make_shared<sphere>(vec3(i - 3, -0.5, 0), 0.5,
-                                       blue_glass_material));
+    world.emplace_back<sphere>(vec3(i - 3, 0.5, 0), 0.5, white_glass_material);
+    world.emplace_back<sphere>(vec3(i - 3, 1.5, 0), 0.5, red_glass_material);
+    world.emplace_back<sphere>(vec3(i - 3, -0.5, 0), 0.5, blue_glass_material);
   }
 
   auto list = hittable_list(bvh_node::from_list(world, 0.0, 1.0));

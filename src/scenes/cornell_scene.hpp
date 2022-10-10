@@ -16,14 +16,15 @@
 #include "triangle.hpp"
 
 #include "scene.hpp"
+#include <algorithm>
 
 inline void add_xy_rect(hittable_list &lst, const real x0, const real x1,
                         const real y0, const real y1, const real z,
                         material *mat) {
   // p0 is the bottom left, proceeding to number counter-clockwise
   const point3 p0(x0, y0, z), p1(x1, y0, z), p2(x1, y1, z), p3(x0, y1, z);
-  lst.add(std::make_shared<triangle>(p0, p1, p2, mat));
-  lst.add(std::make_shared<triangle>(p0, p2, p3, mat));
+  lst.emplace_back<triangle>(p0, p1, p2, mat);
+  lst.emplace_back<triangle>(p0, p2, p3, mat);
 }
 
 inline void add_xz_rect(hittable_list &lst, const real x0, const real x1,
@@ -31,8 +32,8 @@ inline void add_xz_rect(hittable_list &lst, const real x0, const real x1,
                         material *mat) {
   // p0 is the bottom left, proceeding to number counter-clockwise
   const point3 p0(x0, y, z0), p1(x1, y, z0), p2(x1, y, z1), p3(x0, y, z1);
-  lst.add(std::make_shared<triangle>(p0, p1, p2, mat));
-  lst.add(std::make_shared<triangle>(p0, p2, p3, mat));
+  lst.emplace_back<triangle>(p0, p1, p2, mat);
+  lst.emplace_back<triangle>(p0, p2, p3, mat);
 }
 
 inline void add_yz_rect(hittable_list &lst, const real y0, const real y1,
@@ -40,8 +41,8 @@ inline void add_yz_rect(hittable_list &lst, const real y0, const real y1,
                         material *mat) {
   // p0 is the bottom left, proceeding to number counter-clockwise
   const point3 p0(x, y0, z0), p1(x, y1, z0), p2(x, y1, z1), p3(x, y0, z1);
-  lst.add(std::make_shared<triangle>(p0, p1, p2, mat));
-  lst.add(std::make_shared<triangle>(p0, p2, p3, mat));
+  lst.emplace_back<triangle>(p0, p1, p2, mat);
+  lst.emplace_back<triangle>(p0, p2, p3, mat);
 }
 
 inline void add_box(hittable_list &lst, const point3 &min, const point3 &max,
@@ -54,14 +55,7 @@ inline void add_box(hittable_list &lst, const point3 &min, const point3 &max,
                  glm::rotate(identity, util::degrees_to_radians(rotate_angle),
                              vec3(0.0, 1.0, 0.0));
 
-  lst.add(
-      std::make_shared<transformed_hittable>(std::make_shared<box>(mat), m));
-
-  const auto added = lst.m_objects.back();
-  aabb bounding_box;
-  added->bounding_box(0.0, 1.0, bounding_box);
-  std::cout << "Added box with bounding box [" << bounding_box.min << ", "
-            << bounding_box.max << "]" << std::endl;
+  lst.emplace_back<transformed_hittable>(std::make_shared<box>(mat), m);
 }
 
 inline hittable_list cornell_box_objects() {
