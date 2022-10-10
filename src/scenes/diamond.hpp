@@ -24,8 +24,7 @@ inline auto diamond_scene() {
 
   const auto ground_material =
       material_manager::create<lambertian>(colour(0.5, 0.5, 0.5));
-  world.add(
-      std::make_shared<sphere>(point3(0, -1000, 0), 1000, ground_material));
+  world.emplace_back<sphere>(point3(0, -1000, 0), 1000, ground_material);
 
   const auto diamond_material =
       material_manager::create<dielectric>(colour(1.0), 2.418);
