@@ -55,7 +55,7 @@ std::shared_ptr<hittable> load_obj(const std::string_view &filename,
       // std::endl;
       for (size_t idx = 1; idx + 1 < num_points; ++idx) {
         const point3 p1 = points[0], p2 = points[idx], p3 = points[idx + 1];
-        result.add(std::make_shared<triangle>(p1, p2, p3, mat));
+        result.emplace_back<triangle>(p1, p2, p3, mat);
       }
     }
   }

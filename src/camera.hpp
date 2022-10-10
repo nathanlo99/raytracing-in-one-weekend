@@ -51,4 +51,11 @@ struct camera {
                    m_origin - offset,
                util::random_real(m_time0, m_time1));
   }
+
+  // Returns a deterministic ray, for testing
+  ray get_debug_ray(const real s, const real t) const {
+    const vec3 direction =
+        m_upper_left_corner + s * m_horizontal - t * m_vertical - m_origin;
+    return ray(m_origin, direction, 0.0);
+  }
 };

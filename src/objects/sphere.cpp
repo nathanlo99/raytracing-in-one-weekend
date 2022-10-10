@@ -1,8 +1,8 @@
 
 #include "sphere.hpp"
 
-bool sphere::hit(const ray &r, const real t_min, const real t_max,
-                 hit_record &rec) const {
+__attribute__((hot)) bool sphere::hit(const ray &r, const real t_min,
+                                      const real t_max, hit_record &rec) const {
   const vec3 oc = r.orig - m_centre;
   const real a = glm::dot(r.dir, r.dir);
   const real half_b = glm::dot(oc, r.dir);

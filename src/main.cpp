@@ -47,6 +47,37 @@ enum TileProtocol {
   PER_TILE,
 };
 
+inline colour normal_to_colour(const vec3 &normal) {
+  assert(std::abs(glm::length(normal) - 1.0) < eps);
+  return 0.5 * (normal + vec3(1.0));
+}
+
+void render_normals(const hittable_list &world, const camera &cam,
+                    const std::string_view &output, const int image_width,
+                    const int image_height) {
+  image result_image(image_width, image_height);
+  int num_samples = 10;
+#pragma omp parallel for
+  for (int j = 0; j < image_height; ++j) {
+    for (int i = 0; i < image_width; ++i) {
+      colour pixel_colour(0.0);
+      for (int s = 0; s < num_samples; ++s) {
+        const real u = (i + 0.5) / image_width;
+        const real v = (j + 0.5) / image_height;
+        const ray r = cam.get_debug_ray(u, v);
+
+        hit_record rec;
+        if (!world.hit(r, eps, inf, rec))
+          continue;
+        pixel_colour += normal_to_colour(rec.normal);
+      }
+      pixel_colour /= num_samples;
+      result_image.set(j, i, pixel_colour);
+    }
+    result_image.write_png(output);
+  }
+}
+
 void render_singlethreaded(const hittable_list &world, const camera &cam,
                            const std::string_view &output,
                            const int image_width, const int image_height,
@@ -204,29 +235,29 @@ void render(const hittable_list &world, const camera &cam,
   std::cerr << "Starting render with " << task_list.size() << " tasks and "
             << max_threads << " threads..." << std::endl;
   const auto start_ms = util::get_time_ms();
-  const size_t num_tasks = task_list.size();
+  const int num_tasks = task_list.size();
 
   std::vector<std::thread> threads;
   for (int i = 0; i < max_threads; ++i) {
     threads.emplace_back([&]() {
       while (true) {
-        const size_t task_idx = next_task_idx++;
+        const int task_idx = next_task_idx++;
         if (task_idx >= num_tasks)
           break;
         compute_tile(task_list[task_idx]);
 
         static long long last_update_ms = util::get_time_ms();
-        static size_t last_tasks = 0;
+        static int last_tasks = 0;
         static size_t last_samples = 0;
         const long long current_time_ms = util::get_time_ms();
         if (current_time_ms - last_update_ms > 1000) {
           const real update_ms = current_time_ms - last_update_ms;
           last_update_ms = current_time_ms;
           const real elapsed_ms = current_time_ms - start_ms;
-          const size_t done_tasks = next_task_idx;
-          const size_t remaining_tasks = num_tasks - done_tasks;
-          const size_t this_updates_tasks = done_tasks - last_tasks;
-          const size_t this_updates_samples = num_samples - last_samples;
+          const int done_tasks = next_task_idx;
+          const int remaining_tasks = std::max(0, num_tasks - done_tasks);
+          const int this_updates_tasks = done_tasks - last_tasks;
+          const int this_updates_samples = num_samples - last_samples;
           last_tasks = done_tasks;
           last_samples = num_samples;
           const real tasks_per_ms = this_updates_tasks / update_ms;
@@ -239,8 +270,8 @@ void render(const hittable_list &world, const camera &cam,
                       << estimated_remaining_ms / 1000 << "s remaining, "
                       << remaining_tasks << "/" << num_tasks
                       << " tasks remaining... ";
-          const size_t line_length = 120;
-          const size_t output_length = output_line.str().size();
+          const int line_length = 120;
+          const int output_length = output_line.str().size();
           if (output_length < line_length)
             output_line << std::string(line_length - output_length, ' ');
           std::cout << output_line.str() << std::flush;
@@ -272,8 +303,10 @@ int main() {
   }
 
   if (true) {
-    const auto scene = cornell_scene();
-    render(scene.objects, scene.cam, "build/cornell_scene.png",
+    const auto scene = goose_scene();
+    render_normals(scene.objects, scene.cam, "build/output/debug_normals.png",
+                   scene.cam.m_image_width, scene.cam.m_image_height);
+    render(scene.objects, scene.cam, "build/goose_scene.png",
            scene.cam.m_image_width, scene.cam.m_image_height, 100000,
            PER_FRAME);
   }

@@ -1,9 +1,8 @@
 
 #include "animated_sphere.hpp"
 
-__attribute__((hot)) bool animated_sphere::hit(const ray &r, const real t_min,
-                                               const real t_max,
-                                               hit_record &rec) const {
+bool animated_sphere::hit(const ray &r, const real t_min, const real t_max,
+                          hit_record &rec) const {
   const point3 centre = get_centre(r.time);
   const vec3 oc = r.orig - centre;
   const real a = glm::dot(r.dir, r.dir);

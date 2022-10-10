@@ -8,5 +8,6 @@
 #include "diamond.hpp"
 #include "earth.hpp"
 #include "glass_test.hpp"
+#include "goose_scene.hpp"
 #include "platonic.hpp"
 #include "simple_scene.hpp"
