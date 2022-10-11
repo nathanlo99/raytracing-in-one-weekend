@@ -1,5 +1,5 @@
-- cheap instance transformations
-- transition to using matrices instead of ad hoc math
+X cheap instance transformations
+X transition to using matrices instead of ad hoc math
 - add imgui
 - importance sampling
 - triangle mesh import
