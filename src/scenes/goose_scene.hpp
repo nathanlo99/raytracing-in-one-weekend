@@ -10,7 +10,7 @@
 #include "hittable_list.hpp"
 #include "material.hpp"
 #include "material_manager.hpp"
-#include "mesh_loader.hpp"
+#include "obj_loader.hpp"
 #include "sphere.hpp"
 #include "transformed_instance.hpp"
 #include "triangle.hpp"
@@ -33,10 +33,13 @@ inline auto goose_scene() {
   //     material_manager::create<dielectric>(colour(1.0), 1.52);
   const mat4 m =
       glm::scale(mat4(1.0), vec3(0.06)) *
-      glm::rotate(mat4(1.0), util::degrees_to_radians(-15.0), vec3(0, 1, 0)) *
+      glm::rotate(mat4(1.0), util::degrees_to_radians(-20.0), vec3(0, 1, 0)) *
       glm::rotate(mat4(1.0), util::degrees_to_radians(90.0), vec3(-1, 0, 0));
+
+  const auto goose_texture = material_manager::create<lambertian>(
+      std::make_shared<image_texture>("res/obj/goose/diffuse_1.png"));
   world.emplace_back<transformed_hittable>(
-      load_obj("res/obj/goose/goose.obj", ground_material), m);
+      load_obj("res/obj/goose/goose.obj", goose_texture), m);
 
   const auto egg_material =
       material_manager::create<lambertian>(colour(0.4, 0.2, 0.1));

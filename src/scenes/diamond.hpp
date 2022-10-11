@@ -9,7 +9,7 @@
 #include "hittable_list.hpp"
 #include "material.hpp"
 #include "material_manager.hpp"
-#include "mesh_loader.hpp"
+#include "obj_loader.hpp"
 #include "sphere.hpp"
 
 #include "scene.hpp"

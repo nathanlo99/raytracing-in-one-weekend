@@ -52,15 +52,16 @@ inline colour normal_to_colour(const vec3 &normal) {
   return 0.5 * (normal + vec3(1.0));
 }
 
-void render_normals(const hittable_list &world, const camera &cam,
-                    const std::string_view &output, const int image_width,
-                    const int image_height) {
-  image result_image(image_width, image_height);
-  int num_samples = 10;
+void render_debug(const hittable_list &world, const camera &cam,
+                  const int image_width, const int image_height) {
+  image uv_image(image_width, image_height);
+  image normals_image(image_width, image_height);
+  int num_samples = 1;
 #pragma omp parallel for
   for (int j = 0; j < image_height; ++j) {
     for (int i = 0; i < image_width; ++i) {
-      colour pixel_colour(0.0);
+      colour uv_colour(0.0);
+      colour normal_colour(0.0);
       for (int s = 0; s < num_samples; ++s) {
         const real u = (i + 0.5) / image_width;
         const real v = (j + 0.5) / image_height;
@@ -69,12 +70,15 @@ void render_normals(const hittable_list &world, const camera &cam,
         hit_record rec;
         if (!world.hit(r, eps, inf, rec))
           continue;
-        pixel_colour += normal_to_colour(rec.normal);
+        normal_colour +=
+            normal_to_colour(rec.normal) / static_cast<real>(num_samples);
+        uv_colour += vec3(1.0, rec.u, rec.v) / static_cast<real>(num_samples);
       }
-      pixel_colour /= num_samples;
-      result_image.set(j, i, pixel_colour);
+      uv_image.set(j, i, uv_colour);
+      normals_image.set(j, i, normal_colour);
     }
-    result_image.write_png(output);
+    uv_image.write_png("build/output/debug_uvs.png");
+    normals_image.write_png("build/output/debug_normals.png");
   }
 }
 
@@ -304,8 +308,8 @@ int main() {
 
   if (true) {
     const auto scene = goose_scene();
-    render_normals(scene.objects, scene.cam, "build/output/debug_normals.png",
-                   scene.cam.m_image_width, scene.cam.m_image_height);
+    render_debug(scene.objects, scene.cam, scene.cam.m_image_width,
+                 scene.cam.m_image_height);
     render(scene.objects, scene.cam, "build/goose_scene.png",
            scene.cam.m_image_width, scene.cam.m_image_height, 100000,
            PER_FRAME);

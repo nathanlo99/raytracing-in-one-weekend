@@ -5,7 +5,8 @@ X transition to using matrices instead of ad hoc math
 - triangle mesh import
   X write a triangle hittable class
   X import the vertices and faces of an obj model
-  - import the uv coordinates of the obj model
+  X import the uv coordinates of the obj model
+  - import .mtl files
   - integrate normal / bump textures
 - add scene lua support (can get inspiration from lux)
   - consider gltf
