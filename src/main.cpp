@@ -56,24 +56,22 @@ void render_debug(const hittable_list &world, const camera &cam,
                   const int image_width, const int image_height) {
   image uv_image(image_width, image_height);
   image normals_image(image_width, image_height);
-  int num_samples = 1;
 #pragma omp parallel for
   for (int j = 0; j < image_height; ++j) {
     for (int i = 0; i < image_width; ++i) {
       colour uv_colour(0.0);
       colour normal_colour(0.0);
-      for (int s = 0; s < num_samples; ++s) {
-        const real u = (i + 0.5) / image_width;
-        const real v = (j + 0.5) / image_height;
-        const ray r = cam.get_debug_ray(u, v);
 
-        hit_record rec;
-        if (!world.hit(r, eps, inf, rec))
-          continue;
-        normal_colour +=
-            normal_to_colour(rec.normal) / static_cast<real>(num_samples);
-        uv_colour += vec3(1.0, rec.u, rec.v) / static_cast<real>(num_samples);
-      }
+      const real u = (i + 0.5) / image_width;
+      const real v = (j + 0.5) / image_height;
+      const ray r = cam.get_debug_ray(u, v);
+
+      hit_record rec;
+      if (!world.hit(r, eps, inf, rec))
+        continue;
+      normal_colour = normal_to_colour(rec.normal);
+      uv_colour = vec3(1.0, rec.u, rec.v);
+
       uv_image.set(j, i, uv_colour);
       normals_image.set(j, i, normal_colour);
     }

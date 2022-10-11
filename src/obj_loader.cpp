@@ -14,6 +14,12 @@
 void load_mtl(const std::string_view &filename,
               std::unordered_map<std::string, material *> &materials) {
   std::cout << "Loading MTL file '" << filename << "'" << std::endl;
+
+  std::ifstream ifs(filename);
+  if (!ifs.is_open()) {
+    std::cerr << "ERROR: Could not open file '" << filename << "'" << std::endl;
+    throw std::runtime_error("MTL loading failed: .mtl file unreadable");
+  }
 }
 
 std::shared_ptr<hittable> load_obj(const std::string_view &filename,
@@ -82,9 +88,9 @@ std::shared_ptr<hittable> load_obj(const std::string_view &filename,
 
       const size_t num_points = vertices.size();
       for (size_t idx = 1; idx + 1 < num_points; ++idx) {
-        const vertex p1 = vertices[0], p2 = vertices[idx],
-                     p3 = vertices[idx + 1];
-        result.emplace_back<triangle>(p1, p2, p3, current_material);
+        const vertex p0 = vertices[0], p1 = vertices[idx],
+                     p2 = vertices[idx + 1];
+        result.emplace_back<triangle>(p0, p1, p2, current_material);
       }
     } else if (code == "mtllib") {
       std::string mtl_filename;

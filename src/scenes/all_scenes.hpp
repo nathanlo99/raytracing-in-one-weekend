@@ -9,5 +9,6 @@
 #include "earth.hpp"
 #include "glass_test.hpp"
 #include "goose_scene.hpp"
+#include "just_goose.hpp"
 #include "platonic.hpp"
 #include "simple_scene.hpp"

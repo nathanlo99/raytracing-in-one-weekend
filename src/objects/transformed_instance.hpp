@@ -21,10 +21,8 @@ public:
   virtual bool hit(const ray &r, const real t_min, const real t_max,
                    hit_record &rec) const override {
     // 1. Transform ray with the inverse model matrix
-    const vec3 new_origin =
-        glm::transpose(m_inv_trans_matrix) * vec4(r.orig, 1.0);
-    const vec3 new_direction =
-        glm::transpose(m_inv_trans_matrix) * vec4(r.dir, 0.0);
+    const vec3 new_origin = glm::inverse(m_model_matrix) * vec4(r.orig, 1.0);
+    const vec3 new_direction = glm::inverse(m_model_matrix) * vec4(r.dir, 0.0);
     const ray new_ray(new_origin, new_direction, r.time);
 
     // 2. Hit the instance with that transformed_ray

@@ -36,14 +36,12 @@ __attribute__((hot)) bool triangle::hit(const ray &r, const real t_min,
   rec.u = uv[0];
   rec.v = uv[1];
 
-  // TODO: Revisit with better understanding of tangent space
-  // const vec3 normal0 = m_p0.normal.value_or(n);
-  // const vec3 normal1 = m_p1.normal.value_or(n);
-  // const vec3 normal2 = m_p2.normal.value_or(n);
-  // const vec3 normal =
-  //     normal0 + u * (normal1 - normal0) + v * (normal2 - normal0);
-  // rec.set_face_normal(r, normal);
-  rec.set_face_normal(r, n);
+  const vec3 normal0 = m_p0.normal.value_or(n);
+  const vec3 normal1 = m_p1.normal.value_or(n);
+  const vec3 normal2 = m_p2.normal.value_or(n);
+  const vec3 normal =
+      normal0 + u * (normal1 - normal0) + v * (normal2 - normal0);
+  rec.set_face_normal(r, normal);
 
   rec.mat_ptr = m_mat_ptr;
   return true;
