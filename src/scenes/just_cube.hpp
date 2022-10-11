@@ -17,7 +17,7 @@
 
 #include "scene.hpp"
 
-inline auto just_goose_scene() {
+inline auto just_cube_scene() {
   // Image
   const real aspect_ratio = 1.0;
   const int image_width = 600;
@@ -27,17 +27,14 @@ inline auto just_goose_scene() {
 
   const auto white_material =
       material_manager::create<lambertian>(colour(0.5, 0.5, 0.5));
-
-  // const auto goose_texture = material_manager::create<lambertian>(
-  //     std::make_shared<image_texture>("res/obj/goose/diffuse_1.png"));
-  world.add(load_obj("res/obj/goose/goose.obj", white_material));
+  world.add(load_obj("res/obj/smooth_cube.obj", white_material));
 
   auto list = hittable_list(bvh_node::from_list(world, 0.0, 1.0));
   list.add_background_map("res/hdr_pack/5.hdr");
 
   // Camera
-  const point3 lookfrom(50, 50, 50);
-  const point3 lookat(0, 20, 0);
+  const point3 lookfrom(3, 4, 5);
+  const point3 lookat(0.5, 0.5, 0.5);
   const vec3 up(0, 1, 0);
   const real dist_to_focus = glm::length(lookfrom - lookat);
   const real aperture = 0.1;

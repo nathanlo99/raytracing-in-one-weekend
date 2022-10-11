@@ -24,9 +24,10 @@ struct solid_colour : public texture {
 
 struct image_texture : public texture {
   image m_image;
+  std::string m_filename;
 
   explicit image_texture(const std::string_view &filename)
-      : m_image(filename) {}
+      : m_image(filename), m_filename(filename) {}
   virtual ~image_texture() = default;
 
   virtual inline colour value(const real u, const real v,

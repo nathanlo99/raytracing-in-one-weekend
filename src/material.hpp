@@ -113,3 +113,56 @@ struct diffuse_light : public material {
     return emit->value(u, v, p);
   }
 };
+
+/*
+Stores a Wavefront MTL file
+- Ns 10.000000                     - Specular exponent (currently ignored)
+- Kd 1.000000 1.000000 1.000000    - Diffuse colour
+- Ks 0.000000 0.000000 0.000000    - Specular colour
+- Ke 0.000000 0.000000 0.000000    - Emissive colour
+- Ni 1.500000                      - IOR
+- map_Bump                         - Bump map (not yet supported)
+- map_Kd                           - Diffuse map
+- map_Ks                           - Specular map
+*/
+struct obj_material : public material {
+  real specular_exponent = 0.0;
+  real index_of_refraction = 0.0;
+  real transparency = 0.0;
+  colour ambient_colour = colour(0.0);
+  colour diffuse_colour = colour(0.0);
+  colour specular_colour = colour(0.0);
+  colour emissive_colour = colour(0.0);
+
+  std::shared_ptr<image_texture> ambient_map = nullptr;
+  std::shared_ptr<image_texture> diffuse_map = nullptr;
+  std::shared_ptr<image_texture> specular_map = nullptr;
+  std::shared_ptr<image_texture> emissive_map = nullptr;
+  std::shared_ptr<image_texture> bump_map = nullptr;
+
+  explicit obj_material() = default;
+
+  virtual bool scatter(const ray &r_in, const hit_record &rec,
+                       colour &attenuation, ray &scattered) const override {
+
+    const vec3 scatter_direction = rec.normal + util::random_unit_vector();
+    if (util::near_zero(scatter_direction))
+      return false;
+
+    scattered = ray(rec.p, scatter_direction, r_in.time);
+    if (diffuse_map != nullptr)
+      attenuation = diffuse_colour * diffuse_map->value(rec.u, rec.v, rec.p);
+    else
+      attenuation = diffuse_colour;
+    return true;
+  }
+
+  virtual colour emitted(const real u, const real v,
+                         const point3 &p) const override {
+    if (emissive_map != nullptr) {
+      return emissive_colour * emissive_map->value(u, v, p);
+    } else {
+      return emissive_colour;
+    }
+  }
+};

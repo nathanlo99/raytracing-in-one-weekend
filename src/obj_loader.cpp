@@ -1,6 +1,8 @@
 
 #include "bvh_node.hpp"
 #include "hittable_list.hpp"
+#include "material.hpp"
+#include "material_manager.hpp"
 #include "triangle.hpp"
 
 #include <boost/algorithm/string.hpp>
@@ -20,6 +22,111 @@ void load_mtl(const std::string_view &filename,
     std::cerr << "ERROR: Could not open file '" << filename << "'" << std::endl;
     throw std::runtime_error("MTL loading failed: .mtl file unreadable");
   }
+
+  std::string line, code;
+  int line_num = 0;
+
+  std::string current_name = "";
+  obj_material *current_material = nullptr;
+
+  std::unordered_set<std::string> ignored_codes = {"#", "illum"};
+
+  while (std::getline(ifs, line)) {
+    std::stringstream ss(line);
+    line_num++;
+
+    // Read the first token: this is the code
+    if (!(ss >> code) || ignored_codes.count(code) > 0)
+      continue;
+
+    if (code == "newmtl") {
+      if (current_material != nullptr)
+        materials[current_name] = dynamic_cast<material *>(current_material);
+      ss >> current_name;
+      current_material = dynamic_cast<obj_material *>(
+          material_manager::create<obj_material>());
+    } else if (code == "Ns") {
+      assert(current_material != nullptr);
+      ss >> current_material->specular_exponent;
+    } else if (code == "Ka") {
+      assert(current_material != nullptr);
+      ss >> current_material->ambient_colour.x >>
+          current_material->ambient_colour.y >>
+          current_material->ambient_colour.z;
+    } else if (code == "Kd") {
+      assert(current_material != nullptr);
+      ss >> current_material->diffuse_colour.x >>
+          current_material->diffuse_colour.y >>
+          current_material->diffuse_colour.z;
+    } else if (code == "Ks") {
+      assert(current_material != nullptr);
+      ss >> current_material->specular_colour.x >>
+          current_material->specular_colour.y >>
+          current_material->specular_colour.z;
+    } else if (code == "Ke") {
+      assert(current_material != nullptr);
+      ss >> current_material->emissive_colour.x >>
+          current_material->emissive_colour.y >>
+          current_material->emissive_colour.z;
+    } else if (code == "map_Ka") {
+      std::string map_name;
+      ss >> map_name;
+      const std::string map_filename =
+          std::filesystem::path(filename).replace_filename(map_name).string();
+      assert(current_material != nullptr);
+      current_material->ambient_map =
+          std::make_shared<image_texture>(map_filename);
+    } else if (code == "map_Kd") {
+      std::string map_name;
+      ss >> map_name;
+      const std::string map_filename =
+          std::filesystem::path(filename).replace_filename(map_name).string();
+      assert(current_material != nullptr);
+      current_material->diffuse_map =
+          std::make_shared<image_texture>(map_filename);
+    } else if (code == "map_Ks") {
+      std::string map_name;
+      ss >> map_name;
+      const std::string map_filename =
+          std::filesystem::path(filename).replace_filename(map_name).string();
+      assert(current_material != nullptr);
+      current_material->specular_map =
+          std::make_shared<image_texture>(map_filename);
+    } else if (code == "map_Ke") {
+      std::string map_name;
+      ss >> map_name;
+      const std::string map_filename =
+          std::filesystem::path(filename).replace_filename(map_name).string();
+      assert(current_material != nullptr);
+      current_material->emissive_map =
+          std::make_shared<image_texture>(map_filename);
+    } else if (code == "map_Bump") {
+      std::string map_name;
+      ss >> map_name;
+      const std::string map_filename =
+          std::filesystem::path(filename).replace_filename(map_name).string();
+      assert(current_material != nullptr);
+      current_material->bump_map =
+          std::make_shared<image_texture>(map_filename);
+    } else if (code == "Ni") {
+      assert(current_material != nullptr);
+      ss >> current_material->index_of_refraction;
+    } else if (code == "d") {
+      real one_minus_transparency;
+      ss >> one_minus_transparency;
+      assert(current_material != nullptr);
+      current_material->transparency = 1.0 - one_minus_transparency;
+    } else if (code == "Tr") {
+      assert(current_material != nullptr);
+      ss >> current_material->transparency;
+    } else {
+      std::cout << "MTL : Ignored line '" << line << "'" << std::endl;
+    }
+  }
+
+  // Don't forget to add the last material!
+  if (current_material != nullptr)
+    materials[current_name] = current_material;
 }
 
 std::shared_ptr<hittable> load_obj(const std::string_view &filename,
@@ -46,13 +153,14 @@ std::shared_ptr<hittable> load_obj(const std::string_view &filename,
   material *current_material = default_mat;
 
   std::vector<std::string> skipped_lines; // Just for reference
+  std::unordered_set<std::string> ignored_codes = {"#", "s", "o", "g"};
 
   while (std::getline(ifs, line)) {
     std::stringstream ss(line);
     line_num++;
 
     // Read the first token: this is the code
-    if (!(ss >> code) || code == "#")
+    if (!(ss >> code) || ignored_codes.count(code) > 0)
       continue;
 
     if (code == "v") {
@@ -99,20 +207,31 @@ std::shared_ptr<hittable> load_obj(const std::string_view &filename,
                                        .replace_filename(mtl_filename)
                                        .string();
       load_mtl(mtl_path, materials);
+    } else if (code == "usemtl") {
+      std::string material_name;
+      ss >> material_name;
+      if (materials.count(material_name) == 0) {
+        std::cerr << "Invalid MTL: Could not find material named '"
+                  << material_name << "'" << std::endl;
+        throw std::runtime_error("Invalid .mtl file");
+      }
+      current_material = materials[material_name];
     } else {
       skipped_lines.push_back(std::to_string(line_num) + ": " + line);
     }
   }
 
-  std::cout << "Skipped lines: " << std::endl;
-  for (const std::string &line : skipped_lines)
-    std::cout << line << std::endl;
+  if (!skipped_lines.empty()) {
+    std::cout << "Unsupported lines: " << std::endl;
+    for (const std::string &line : skipped_lines)
+      std::cout << line << std::endl;
+  }
 
   std::cout << "Loaded OBJ file: " << filename << std::endl;
   std::cout << "  Triangles: " << result.size() << std::endl;
-  std::cout << "  Positions: " << positions.size() << std::endl;
-  std::cout << "  UV Coords: " << uvs.size() << std::endl;
-  std::cout << "  Normals  : " << normals.size() << std::endl;
+  std::cout << "  Positions: " << positions.size() - 1 << std::endl;
+  std::cout << "  UV Coords: " << uvs.size() - 1 << std::endl;
+  std::cout << "  Normals  : " << normals.size() - 1 << std::endl;
 
   return bvh_node::from_list(result, 0.0, 1.0);
 }
