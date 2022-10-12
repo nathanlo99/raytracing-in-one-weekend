@@ -14,7 +14,8 @@ struct vertex {
 
   constexpr vertex(const point3 &pos)
       : position(pos), uv(std::nullopt), normal(std::nullopt) {}
-  constexpr vertex(const point3 &pos, const vec3 &uv, const vec3 &normal)
+  constexpr vertex(const point3 &pos, const std::optional<vec3> &uv,
+                   const std::optional<vec3> &normal)
       : position(pos), uv(uv), normal(normal) {}
 };
 

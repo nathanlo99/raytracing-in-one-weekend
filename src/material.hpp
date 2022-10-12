@@ -114,31 +114,21 @@ struct diffuse_light : public material {
   }
 };
 
-/*
-Stores a Wavefront MTL file
-- Ns 10.000000                     - Specular exponent (currently ignored)
-- Kd 1.000000 1.000000 1.000000    - Diffuse colour
-- Ks 0.000000 0.000000 0.000000    - Specular colour
-- Ke 0.000000 0.000000 0.000000    - Emissive colour
-- Ni 1.500000                      - IOR
-- map_Bump                         - Bump map (not yet supported)
-- map_Kd                           - Diffuse map
-- map_Ks                           - Specular map
-*/
+// Stores data from a Wavefront .mtl material file
 struct obj_material : public material {
-  real specular_exponent = 0.0;
-  real index_of_refraction = 0.0;
-  real transparency = 0.0;
-  colour ambient_colour = colour(0.0);
-  colour diffuse_colour = colour(0.0);
-  colour specular_colour = colour(0.0);
-  colour emissive_colour = colour(0.0);
+  real specular_exponent = 0.0;         // Ns
+  real index_of_refraction = 0.0;       // Ni
+  real transparency = 0.0;              // Tr (or 1 - d)
+  colour ambient_colour = colour(0.0);  // Ka
+  colour diffuse_colour = colour(0.0);  // Kd
+  colour specular_colour = colour(0.0); // Ks
+  colour emissive_colour = colour(0.0); // Ke
 
-  std::shared_ptr<image_texture> ambient_map = nullptr;
-  std::shared_ptr<image_texture> diffuse_map = nullptr;
-  std::shared_ptr<image_texture> specular_map = nullptr;
-  std::shared_ptr<image_texture> emissive_map = nullptr;
-  std::shared_ptr<image_texture> bump_map = nullptr;
+  std::shared_ptr<image_texture> ambient_map = nullptr;  // map_Ka
+  std::shared_ptr<image_texture> diffuse_map = nullptr;  // map_Kd
+  std::shared_ptr<image_texture> specular_map = nullptr; // map_Ks
+  std::shared_ptr<image_texture> emissive_map = nullptr; // map_Ke
+  std::shared_ptr<image_texture> bump_map = nullptr;     // map_Bump (map_bump)
 
   explicit obj_material() = default;
 

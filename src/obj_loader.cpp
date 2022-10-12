@@ -24,16 +24,14 @@ void load_mtl(const std::string_view &filename,
   }
 
   std::string line, code;
-  int line_num = 0;
 
   std::string current_name = "";
   obj_material *current_material = nullptr;
 
-  std::unordered_set<std::string> ignored_codes = {"#", "illum"};
+  std::unordered_set<std::string> ignored_codes = {"#", "illum", "Tf"};
 
   while (std::getline(ifs, line)) {
     std::stringstream ss(line);
-    line_num++;
 
     // Read the first token: this is the code
     if (!(ss >> code) || ignored_codes.count(code) > 0)
@@ -100,7 +98,7 @@ void load_mtl(const std::string_view &filename,
       assert(current_material != nullptr);
       current_material->emissive_map =
           std::make_shared<image_texture>(map_filename);
-    } else if (code == "map_Bump") {
+    } else if (code == "map_Bump" || code == "map_bump") {
       std::string map_name;
       ss >> map_name;
       const std::string map_filename =
@@ -137,7 +135,6 @@ std::shared_ptr<hittable> load_obj(const std::string_view &filename,
   std::cout << "Loading OBJ file '" << filename << "'" << std::endl;
 
   std::string code, line;
-  int line_num = 0;
   std::ifstream ifs(filename);
   if (!ifs.is_open()) {
     std::cerr << "ERROR: Could not open file '" << filename << "'" << std::endl;
@@ -157,7 +154,6 @@ std::shared_ptr<hittable> load_obj(const std::string_view &filename,
 
   while (std::getline(ifs, line)) {
     std::stringstream ss(line);
-    line_num++;
 
     // Read the first token: this is the code
     if (!(ss >> code) || ignored_codes.count(code) > 0)
@@ -186,11 +182,18 @@ std::shared_ptr<hittable> load_obj(const std::string_view &filename,
         if (tokens.size() == 1) {
           vertices.emplace_back(vertices[std::stoi(tokens[0])]);
         } else if (tokens.size() == 3) {
-          const int position_idx = std::stoi(tokens[0]);
-          const int uv_idx = std::stoi(tokens[1]);
-          const int normal_idx = std::stoi(tokens[2]);
-          vertices.emplace_back(positions[position_idx], uvs[uv_idx],
-                                normals[normal_idx]);
+          if (tokens[1] == "") {
+            const int position_idx = std::stoi(tokens[0]);
+            const int normal_idx = std::stoi(tokens[2]);
+            vertices.emplace_back(positions[position_idx], std::nullopt,
+                                  normals[normal_idx]);
+          } else {
+            const int position_idx = std::stoi(tokens[0]);
+            const int uv_idx = std::stoi(tokens[1]);
+            const int normal_idx = std::stoi(tokens[2]);
+            vertices.emplace_back(positions[position_idx], uvs[uv_idx],
+                                  normals[normal_idx]);
+          }
         }
       }
 
@@ -217,7 +220,7 @@ std::shared_ptr<hittable> load_obj(const std::string_view &filename,
       }
       current_material = materials[material_name];
     } else {
-      skipped_lines.push_back(std::to_string(line_num) + ": " + line);
+      std::cout << "OBJ: Ignored line '" << line << "'" << std::endl;
     }
   }
 

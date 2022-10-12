@@ -15,6 +15,7 @@ struct hittable_with_box {
 
 struct bvh_node : public hittable {
   std::shared_ptr<hittable> m_left, m_right;
+  int m_axis;
   aabb m_box;
 
   bvh_node(std::vector<hittable_with_box> &src_objects, const size_t start,
