@@ -7,6 +7,7 @@
 #include "dark_scene.hpp"
 #include "diamond.hpp"
 #include "earth.hpp"
+#include "flat_bvh_scene.hpp"
 #include "glass_test.hpp"
 #include "goose_scene.hpp"
 #include "just_cube.hpp"

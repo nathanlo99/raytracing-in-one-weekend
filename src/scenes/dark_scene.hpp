@@ -4,7 +4,7 @@
 #include "util.hpp"
 
 #include "animated_sphere.hpp"
-#include "bvh_node.hpp"
+#include "bvh.hpp"
 #include "camera.hpp"
 #include "colour.hpp"
 #include "hittable_list.hpp"
@@ -29,7 +29,7 @@ inline auto dark_scene() {
       const point3 center(a + 0.9 * util::random_real(), ball_height,
                           b + 0.9 * util::random_real());
 
-      if (length(center - point3(4, 0.2, 0)) > 0.9) {
+      if (glm::length(center - point3(4, 0.2, 0)) > 0.9) {
         if (choose_mat < 0.1) {
           // diffuse
           const auto sphere_material =
@@ -79,5 +79,5 @@ inline auto dark_scene() {
       material_manager::create<metal>(colour(0.7, 0.6, 0.5), 0.0);
   world.emplace_back<sphere>(point3(4, 1, 0), 1.0, material3);
 
-  return hittable_list(bvh_node::from_list(world, 0.0, 1.0));
+  return hittable_list(std::make_shared<bvh>(world, 0.0, 1.0));
 }
