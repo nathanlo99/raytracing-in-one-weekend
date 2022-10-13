@@ -4,7 +4,6 @@
 #include "util.hpp"
 
 #include "animated_sphere.hpp"
-#include "bvh_node.hpp"
 #include "camera.hpp"
 #include "colour.hpp"
 #include "hittable_list.hpp"
@@ -43,7 +42,7 @@ inline auto platonic_scene() {
 
   world.add(load_obj("res/obj/icosa.obj", glass_material));
 
-  auto list = hittable_list(bvh_node::from_list(world, 0.0, 1.0));
+  auto list = hittable_list(std::make_shared<bvh>(world, 0.0, 1.0));
   list.add_background_map("res/hdr_pack/5.hdr");
 
   // Camera

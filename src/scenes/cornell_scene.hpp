@@ -6,7 +6,7 @@
 
 #include "animated_sphere.hpp"
 #include "box.hpp"
-#include "bvh_node.hpp"
+#include "bvh.hpp"
 #include "camera.hpp"
 #include "colour.hpp"
 #include "hittable_list.hpp"

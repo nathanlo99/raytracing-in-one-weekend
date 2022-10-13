@@ -25,6 +25,11 @@ struct aabb {
     return t_max > t_min;
   }
 
+  constexpr size_t largest_axis() const {
+    // TODO: Just inline this
+    return util::largest_axis(max - min);
+  }
+
   constexpr inline real hit(const ray &r, real t_min, real t_max) const {
     for (int a = 0; a < 3; a++) {
       real t0 = (min[a] - r.orig[a]) / r.dir[a];
@@ -53,6 +58,11 @@ struct aabb {
       new_max = glm::max(new_max, transformed_corner);
     }
     return aabb(new_min, new_max);
+  }
+
+  constexpr void merge(const aabb &other) {
+    min = glm::min(min, other.min);
+    max = glm::max(max, other.max);
   }
 };
 

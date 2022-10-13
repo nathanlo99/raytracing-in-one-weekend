@@ -4,6 +4,7 @@
 #include "util.hpp"
 
 #include "animated_sphere.hpp"
+#include "bvh.hpp"
 #include "camera.hpp"
 #include "colour.hpp"
 #include "hittable_list.hpp"
@@ -16,7 +17,7 @@
 
 #include "scene.hpp"
 
-inline auto just_cube_scene() {
+inline auto flat_bvh_scene() {
   // Image
   const real aspect_ratio = 1.0;
   const int image_width = 600;

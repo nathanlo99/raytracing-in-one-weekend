@@ -4,7 +4,7 @@
 #include "util.hpp"
 
 #include "animated_sphere.hpp"
-#include "bvh_node.hpp"
+#include "bvh.hpp"
 #include "camera.hpp"
 #include "colour.hpp"
 #include "hittable_list.hpp"
@@ -86,7 +86,7 @@ inline auto bright_scene() {
       material_manager::create<metal>(colour(0.7, 0.6, 0.5), 0.0);
   world.emplace_back<sphere>(point3(4, 1, 0), 1.0, material3);
 
-  auto list = hittable_list(bvh_node::from_list(world, 0.0, 1.0));
+  auto list = hittable_list(std::make_shared<bvh>(world, 0.0, 1.0));
 
   const auto skybox_image =
       std::make_shared<image_texture>("res/hdr_pack/5.hdr");

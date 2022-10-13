@@ -4,7 +4,7 @@
 #include "util.hpp"
 
 #include "animated_sphere.hpp"
-#include "bvh_node.hpp"
+#include "bvh.hpp"
 #include "camera.hpp"
 #include "colour.hpp"
 #include "hittable_list.hpp"
@@ -45,7 +45,7 @@ inline auto simple_scene() {
   world.emplace_back<triangle>(point3(0, 2, 0), point3(2.5, 2, 0),
                                point3(1.25, 4, 0), mirror_material);
 
-  auto list = hittable_list(bvh_node::from_list(world, 0.0, 1.0));
+  auto list = hittable_list(std::make_shared<bvh>(world, 0.0, 1.0));
   list.add_background_map("res/hdr_pack/5.hdr");
 
   // Camera
