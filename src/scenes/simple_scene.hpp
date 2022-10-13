@@ -39,12 +39,6 @@ inline auto simple_scene() {
       material_manager::create<metal>(colour(0.7, 0.6, 0.5), 0.0);
   world.emplace_back<sphere>(point3(2.5, 1, 0), 1.0, mirror_material);
 
-  world.emplace_back<triangle>(point3(-2.5, 2, 0), point3(0, 2, 0),
-                               point3(-1.25, 4, 0), egg_material);
-
-  world.emplace_back<triangle>(point3(0, 2, 0), point3(2.5, 2, 0),
-                               point3(1.25, 4, 0), mirror_material);
-
   auto list = hittable_list(std::make_shared<bvh>(world, 0.0, 1.0));
   list.add_background_map("res/hdr_pack/5.hdr");
 

@@ -272,10 +272,10 @@ void render(const hittable_list &world, const camera &cam,
                       << estimated_remaining_ms / 1000 << "s remaining, "
                       << remaining_tasks << "/" << num_tasks
                       << " tasks remaining... ";
-          const int line_length = 120;
+          const int target_line_length = 120;
           const int output_length = output_line.str().size();
-          if (output_length < line_length)
-            output_line << std::string(line_length - output_length, ' ');
+          if (output_length < target_line_length)
+            output_line << std::string(target_line_length - output_length, ' ');
           std::cout << output_line.str() << std::flush;
           result_image.write_png("build/output/progress.png");
         }
@@ -305,10 +305,10 @@ int main() {
   }
 
   if (true) {
-    const auto scene = diamond_scene();
+    const auto scene = goose_scene();
     render_debug(scene.objects, scene.cam, scene.cam.m_image_width,
                  scene.cam.m_image_height);
-    render(scene.objects, scene.cam, "build/diamond_scene.png",
+    render(scene.objects, scene.cam, "build/goose_scene.png",
            scene.cam.m_image_width, scene.cam.m_image_height, 10000, PER_FRAME);
   }
 }

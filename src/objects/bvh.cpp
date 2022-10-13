@@ -9,10 +9,9 @@
 #include <vector>
 
 bvh::bvh(const std::vector<std::shared_ptr<hittable>> &objects,
-         const real time0, const real time1, const size_t max_nodes_per_leaf)
-    : m_max_nodes_per_leaf(std::min<size_t>(max_nodes_per_leaf, 255)),
-      m_primitives(), m_entries() {
-
+         const real time0, const real time1, size_t max_nodes_per_leaf)
+    : m_primitives(), m_entries() {
+  max_nodes_per_leaf = std::min<size_t>(max_nodes_per_leaf, 255);
   const auto start_ns = util::get_time_ns();
 
   std::vector<bvh_build_data> data(objects.size());
@@ -30,7 +29,7 @@ bvh::bvh(const std::vector<std::shared_ptr<hittable>> &objects,
   }
 
   m_entries.emplace_back(); // Root
-  recursive_build(data, 0, 0, data.size(), time0, time1);
+  recursive_build(data, 0, 0, data.size(), time0, time1, max_nodes_per_leaf);
 
   for (size_t entry_idx = 0; entry_idx < m_entries.size(); ++entry_idx) {
     bvh_entry &entry = m_entries[entry_idx];
@@ -57,14 +56,14 @@ bvh::bvh(const std::vector<std::shared_ptr<hittable>> &objects,
 
 void bvh::recursive_build(std::vector<bvh_build_data> &data,
                           const size_t entry_idx, const size_t start,
-                          const size_t end, const real time0,
-                          const real time1) {
+                          const size_t end, const real time0, const real time1,
+                          const size_t max_nodes_per_leaf) {
   const size_t span = end - start;
   aabb total_bounding_box;
   for (size_t idx = start; idx < end; ++idx)
     total_bounding_box.merge(data[idx].bounding_box);
 
-  if (span <= m_max_nodes_per_leaf) {
+  if (span <= max_nodes_per_leaf) {
     m_entries[entry_idx] = {true, total_bounding_box, 0, start, end, 0};
     return;
   }
@@ -81,8 +80,10 @@ void bvh::recursive_build(std::vector<bvh_build_data> &data,
                right_entry_idx = left_entry_idx + 1;
   m_entries.emplace_back(); // Left
   m_entries.emplace_back(); // Right
-  recursive_build(data, left_entry_idx, start, mid, time0, time1);
-  recursive_build(data, right_entry_idx, mid, end, time0, time1);
+  recursive_build(data, left_entry_idx, start, mid, time0, time1,
+                  max_nodes_per_leaf);
+  recursive_build(data, right_entry_idx, mid, end, time0, time1,
+                  max_nodes_per_leaf);
   m_entries[entry_idx] = {false, total_bounding_box, left_entry_idx, 0, 0,
                           axis};
 }

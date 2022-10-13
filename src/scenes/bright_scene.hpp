@@ -36,7 +36,7 @@ inline auto bright_scene() {
       const point3 center(a + 0.9 * util::random_real(), ball_height,
                           b + 0.9 * util::random_real());
 
-      if (length(center - point3(4, 0.2, 0)) > 0.9) {
+      if (glm::length(center - point3(4, 0.2, 0)) > 0.9) {
         if (choose_mat < 0.1) {
           // diffuse earth
           const auto sphere_material =

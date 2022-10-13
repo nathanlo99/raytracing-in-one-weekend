@@ -34,9 +34,6 @@ inline auto goose_scene() {
       glm::scale(mat4(1.0), vec3(0.06)) *
       glm::rotate(mat4(1.0), util::degrees_to_radians(-20.0), vec3(0, 1, 0));
 
-  world.emplace_back<transformed_hittable>(
-      load_obj("res/obj/goose/goose.obj", ground_material), m);
-
   const auto egg_material =
       material_manager::create<lambertian>(colour(0.4, 0.2, 0.1));
   world.emplace_back<sphere>(point3(-2.5, 1, 0), 1.0, egg_material);
@@ -44,6 +41,9 @@ inline auto goose_scene() {
   const auto mirror_material =
       material_manager::create<metal>(colour(0.7, 0.6, 0.5), 0.0);
   world.emplace_back<sphere>(point3(2.5, 1, 0), 1.0, mirror_material);
+
+  world.emplace_back<transformed_hittable>(load_obj("res/obj/goose/goose.obj"),
+                                           m);
 
   auto list = hittable_list(std::make_shared<bvh>(world, 0.0, 1.0));
   list.add_background_map("res/hdr_pack/5.hdr");
