@@ -29,14 +29,14 @@ inline auto just_goose_scene() {
 
   // const auto goose_texture = material_manager::create<lambertian>(
   //     std::make_shared<image_texture>("res/obj/goose/diffuse_1.png"));
-  world.add(load_obj("res/obj/goose/goose.obj", white_material, false));
+  world.add(load_obj("res/obj/goose/goose.obj", white_material, true));
 
   auto list = hittable_list(std::make_shared<bvh>(world, 0.0, 1.0));
   list.add_background_map("res/hdr_pack/5.hdr");
 
   // Camera
   const point3 lookfrom(50, 50, 50);
-  const point3 lookat(0, 20, 0);
+  const point3 lookat(-10, 20, 0);
   const vec3 up(0, 1, 0);
   const real dist_to_focus = glm::length(lookfrom - lookat);
   const real aperture = 0.1;

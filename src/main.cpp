@@ -1,4 +1,5 @@
 
+#include "material_manager.hpp"
 #include "util.hpp"
 
 #include "colour.hpp"
@@ -126,7 +127,7 @@ void render_singlethreaded(const hittable_list &world, const camera &cam,
         const real num_tasks = image_width * image_height;
         const real remaining_tasks = num_tasks - done_tasks;
         const real tasks_per_ms = done_tasks / elapsed_ms;
-        const real estimated_remaining_ms = num_tasks / tasks_per_ms;
+        const real estimated_remaining_ms = remaining_tasks / tasks_per_ms;
         std::cout << "\r" << elapsed_ms / 1000 << "s elapsed, "
                   << tasks_per_ms * 1000 << " pixels per sec, "
                   << estimated_remaining_ms / 1000 << "s remaining, "
@@ -236,6 +237,8 @@ void render(const hittable_list &world, const camera &cam,
 
   std::cerr << "Starting render with " << task_list.size() << " tasks and "
             << max_threads << " threads..." << std::endl;
+  std::cerr << "There are " << material_manager::size() << " materials loaded"
+            << std::endl;
   const auto start_ms = util::get_time_ms();
   const int num_tasks = task_list.size();
 
@@ -305,10 +308,11 @@ int main() {
   }
 
   if (true) {
-    const auto scene = goose_scene();
+    const auto scene = instance_scene();
     render_debug(scene.objects, scene.cam, scene.cam.m_image_width,
                  scene.cam.m_image_height);
-    render(scene.objects, scene.cam, "build/goose_scene.png",
-           scene.cam.m_image_width, scene.cam.m_image_height, 10000, PER_FRAME);
+    render_singlethreaded(scene.objects, scene.cam, "build/instance_scene.png",
+                          scene.cam.m_image_width, scene.cam.m_image_height,
+                          10000, PER_FRAME);
   }
 }

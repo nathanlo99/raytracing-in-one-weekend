@@ -22,6 +22,8 @@ struct material_manager {
     return instance().materials.back().get();
   }
 
+  static size_t size() { return instance().materials.size(); }
+
 private:
   material_manager() = default;
 

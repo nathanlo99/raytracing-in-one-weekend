@@ -157,6 +157,7 @@ std::shared_ptr<bvh> load_obj(const std::string_view &filename,
 
   while (std::getline(ifs, line)) {
     std::stringstream ss(line);
+    // std::cout << line << std::endl;
 
     // Read the first token: this is the code
     if (!(ss >> code) || ignored_codes.count(code) > 0)
@@ -183,7 +184,7 @@ std::shared_ptr<bvh> load_obj(const std::string_view &filename,
         boost::split(tokens, vertex_info, boost::is_any_of("/"));
 
         if (tokens.size() == 1) {
-          vertices.emplace_back(vertices[std::stoi(tokens[0])]);
+          vertices.emplace_back(positions[std::stoi(tokens[0])]);
         } else if (tokens.size() == 3) {
           if (tokens[1] == "") {
             const int position_idx = std::stoi(tokens[0]);
