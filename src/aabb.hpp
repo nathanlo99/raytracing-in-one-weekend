@@ -50,6 +50,8 @@ struct aabb {
             vec3(x1, y1, z0), vec3(x1, y1, z1)};
   }
 
+  constexpr vec3 centroid() const { return (min + max) / 2.0; }
+
   constexpr aabb apply(const mat4 &trans) const {
     vec3 new_min(inf), new_max(-inf);
     for (const vec3 corner : corners()) {

@@ -24,15 +24,14 @@ bvh::bvh(const std::vector<std::shared_ptr<hittable>> &objects,
           std::string("Could not build BVH with unbounded hittable at index " +
                       std::to_string(i)));
     }
-    data[i] = {i, bounding_box, (bounding_box.min + bounding_box.max) / 2.0};
+    data[i] = {i, bounding_box, bounding_box.centroid()};
     total_bounding_box.merge(bounding_box);
   }
 
   m_entries.emplace_back(); // Root
   recursive_build(data, 0, 0, data.size(), time0, time1, max_nodes_per_leaf);
 
-  for (size_t entry_idx = 0; entry_idx < m_entries.size(); ++entry_idx) {
-    bvh_entry &entry = m_entries[entry_idx];
+  for (bvh_entry &entry : m_entries) {
     if (entry.is_leaf) {
       const size_t prim_start = entry.primitive_start,
                    prim_end = entry.primitive_end;
@@ -64,17 +63,29 @@ void bvh::recursive_build(std::vector<bvh_build_data> &data,
     total_bounding_box.merge(data[idx].bounding_box);
 
   if (span <= max_nodes_per_leaf) {
-    m_entries[entry_idx] = {true, total_bounding_box, 0, start, end, 0};
+    m_entries[entry_idx].construct_leaf(total_bounding_box, start, end);
     return;
   }
 
+  // ----- START SPLIT LOGIC -----
   // For now, just split like before
   const size_t axis = total_bounding_box.largest_axis();
-  std::sort(data.begin() + start, data.begin() + end,
-            [axis](const bvh_build_data &a, const bvh_build_data &b) {
-              return a.centroid[axis] < b.centroid[axis];
-            });
-  const size_t mid = start + span / 2;
+  const auto &cmp = [axis](const bvh_build_data &a, const bvh_build_data &b) {
+    return a.centroid[axis] < b.centroid[axis];
+  };
+  std::sort(data.begin() + start, data.begin() + end, cmp);
+
+  // const size_t mid = start + span / 2;
+
+  const size_t mid = std::clamp<size_t>(
+      std::lower_bound(data.begin() + start, data.begin() + end,
+                       bvh_build_data{0, aabb(), total_bounding_box.centroid()},
+                       cmp) -
+          data.begin(),
+      start + 1, end - 1);
+
+  std::cout << start << " - " << mid << " - " << end << std::endl;
+  // ------ END SPLIT LOGIC ------
 
   const size_t left_entry_idx = m_entries.size(),
                right_entry_idx = left_entry_idx + 1;
@@ -84,8 +95,8 @@ void bvh::recursive_build(std::vector<bvh_build_data> &data,
                   max_nodes_per_leaf);
   recursive_build(data, right_entry_idx, mid, end, time0, time1,
                   max_nodes_per_leaf);
-  m_entries[entry_idx] = {false, total_bounding_box, left_entry_idx, 0, 0,
-                          axis};
+  m_entries[entry_idx].construct_non_leaf(total_bounding_box, left_entry_idx,
+                                          axis);
 }
 
 bool bvh::recursive_hit(const ray &r, const size_t idx, const real t_min,

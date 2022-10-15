@@ -18,12 +18,30 @@ struct bvh : public hittable {
   struct bvh_entry {
     bool is_leaf = true;
     aabb bounding_box;
-    size_t left_child = 0;
-    size_t primitive_start = 0;
-    size_t primitive_end = 0;
-    size_t axis = 0;
+    union {
+      size_t left_child;
+      size_t primitive_start;
+    };
+    union {
+      size_t axis;
+      size_t primitive_end;
+    };
 
     bvh_entry() = default;
+    void construct_non_leaf(const aabb &box, const size_t left,
+                            const size_t split_axis) {
+      is_leaf = false;
+      bounding_box = box;
+      left_child = left;
+      axis = split_axis;
+    }
+
+    void construct_leaf(const aabb &box, const size_t start, const size_t end) {
+      is_leaf = true;
+      bounding_box = box;
+      primitive_start = start;
+      primitive_end = end;
+    }
   };
 
   std::vector<std::shared_ptr<hittable>> m_primitives;
