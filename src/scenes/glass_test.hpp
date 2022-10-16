@@ -37,7 +37,7 @@ inline auto glass_test_scene() {
     world.emplace_back<sphere>(vec3(i - 3, -0.5, 0), 0.5, blue_glass_material);
   }
 
-  auto list = hittable_list(std::make_shared<bvh>(world, 0.0, 1.0));
+  auto list = hittable_list(std::make_shared<bvh<>>(world, 0.0, 1.0));
   list.add_background_map("res/hdr_pack/5.hdr");
 
   // Camera

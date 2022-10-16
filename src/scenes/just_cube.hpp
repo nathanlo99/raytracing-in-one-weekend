@@ -28,7 +28,7 @@ inline auto just_cube_scene() {
       material_manager::create<lambertian>(colour(0.5, 0.5, 0.5));
   world.add(load_obj("res/obj/cube.obj", white_material, false));
 
-  auto list = hittable_list(std::make_shared<bvh>(world, 0.0, 1.0));
+  auto list = hittable_list(std::make_shared<bvh<>>(world, 0.0, 1.0));
   list.add_background_map("res/hdr_pack/5.hdr");
 
   // Camera

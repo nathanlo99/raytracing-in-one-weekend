@@ -45,7 +45,7 @@ inline auto goose_scene() {
   world.emplace_back<transformed_hittable>(load_obj("res/obj/goose/goose.obj"),
                                            m);
 
-  auto list = hittable_list(std::make_shared<bvh>(world, 0.0, 1.0));
+  auto list = hittable_list(std::make_shared<bvh<>>(world, 0.0, 1.0));
   list.add_background_map("res/hdr_pack/5.hdr");
 
   // Camera

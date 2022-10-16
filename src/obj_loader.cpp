@@ -127,8 +127,8 @@ void load_mtl(const std::string_view &filename,
     materials[current_name] = current_material;
 }
 
-std::shared_ptr<bvh> load_obj(const std::string_view &filename,
-                              material *default_mat, const bool load_mtls) {
+std::shared_ptr<bvh<>> load_obj(const std::string_view &filename,
+                                material *default_mat, const bool load_mtls) {
   hittable_list result;
 
   std::cout << "Loading OBJ file '" << filename << "'" << std::endl;
@@ -240,5 +240,5 @@ std::shared_ptr<bvh> load_obj(const std::string_view &filename,
   std::cout << "  UV Coords: " << uvs.size() - 1 << std::endl;
   std::cout << "  Normals  : " << normals.size() - 1 << std::endl;
 
-  return std::make_shared<bvh>(result, 0.0, 1.0);
+  return std::make_shared<bvh<>>(result, 0.0, 1.0);
 }

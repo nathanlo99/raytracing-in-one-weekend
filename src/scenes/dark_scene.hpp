@@ -79,5 +79,5 @@ inline auto dark_scene() {
       material_manager::create<metal>(colour(0.7, 0.6, 0.5), 0.0);
   world.emplace_back<sphere>(point3(4, 1, 0), 1.0, material3);
 
-  return hittable_list(std::make_shared<bvh>(world, 0.0, 1.0));
+  return hittable_list(std::make_shared<bvh<>>(world, 0.0, 1.0));
 }
