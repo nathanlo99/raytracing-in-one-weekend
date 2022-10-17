@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "transformed_instance.hpp"
+#include "transformed_hittable.hpp"
 #include "util.hpp"
 
 #include "animated_sphere.hpp"

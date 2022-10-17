@@ -87,12 +87,7 @@ inline auto bright_scene() {
   world.emplace_back<sphere>(point3(4, 1, 0), 1.0, material3);
 
   auto list = hittable_list(std::make_shared<bvh<>>(world, 0.0, 1.0));
-
-  const auto skybox_image =
-      std::make_shared<image_texture>("res/hdr_pack/5.hdr");
-  const auto skybox_texture =
-      material_manager::create<diffuse_light>(skybox_image);
-  list.emplace_back<sphere>(point3(0, 0, 0), 9000, skybox_texture);
+  list.add_background_map("res/hdr_pack/5.hdr");
 
   // Camera
   const point3 lookfrom(13, 2, 3);

@@ -12,7 +12,7 @@
 #include "material_manager.hpp"
 #include "obj_loader.hpp"
 #include "sphere.hpp"
-#include "transformed_instance.hpp"
+#include "transformed_hittable.hpp"
 #include "triangle.hpp"
 
 #include "scene.hpp"

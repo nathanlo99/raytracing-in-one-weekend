@@ -54,7 +54,7 @@ struct aabb {
 
   constexpr aabb apply(const mat4 &trans) const {
     vec3 new_min(inf), new_max(-inf);
-    for (const vec3 corner : corners()) {
+    for (const vec3 &corner : corners()) {
       const vec3 transformed_corner = trans * vec4(corner, 1.0);
       new_min = glm::min(new_min, transformed_corner);
       new_max = glm::max(new_max, transformed_corner);

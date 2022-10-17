@@ -56,10 +56,10 @@ struct bvh : public hittable {
 
 public:
   bvh(const hittable_list &lst, const real time0, const real time1,
-      const size_t max_nodes_per_leaf = 16)
+      const size_t max_nodes_per_leaf = 8)
       : bvh(lst.m_objects, time0, time1, max_nodes_per_leaf) {}
   bvh(const std::vector<std::shared_ptr<hittable>> &objects, const real time0,
-      const real time1, const size_t max_nodes_per_leaf = 16);
+      const real time1, const size_t max_nodes_per_leaf);
 
   virtual ~bvh() {}
 
@@ -78,6 +78,8 @@ public:
 
   virtual bool bounding_box(const real time0, const real time1,
                             aabb &output_box) const override {
+    if (m_entries.empty())
+      return false;
     output_box = m_entries[0].bounding_box;
     return true;
   }

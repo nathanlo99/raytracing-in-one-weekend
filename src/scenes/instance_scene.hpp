@@ -12,7 +12,7 @@
 #include "material_manager.hpp"
 #include "obj_loader.hpp"
 #include "sphere.hpp"
-#include "transformed_instance.hpp"
+#include "transformed_hittable.hpp"
 #include "triangle.hpp"
 
 #include "scene.hpp"
@@ -35,7 +35,7 @@ inline auto instance_scene() {
   for (int i = -spread; i <= spread; i += spacing) {
     for (int j = -spread; j <= spread; j += spacing) {
       const real x = i + util::random_real(-0.5, 0.5);
-      const real y = util::random_real(0.0, 0.05);
+      const real y = 0.0;
       const real z = j + util::random_real(-0.5, 0.5);
       const real angle = util::random_real(0.0, 360.0);
       const mat4 m = glm::translate(mat4(1.0), vec3(x, y, z)) *

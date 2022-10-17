@@ -308,10 +308,10 @@ int main() {
   }
 
   if (true) {
-    const auto scene = goose_scene();
+    const auto scene = simple_scene();
     render_debug(scene.objects, scene.cam, scene.cam.m_image_width,
                  scene.cam.m_image_height);
-    render(scene.objects, scene.cam, "build/goose_scene.png",
+    render(scene.objects, scene.cam, "build/simple_scene.png",
            scene.cam.m_image_width, scene.cam.m_image_height, 10000, PER_FRAME);
   }
 }

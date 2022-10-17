@@ -10,7 +10,9 @@
 #include "hittable_list.hpp"
 #include "material.hpp"
 #include "material_manager.hpp"
+#include "obj_loader.hpp"
 #include "sphere.hpp"
+#include "transformed_hittable.hpp"
 #include "triangle.hpp"
 
 #include "scene.hpp"
@@ -29,7 +31,11 @@ inline auto simple_scene() {
 
   const auto glass_material =
       material_manager::create<dielectric>(colour(1.0), 1.52);
-  world.emplace_back<sphere>(point3(0, 1, 0), 1.0, glass_material);
+  const mat4 m =
+      glm::scale(mat4(1.0), vec3(0.06)) *
+      glm::rotate(mat4(1.0), util::degrees_to_radians(-20.0), vec3(0, 1, 0));
+  world.emplace_back<transformed_hittable>(
+      load_obj("res/obj/goose/goose.obj", glass_material, false), m);
 
   const auto egg_material =
       material_manager::create<lambertian>(colour(0.4, 0.2, 0.1));
