@@ -29,8 +29,8 @@ inline auto simple_scene() {
       material_manager::create<lambertian>(colour(0.5, 0.5, 0.5));
   world.emplace_back<sphere>(point3(0, -1000, 0), 1000, ground_material);
 
-  const auto glass_material =
-      material_manager::create<dielectric>(colour(1.0), 1.52);
+  //   const auto glass_material =
+  //       material_manager::create<dielectric>(colour(1.0), 1.52);
   const mat4 m =
       glm::scale(mat4(1.0), vec3(0.06)) *
       glm::rotate(mat4(1.0), util::degrees_to_radians(-20.0), vec3(0, 1, 0));

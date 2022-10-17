@@ -1,10 +1,6 @@
 x cheap instance transformations
 x transition to using matrices instead of ad hoc math
-- improve BVHs
-  x make the resulting data structure contiguous, with siblings sitting close
-    together for locality
-  x add a strategy parameter
-  - implement SAH-heuristic splitting
+x improve BVHs
 - add imgui
 - importance sampling
 - triangle mesh import

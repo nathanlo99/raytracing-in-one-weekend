@@ -66,6 +66,12 @@ struct aabb {
     min = glm::min(min, other.min);
     max = glm::max(max, other.max);
   }
+
+  constexpr real surface_area() const {
+    const vec3 size = max - min;
+    const real x = size.x, y = size.y, z = size.z;
+    return 2.0 * (x * y + x * z + y * z);
+  }
 };
 
 constexpr inline aabb surrounding_box(const aabb &box0, const aabb &box1) {
