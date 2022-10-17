@@ -34,8 +34,8 @@ inline auto simple_scene() {
   const mat4 m =
       glm::scale(mat4(1.0), vec3(0.06)) *
       glm::rotate(mat4(1.0), util::degrees_to_radians(-20.0), vec3(0, 1, 0));
-  world.emplace_back<transformed_hittable>(
-      load_obj("res/obj/goose/goose.obj", glass_material, false), m);
+  world.emplace_back<transformed_hittable>(load_obj("res/obj/goose/goose.obj"),
+                                           m);
 
   const auto egg_material =
       material_manager::create<lambertian>(colour(0.4, 0.2, 0.1));

@@ -5,6 +5,7 @@
 #include "hittable_list.hpp"
 #include "util.hpp"
 
+#include <algorithm>
 #include <stdexcept>
 #include <vector>
 
@@ -73,6 +74,8 @@ public:
 
   virtual bool hit(const ray &r, const real t_min, const real t_max,
                    hit_record &rec) const override {
+    if (m_entries.empty())
+      return false;
     return recursive_hit(r, 0, t_min, t_max, rec);
   }
 
@@ -145,20 +148,25 @@ bvh<HalveLongestAxis>::split(std::vector<bvh_build_data> &data,
                              const size_t start, const size_t end,
                              const aabb &total_bounding_box) const {
   const size_t axis = total_bounding_box.largest_axis();
+  const auto &cmp_to_center = [axis,
+                               total_bounding_box](const bvh_build_data &a) {
+    return a.centroid[axis] < total_bounding_box.centroid()[axis];
+  };
+  const size_t mid =
+      std::partition(data.begin() + start, data.begin() + end, cmp_to_center) -
+      data.begin();
+  if (mid != start && mid != end)
+    return {mid, axis};
+
+  // If the split above was trivial, fall back to splitting into an equal number
+  // of primitives
+  const size_t fallback_mid = start + (end - start) / 2;
   const auto &cmp = [axis](const bvh_build_data &a, const bvh_build_data &b) {
     return a.centroid[axis] < b.centroid[axis];
   };
-  std::sort(data.begin() + start, data.begin() + end, cmp);
-
-  const size_t mid = std::clamp<size_t>(
-      std::lower_bound(data.begin() + start, data.begin() + end,
-                       bvh_build_data{0, aabb(), total_bounding_box.centroid()},
-                       cmp) -
-          data.begin(),
-      start + 1, end - 1);
-
-  std::cout << start << " - " << mid << " - " << end << std::endl;
-  return std::make_pair(mid, axis);
+  std::nth_element(data.begin() + start, data.begin() + fallback_mid,
+                   data.begin() + end, cmp);
+  return {fallback_mid, axis};
 }
 
 template <>
@@ -169,8 +177,9 @@ bvh<EqualParts>::split(std::vector<bvh_build_data> &data, const size_t start,
   const auto &cmp = [axis](const bvh_build_data &a, const bvh_build_data &b) {
     return a.centroid[axis] < b.centroid[axis];
   };
-  std::sort(data.begin() + start, data.begin() + end, cmp);
   const size_t mid = start + (end - start) / 2;
+  std::nth_element(data.begin() + start, data.begin() + mid, data.begin() + end,
+                   cmp);
   return std::make_pair(mid, axis);
 }
 
