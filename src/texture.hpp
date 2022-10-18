@@ -9,7 +9,7 @@ struct texture {
 };
 
 struct solid_colour : public texture {
-  colour m_colour;
+  const colour m_colour;
 
   explicit solid_colour(const colour &c) : m_colour(c) {}
   explicit solid_colour(const real r, const real g, const real b)
@@ -23,11 +23,10 @@ struct solid_colour : public texture {
 };
 
 struct image_texture : public texture {
-  image m_image;
-  std::string m_filename;
+  const image m_image;
 
   explicit image_texture(const std::string_view &filename)
-      : m_image(filename), m_filename(filename) {}
+      : m_image(filename) {}
   virtual ~image_texture() = default;
 
   virtual inline colour value(const real u, const real v,

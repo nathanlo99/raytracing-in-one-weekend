@@ -23,8 +23,7 @@ inline void add_xy_rect(hittable_list &lst, const real x0, const real x1,
                         material *mat) {
   // p0 is the bottom left, proceeding to number counter-clockwise
   const point3 p0(x0, y0, z), p1(x1, y0, z), p2(x1, y1, z), p3(x0, y1, z);
-  lst.emplace_back<triangle>(p0, p1, p2, mat);
-  lst.emplace_back<triangle>(p0, p2, p3, mat);
+  lst.emplace_back<quad>(p0, p1, p3, mat);
 }
 
 inline void add_xz_rect(hittable_list &lst, const real x0, const real x1,
@@ -32,8 +31,7 @@ inline void add_xz_rect(hittable_list &lst, const real x0, const real x1,
                         material *mat) {
   // p0 is the bottom left, proceeding to number counter-clockwise
   const point3 p0(x0, y, z0), p1(x1, y, z0), p2(x1, y, z1), p3(x0, y, z1);
-  lst.emplace_back<triangle>(p0, p1, p2, mat);
-  lst.emplace_back<triangle>(p0, p2, p3, mat);
+  lst.emplace_back<quad>(p0, p1, p3, mat);
 }
 
 inline void add_yz_rect(hittable_list &lst, const real y0, const real y1,
@@ -41,8 +39,7 @@ inline void add_yz_rect(hittable_list &lst, const real y0, const real y1,
                         material *mat) {
   // p0 is the bottom left, proceeding to number counter-clockwise
   const point3 p0(x, y0, z0), p1(x, y1, z0), p2(x, y1, z1), p3(x, y0, z1);
-  lst.emplace_back<triangle>(p0, p1, p2, mat);
-  lst.emplace_back<triangle>(p0, p2, p3, mat);
+  lst.emplace_back<quad>(p0, p1, p3, mat);
 }
 
 inline void add_box(hittable_list &lst, const point3 &min, const point3 &max,

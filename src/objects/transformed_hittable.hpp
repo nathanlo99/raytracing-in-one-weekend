@@ -5,7 +5,7 @@
 #include "util.hpp"
 
 struct transformed_hittable : public hittable {
-  std::shared_ptr<hittable> m_instance;
+  const std::shared_ptr<hittable> m_instance;
   mat4 m_model_matrix = mat4(1.0);
   mat4 m_inv_matrix = mat4(1.0);
   mat4 m_inv_trans_matrix = mat4(1.0);

@@ -54,6 +54,7 @@ struct bvh : public hittable {
   };
 
   std::vector<std::shared_ptr<hittable>> m_primitives;
+  std::vector<aabb> m_bounding_boxes;
   std::vector<bvh_entry> m_entries;
 
 public:
@@ -128,6 +129,7 @@ bvh<strategy>::bvh(const std::vector<std::shared_ptr<hittable>> &objects,
       entry.primitive_start = m_primitives.size();
       for (size_t data_idx = prim_start; data_idx < prim_end; ++data_idx) {
         m_primitives.push_back(objects[data[data_idx].primitive_index]);
+        m_bounding_boxes.push_back(data[data_idx].bounding_box);
       }
       entry.primitive_end = m_primitives.size();
     }
@@ -243,7 +245,6 @@ bvh<SAH>::split(std::vector<bvh_build_data> &data, const size_t start,
   std::nth_element(data.begin() + start, data.begin() + best_mid,
                    data.begin() + end, cmp);
 
-  std::cout << start << " - " << best_mid << " - " << end << std::endl;
   return std::make_pair(best_mid, best_axis);
 }
 
@@ -281,7 +282,7 @@ template <bvh_split_strategy strategy>
 bool bvh<strategy>::recursive_hit(const ray &r, const size_t idx,
                                   const real t_min, const real t_max,
                                   hit_record &rec) const {
-  const bvh_entry entry = m_entries[idx];
+  const bvh_entry &entry = m_entries[idx];
   if (!entry.bounding_box.does_hit(r, t_min, t_max))
     return false;
 
@@ -292,6 +293,9 @@ bool bvh<strategy>::recursive_hit(const ray &r, const size_t idx,
     float closest_so_far = t_max;
     for (size_t prim_idx = prim_start; prim_idx < prim_end; ++prim_idx) {
       const std::shared_ptr<hittable> &object = m_primitives[prim_idx];
+      const aabb &box = m_bounding_boxes[prim_idx];
+      if (!box.does_hit(r, t_min, closest_so_far))
+        continue;
       if (object->hit(r, t_min, closest_so_far, rec)) {
         hit_anything = true;
         closest_so_far = rec.t;

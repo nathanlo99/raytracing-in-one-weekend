@@ -11,18 +11,17 @@ struct aabb {
   constexpr aabb(const point3 &min, const point3 &max) : min(min), max(max) {}
   constexpr aabb() : min(inf), max(-inf) {}
 
-  constexpr inline bool does_hit(const ray &r, real t_min, real t_max) const {
-    for (int a = 0; a < 3; a++) {
-      real t0 = (min[a] - r.orig[a]) / r.dir[a];
-      real t1 = (max[a] - r.orig[a]) / r.dir[a];
-      if (r.dir[a] < 0.0f)
-        std::swap(t0, t1);
-      t_min = std::max(t0, t_min);
-      t_max = std::min(t1, t_max);
-      if (t_max <= t_min)
-        return false;
-    }
-    return t_max > t_min;
+  constexpr inline bool does_hit(const ray &r, const real t_min,
+                                 const real t_max) const {
+    const vec3 ray_hit_min = (min - r.orig) / r.dir,
+               ray_hit_max = (max - r.orig) / r.dir;
+    const vec3 left_endpoints = glm::min(ray_hit_max, ray_hit_min);
+    const vec3 right_endpoints = ray_hit_min + ray_hit_max - left_endpoints;
+    const real left = std::max(std::max(left_endpoints.x, left_endpoints.y),
+                               std::max(left_endpoints.z, t_min));
+    const real right = std::min(std::min(right_endpoints.x, right_endpoints.y),
+                                std::min(right_endpoints.z, t_max));
+    return right > left;
   }
 
   constexpr size_t largest_axis() const {
@@ -30,16 +29,17 @@ struct aabb {
     return util::largest_axis(max - min);
   }
 
-  constexpr inline real hit(const ray &r, real t_min, real t_max) const {
-    for (int a = 0; a < 3; a++) {
-      real t0 = (min[a] - r.orig[a]) / r.dir[a];
-      real t1 = (max[a] - r.orig[a]) / r.dir[a];
-      if (r.dir[a] < 0.0f)
-        std::swap(t0, t1);
-      t_min = std::max(t0, t_min);
-      t_max = std::min(t1, t_max);
-    }
-    return (t_max > t_min) ? t_min : inf;
+  constexpr inline real hit(const ray &r, const real t_min,
+                            const real t_max) const {
+    const vec3 ray_hit_min = (min - r.orig) / r.dir,
+               ray_hit_max = (max - r.orig) / r.dir;
+    const vec3 left_endpoints = glm::min(ray_hit_min, ray_hit_max);
+    const vec3 right_endpoints = ray_hit_min + ray_hit_max - left_endpoints;
+    const real left = std::max(std::max(left_endpoints.x, left_endpoints.y),
+                               std::max(left_endpoints.z, t_min));
+    const real right = std::min(std::min(right_endpoints.x, right_endpoints.y),
+                                std::min(right_endpoints.z, t_max));
+    return right > left ? left : inf;
   }
 
   constexpr std::array<vec3, 8> corners() const {
@@ -67,10 +67,21 @@ struct aabb {
     max = glm::max(max, other.max);
   }
 
+  constexpr void merge(const point3 &point) {
+    min = glm::min(min, point);
+    max = glm::max(max, point);
+  }
+
   constexpr real surface_area() const {
     const vec3 size = max - min;
     const real x = size.x, y = size.y, z = size.z;
     return 2.0 * (x * y + x * z + y * z);
+  }
+
+  constexpr void expand(const real amt) {
+    const vec3 diff = vec3(amt);
+    min -= diff;
+    max += diff;
   }
 };
 

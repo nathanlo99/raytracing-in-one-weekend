@@ -17,26 +17,27 @@ struct image {
   image(const int width, const int height)
       : m_width(width), m_height(height), m_pixels(width * height) {}
 
-  inline colour get(const int row, const int col) const {
+  constexpr inline colour get(const int row, const int col) const {
     // Take row mod height and col mod width to wrap the texture on overflow
     const size_t idx = (row % m_height) * m_width + (col % m_width);
     return m_pixels[idx];
   }
 
-  inline colour get_floored(real u, real v) const {
+  constexpr inline colour get_floored(const real u, const real v) const {
     if (m_pixels.empty()) {
       // Return magenta to identify loading errors more easily
       return colour(1.0, 0.0, 1.0);
     }
 
-    u = std::clamp<real>(u, 0.0, 1.0) * m_width;
-    v = (1.0 - std::clamp<real>(v, 0.0, 1.0)) * m_height;
+    const real scaled_u = std::clamp<real>(u, 0.0, 1.0) * m_width;
+    const real scaled_v = (1.0 - std::clamp<real>(v, 0.0, 1.0)) * m_height;
 
-    return get(static_cast<int>(v), static_cast<int>(u));
+    // v becomes the row, u is the column
+    return get(static_cast<int>(scaled_v), static_cast<int>(scaled_u));
   }
 
   // Bilinear interpolation
-  inline colour get_interpolated(const real u, const real v) const {
+  constexpr inline colour get_interpolated(const real u, const real v) const {
     if (m_pixels.empty())
       return colour(1.0, 0.0, 1.0);
 
@@ -55,7 +56,7 @@ struct image {
            (1 - frac_u) * (1 - frac_v) * get(floor_v + 1, floor_u + 1);
   }
 
-  inline void set(const int row, const int col, const colour &c) {
+  constexpr inline void set(const int row, const int col, const colour &c) {
     const size_t idx = row * m_width + col;
     m_pixels[idx] = c;
   }
