@@ -5,7 +5,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # set the project name
 project(raytracer)
-include_directories(raytracer PUBLIC src include)
+include_directories(raytracer PUBLIC src thirdparty/stb)
 
 find_package(OpenMP REQUIRED)
 
