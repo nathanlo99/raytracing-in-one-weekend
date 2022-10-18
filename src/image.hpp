@@ -7,6 +7,9 @@
 #include <string>
 #include <vector>
 
+#include <GL/glew.h>
+#include <SDL2/SDL.h>
+
 struct image {
   int m_width, m_height;
   std::vector<colour> m_pixels;
@@ -47,8 +50,8 @@ struct image {
     real floor_ud = 0.0, floor_vd = 0.0;
     const real frac_u = modf(scaled_u, &floor_ud),
                frac_v = modf(scaled_v, &floor_vd);
-    const int floor_u = static_cast<int>(floor_ud);
-    const int floor_v = static_cast<int>(floor_vd);
+    const int floor_u = floor_ud;
+    const int floor_v = floor_vd;
 
     return frac_u * frac_v * get(floor_v, floor_u) +
            (1 - frac_u) * frac_v * get(floor_v, floor_u + 1) +
@@ -61,5 +64,9 @@ struct image {
     m_pixels[idx] = c;
   }
 
-  void write_png(const std::string_view &filename);
+  std::vector<unsigned char> gamma_corrected_bytes() const;
+
+  void write_png(const std::string_view &filename) const;
+
+  void draw_to_screen_texture() const;
 };

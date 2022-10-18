@@ -17,16 +17,8 @@
 __attribute__((hot)) inline colour
 ray_colour(const ray &r, const hittable &world, const int depth,
            const colour &contribution = colour(1.0)) {
-  if (depth <= 0 || glm::length(contribution) < 1e-12) {
-    // static std::atomic<int> early_exits = 0;
-    // static int last_update = 0;
-    // early_exits += depth;
-    // if (early_exits >= last_update + 1000000) {
-    //   last_update = early_exits;
-    //   std::cout << early_exits << " early exits" << std::endl;
-    // }
+  if (depth <= 0 || glm::length(contribution) < 1e-12)
     return colour(0.0);
-  }
 
   hit_record rec;
   if (!world.hit(r, eps, inf, rec))
@@ -57,6 +49,7 @@ inline colour normal_to_colour(const vec3 &normal) {
 
 inline void render_debug(const hittable_list &world, const camera &cam,
                          const int image_width, const int image_height) {
+
   image uv_image(image_width, image_height);
   image normals_image(image_width, image_height);
 #pragma omp parallel for
@@ -83,14 +76,16 @@ inline void render_debug(const hittable_list &world, const camera &cam,
   }
 }
 
-inline void render_singlethreaded(const hittable_list &world, const camera &cam,
+inline void render_singlethreaded(std::atomic<bool> &running,
+                                  const hittable_list &world, const camera &cam,
+                                  image &result_image,
                                   const std::string_view &output,
-                                  const int image_width, const int image_height,
                                   const int samples_per_pixel,
                                   const TileProtocol) {
+  const int image_width = result_image.m_width,
+            image_height = result_image.m_height;
   const int max_depth = 100;
 
-  image result_image(image_width, image_height);
   std::vector<long long> debug_times(image_width * image_height, 0);
   long long slowest_pixel = 0;
 
@@ -101,6 +96,8 @@ inline void render_singlethreaded(const hittable_list &world, const camera &cam,
 
 #pragma omp parallel for
   for (int j = 0; j < image_height; ++j) {
+    if (!running)
+      continue;
     for (int i = 0; i < image_width; ++i) {
       const auto pixel_start_ns = util::get_time_ns();
       colour pixel_colour(0.0);
@@ -161,10 +158,13 @@ inline void render_singlethreaded(const hittable_list &world, const camera &cam,
   result_image.write_png(output);
 }
 
-inline void render(const hittable_list &world, const camera &cam,
-                   const std::string_view &output, const int image_width,
-                   const int image_height, const int samples_per_pixel,
+inline void render(std::atomic<bool> &running, const hittable_list &world,
+                   const camera &cam, image &result_image,
+                   const std::string_view &output, const int samples_per_pixel,
                    const TileProtocol protocol = PER_TILE) {
+  const int image_width = result_image.m_width,
+            image_height = result_image.m_height;
+
   const int max_threads = 4;
   const int max_depth = 100;
 
@@ -187,7 +187,6 @@ inline void render(const hittable_list &world, const camera &cam,
     int tile_row, tile_col, tile_height, tile_width, sample_idx, tile_weight;
   };
 
-  image result_image(image_width, image_height);
   std::vector<colour> framebuffer(image_width * image_height);
   std::vector<int> weights(image_width * image_height);
   std::mutex image_mutex;
@@ -197,6 +196,8 @@ inline void render(const hittable_list &world, const camera &cam,
   auto compute_tile = [&](const task &tsk) {
     std::vector<colour> tmp_image(image_width * image_height);
     for (int j = tsk.tile_row; j < tsk.tile_row + tsk.tile_height; ++j) {
+      if (!running)
+        break;
       for (int i = tsk.tile_col; i < tsk.tile_col + tsk.tile_width; ++i) {
         colour &pixel_colour = tmp_image[j * image_width + i];
         for (int s = 0; s < tsk.tile_weight; ++s) {
@@ -248,7 +249,7 @@ inline void render(const hittable_list &world, const camera &cam,
   std::vector<std::thread> threads;
   for (int i = 0; i < max_threads; ++i) {
     threads.emplace_back([&]() {
-      while (true) {
+      while (running) {
         const int task_idx = next_task_idx++;
         if (task_idx >= num_tasks)
           break;
