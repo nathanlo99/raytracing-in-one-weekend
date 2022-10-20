@@ -2,6 +2,9 @@ x cheap instance transformations
 x transition to using matrices instead of ad hoc math
 x improve BVHs
 - add imgui
+  x transfer code from dev/render_test
+  - decouple the width and height from the rendering code
+  - write a more reasonable main loop
 - importance sampling
 - triangle mesh import
   x write a triangle hittable class
